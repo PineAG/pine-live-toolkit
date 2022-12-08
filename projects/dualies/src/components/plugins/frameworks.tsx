@@ -47,8 +47,8 @@ export const ScaledFramework = (props: FixedFrameworkProps) => {
     const wrapperStyle: CSSProperties = {
         position: "absolute",
         left: 0, top: 0,
-        width: "100%",
-        height: "100%",
+        width: `${100 / scale}%`,
+        height: `${100 / scale}%`,
         transform: `scale(${scale})`,
         transformOrigin: "left top"
     }
@@ -98,7 +98,12 @@ export const ResizableFramework = (props: ResizableFrameworkProps) => {
     }, [props.rect, scale])
     function setRectValidated(rect: Rect) {
         if(isValidRect(rect, parentSize, scale)) {
-            setRect(rect)
+            setRect({
+                width: rect.width * scale,
+                height: rect.height * scale,
+                x: rect.x * scale,
+                y: rect.y * scale,
+            })
         }
     }
     function updateRectValidated(rect: DOMRect) {

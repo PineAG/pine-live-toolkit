@@ -1,6 +1,6 @@
 import { ButtonGroup, IconButton } from "@mui/material"
 import { ReactNode, useState, CSSProperties, useContext } from "react"
-import { EditableStateContext, PluginStoreContext, useNotNullContext } from "../context"
+import { EditableStateContext, PanelSizeContext, PluginStoreContext, useNotNullContext } from "../context"
 import { EditableState } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"
 import {
@@ -9,21 +9,32 @@ import {
     DeleteForever as DeleteIcon,
     Done as DoneIcon
 } from "@mui/icons-material"
+import { Rect, Size } from "../../store"
 
 export type EditableBodyRenderer = {
     [K in EditableState]: () => ReactNode
 }
 
-const styleEditableSwitch: CSSProperties = {
-    position: 'absolute',
-    right: 0,
-    bottom: 0
+function getEditableSwitchStyle(pluginSize: Rect, panelSize: Size): CSSProperties {
+    const pluginCenterX = pluginSize.x + pluginSize.width / 2
+    const pluginCenterY = pluginSize.y + pluginSize.height / 2
+    const panelCenterX = panelSize.width / 2
+    const panelCenterY = panelSize.height / 2
+    const left = pluginCenterX < panelCenterX
+    const top = pluginCenterY < panelCenterY
+    const style: CSSProperties = {position: "absolute"}
+    style[left ? "right" : "left"] = 0
+    style[top ? "bottom" : "top"] = 0
+    return style
 }
 
 export const EditableSwitch = () => {
     const {state, setState} = useContext(EditableStateContext);
+    const panelSize = useContext(PanelSizeContext)
+    const {size: pluginRect} = useNotNullContext(PluginStoreContext)
+    const style = getEditableSwitchStyle(pluginRect, panelSize)
     if(state === EditableState.Preview) {
-        return <ButtonGroup style={styleEditableSwitch}>
+        return <ButtonGroup style={style}>
             <IconButton size="small">
                 <DeleteIcon/>
             </IconButton>
@@ -35,7 +46,7 @@ export const EditableSwitch = () => {
             </IconButton>
         </ButtonGroup>
     } else {
-        return <ButtonGroup style={styleEditableSwitch}>
+        return <ButtonGroup style={style}>
             <IconButton size="small" onClick={() => setState(EditableState.Preview)}>
                 <DoneIcon/>
             </IconButton>

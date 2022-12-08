@@ -4,6 +4,7 @@ import { KeepRatio } from "../components/panels/KeepRatio"
 import { EditablePlugin } from "../components/plugins"
 import { usePanel } from "../store"
 import { usePanelId } from "./utils"
+import "./Panel.css"
 
 export const PanelPage = () => {
     const panelId = usePanelId()
@@ -11,16 +12,20 @@ export const PanelPage = () => {
     if(!panel){
         return <Loading/>
     }
-    return <KeepRatio internalSize={panel.size}>
-        <TransparentBackground/>
-        <>
-        {panel.pluginsList.map(pluginId => (
-            <EditablePlugin
-                key={pluginId}
-                panelId={panelId}
-                pluginId={pluginId}
-            />
-        ))}
-        </>
-    </KeepRatio>
+    return <div className="route-panel-root">
+        <div className="route-panel-body">
+            <KeepRatio internalSize={panel.size}>
+                <TransparentBackground/>
+                <>
+                {panel.pluginsList.map(pluginId => (
+                    <EditablePlugin
+                        key={pluginId}
+                        panelId={panelId}
+                        pluginId={pluginId}
+                    />
+                ))}
+                </>
+            </KeepRatio>
+        </div>
+    </div>
 }

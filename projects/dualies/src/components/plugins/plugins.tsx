@@ -1,11 +1,9 @@
-import {useContext, createContext} from "react"
 import { enabledPlugins } from "../../plugins"
-import { Rect, usePlugin } from "../../store"
-import { PanelSizeContext, PluginStoreContext, EditableStateContext, useStateManager } from "../context"
+import { usePlugin } from "../../store"
+import { EditableStateContext, PluginStoreContext, useStateManager } from "../context"
 import Loading from "../Loading"
 import { EditableState } from "./base"
-import { EditableBody, EditableBodyRenderer } from "./editable"
-import { ResizableFramework } from "./frameworks"
+import { EditableBody } from "./editable"
 
 export interface ComponentProps {
     panelId: number

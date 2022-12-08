@@ -1,10 +1,9 @@
-import {useState, useEffect, CSSProperties} from "react"
-import { Plugin } from "./base"
+import {useState, useEffect, useRef} from "react"
+import { Plugin, usePluginSize } from "./base"
 import moment from "moment"
 
 interface ClockConfig {
     format: string
-    fontSize: number
     color: string
 }
 
@@ -26,8 +25,18 @@ interface ClockProps {
 }
 
 const Clock = (props: ClockProps) => {
+    const ref = useRef<HTMLDivElement>(null)
     const date = useDate(props.config.format)
-    return <div style={{fontSize: props.config.fontSize, color: props.config.color}}>
+    const [fontSize, setFontSize] = useState<number>(100)
+    useEffect(() => {
+        setFontSize(ref.current?.clientHeight ?? 100)
+    }, [ref.current?.clientHeight])
+    return <div ref={ref} style={{
+            width: "100%",
+            height: "100%",
+            fontSize: fontSize * 0.8, 
+            color: props.config.color
+        }}>
         {date}
     </div>
 }
@@ -41,7 +50,6 @@ const ClockPlugin: Plugin<ClockConfig> = {
     initialize: {
         defaultConfig: () => ({
             format: "HH:mm",
-            fontSize: 150,
             color: "white"
         }),
         defaultSize: () => ({width: 300, height: 200})

@@ -1,4 +1,5 @@
-import { ReactNode } from "react"
+import { ReactNode, useContext } from "react"
+import { PluginStoreContext } from "../components/context"
 import { EditableState } from "../components/plugins/base"
 import { Rect, Size } from "../store"
 
@@ -15,4 +16,12 @@ export interface Plugin<Config> {
         defaultConfig(): Config
     }
     render: Renderer<Config>
+}
+
+export function usePluginSize(): Rect {
+    const context = useContext(PluginStoreContext)
+    if(context === null) {
+        throw new Error("Invalid state")
+    }
+    return context.size
 }

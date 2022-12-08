@@ -1,0 +1,17 @@
+.route-panel-root {
+    position: absolute;
+    width: 100vw; height: 100vh;
+    margin: 0;
+    left: 0; top: 0;
+}
+
+.route-panel-header {
+}
+
+.route-panel-body {
+    position: absolute;
+    width: calc(100% - 100px); height: calc(100% - 100px);
+    left: 50px; right: 50px;
+    top: 100px;
+    bottom: 50px;
+}
