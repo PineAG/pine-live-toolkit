@@ -2,7 +2,7 @@ import {CSSProperties} from "react"
 import * as rnd from "react-rnd"
 import {useContext, useState, useEffect} from "react"
 import { Position, Rect, Size } from "../../store"
-import { PanelSizeContext } from "../context"
+import { PanelElementSizeContext, PanelSizeContext } from "../context"
 
 const editableFrameworkStyles: rnd.Props["style"] = {
     borderStyle: "solid", 
@@ -93,20 +93,25 @@ function isValidRect({x, y, width, height}: Rect, parentSize: Size, scale: numbe
 export const ResizableFramework = (props: ResizableFrameworkProps) => {
     const {scale, ...parentSize} = useContext(PanelSizeContext)
     const [rect, setRect] = useState<Rect>({x: 0, y: 0, width: 1, height: 1})
+    const containerSize = useContext(PanelElementSizeContext)
     useEffect(() => {
         setRect(rescaleRect(props.rect, scale))
     }, [props.rect, scale])
     function setRectValidated(rect: Rect) {
+        rect.x -= containerSize.x
+        rect.y -= containerSize.y
         if(isValidRect(rect, parentSize, scale)) {
             setRect({
-                width: rect.width * scale,
-                height: rect.height * scale,
-                x: rect.x * scale,
-                y: rect.y * scale,
+                width: rect.width,
+                height: rect.height,
+                x: rect.x,
+                y: rect.y,
             })
         }
     }
     function updateRectValidated(rect: DOMRect) {
+        rect.x -= containerSize.x
+        rect.y -= containerSize.y
         if(isValidRect(rect, parentSize, scale)) {
             props.onSizeChanged(retrieveRectFromDom(rect, scale))
         }

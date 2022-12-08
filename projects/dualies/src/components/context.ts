@@ -1,5 +1,5 @@
 import { createContext, Context, useContext, useState } from "react";
-import { PluginInfo } from "../store";
+import { PluginInfo, Rect } from "../store";
 import { EditableState } from "./plugins/base";
 
 export interface PanelSize {
@@ -9,6 +9,7 @@ export interface PanelSize {
 }
 
 export const PanelSizeContext = createContext<PanelSize>({scale: 1, width: 1920, height: 1080})
+export const PanelElementSizeContext = createContext<Rect>({x: 0, y: 0, width: 1, height: 1})
 
 export const PluginStoreContext = createContext<PluginInfo | null>(null)
 
