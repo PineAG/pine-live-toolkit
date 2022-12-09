@@ -1,5 +1,4 @@
 import Loading from "../components/Loading"
-import { AutoScale } from "../components/panels/AutoScale"
 import { PreviewPlugin } from "../components/plugins"
 import { usePanel } from "../store"
 import { usePanelId } from "./utils"
@@ -10,7 +9,7 @@ export const PanelExhibitionPage = () => {
     if(panel === null){
         return <Loading/>
     }
-    return <AutoScale internalSize={panel.size}>
+    return <div style={panel.size}>
         {panel.pluginsList.map(pluginId => (
             <PreviewPlugin
                 key={pluginId}
@@ -18,5 +17,5 @@ export const PanelExhibitionPage = () => {
                 pluginId={pluginId}
             />
         ))}
-    </AutoScale>
+    </div>
 }
