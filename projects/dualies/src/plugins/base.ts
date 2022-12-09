@@ -10,11 +10,13 @@ interface Renderer<Config> {
 }
 
 export interface Plugin<Config> {
+    title: string
     type: string
     initialize: {
         defaultSize(): Size
         defaultConfig(): Config
     }
+    onDestroy?: (config: Config) => void | Promise<void>
     render: Renderer<Config>
 }
 

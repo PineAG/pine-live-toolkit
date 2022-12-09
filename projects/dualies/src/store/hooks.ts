@@ -1,7 +1,7 @@
 import { SubscriptionManager } from "@dualies/client";
 import { useState, useEffect } from "react";
 import { enabledPlugins } from "../plugins";
-import { error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size } from "./client";
+import { error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size, FileClient } from "./client";
 
 function useAsyncSubscription(starter: () => Promise<SubscriptionManager>, deps: any[]) {
     const [subscription, setSubscription] = useState<null | SubscriptionManager>(null)
@@ -127,6 +127,8 @@ export interface PluginInfo {
     size: Rect
     config: any
     resize(size: Rect): Promise<void>
+    delete(): Promise<void>
+    setConfig: (config: any) => Promise<void>
 }
 
 export function usePlugin(panelId: number, pluginId: number): PluginInfo | null {
@@ -164,9 +166,40 @@ export function usePlugin(panelId: number, pluginId: number): PluginInfo | null 
     if(meta === null || size === null || config === null){
         return null
     }
+    const pluginTemplate = enabledPlugins[meta.pluginType]
     return {
         meta, size, 
-        config: config ?? enabledPlugins[meta.pluginType].initialize.defaultConfig(),
-        resize: (size) => client.resize(size)
+        config: config ?? pluginTemplate.initialize.defaultConfig(),
+        resize: (size) => client.resize(size),
+        setConfig: (c) => client.setConfig(c),
+        delete: async () => {
+            await client.delete()
+            if(pluginTemplate.onDestroy) {
+                await pluginTemplate.onDestroy(config)
+            } 
+        }
     }
 }
+
+export function useFileId(fileId: string | null): string | null {
+    return fileId === null ? null : `/api/files/${fileId}`
+}
+
+// export function useFileId(fileId: string | null): string | null {
+//     const [url, setURL] = useState<string | null>(null)
+//     useEffect(() => {
+//         if(fileId === null) {
+//             return
+//         }
+//         const client = new FileClient()
+//         const promise = client.downloadAsObjectURL(fileId)
+//         promise.then(setURL)
+//         return () => {
+//             promise.then(url => URL.revokeObjectURL(url))
+//         }
+//     }, [fileId])
+//     if(fileId === null) {
+//         return null;
+//     }
+//     return url
+// }

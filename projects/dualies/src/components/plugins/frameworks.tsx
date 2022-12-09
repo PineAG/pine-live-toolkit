@@ -10,27 +10,40 @@ const editableFrameworkStyles: rnd.Props["style"] = {
     borderColor: "black"
 }
 
-export interface FixedFrameworkProps {
+export interface FrameworkProps {
     rect: Rect
     children: React.ReactNode | React.ReactNode[]
     attachments?: React.ReactElement | React.ReactElement[]
 }
 
-export const FixedFramework = (props: FixedFrameworkProps) => {
+export const PreviewFramework = (props: FrameworkProps) => {
+    const {scale} = useContext(PanelSizeContext)
     const {x, y, width, height} = props.rect
     const style: CSSProperties = {
-        left: x,
-        top: y,
-        width: width,
-        height: height,
-        position: "absolute"
+        left: x * scale,
+        top: y * scale,
+        width: width * scale,
+        height: height * scale,
+        position: "absolute",
+        overflow: "hidden"
+    }
+    const wrapperStyle: CSSProperties = {
+        position: "absolute",
+        left: 0, top: 0,
+        width: `${100 / scale}%`,
+        height: `${100 / scale}%`,
+        transform: `scale(${scale})`,
+        transformOrigin: "left top"
     }
     return <div style={style}>
-        {props.children}
+        <div style={wrapperStyle}>
+            {props.children}
+        </div>
+        {props.attachments}
     </div>
 }
 
-export const ScaledFramework = (props: FixedFrameworkProps) => {
+export const ScaledFramework = (props: FrameworkProps) => {
     const {scale} = useContext(PanelSizeContext)
     const {x, y, width, height} = props.rect
     const style: CSSProperties = {
@@ -60,7 +73,7 @@ export const ScaledFramework = (props: FixedFrameworkProps) => {
     </div>
 }
 
-export interface ResizableFrameworkProps extends FixedFrameworkProps {
+export interface ResizableFrameworkProps extends FrameworkProps {
     onSizeChanged: (size: Rect) => void
 }
 

@@ -1,12 +1,14 @@
 import {Plugin} from "./base"
 import ClockPlugin from "./Clock"
+import ImageViewerPlugin from "./ImageViewer"
 
-const plugins: Plugin<any>[] = [
+export const enabledPluginsList: Plugin<any>[] = [
     ClockPlugin,
+    ImageViewerPlugin,
 ]
 
 export const enabledPlugins: {[key: string]: Plugin<any>} = {}
 
-for(const p of plugins) {
+for(const p of enabledPluginsList) {
     enabledPlugins[p.type] = p
 }

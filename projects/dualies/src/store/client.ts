@@ -153,6 +153,7 @@ export class PanelClient {
         const panelList = (await this.api.panelsList().get())?.filter(id => id !== this.panelId) ?? []
 
         const pluginList = await this.api.pluginsList(this.panelId).get() ?? []
+        await this.api.panelsList().set(panelList)
         for(const pluginId of pluginList){
             await new PluginClient(this.panelId, pluginId).delete()
         }
@@ -160,8 +161,6 @@ export class PanelClient {
         await this.api.pluginsList(this.panelId).delete()
         await this.api.panelMeta(this.panelId).delete()
         await this.api.panelSize(this.panelId).delete()
-
-        await this.api.panelsList().set(panelList)
     }
 
     async subscribeMeta(callback: Callback): Promise<SubscriptionManager> {
@@ -193,6 +192,10 @@ export class PluginClient {
         return config ?? error("Plugin not exists")
     }
 
+    async setConfig(config: any): Promise<any> {
+        await this.api.pluginConfig(this.panelId, this.pluginId).set(config)
+    }
+
     async configOrNull(): Promise<{} | null> {
         const config = await this.api.pluginConfig<any>(this.panelId, this.pluginId).get()
         return config ?? null
@@ -209,10 +212,10 @@ export class PluginClient {
 
     async delete() {
         const pluginList = (await this.api.pluginsList(this.panelId).get()) ?? []
+        await this.api.pluginsList(this.panelId).set(pluginList.filter(id => id !== this.pluginId))
         await this.api.pluginMeta(this.panelId, this.pluginId).delete()
         await this.api.pluginRect(this.panelId, this.pluginId).delete()
         await this.api.pluginConfig(this.panelId, this.pluginId).delete()
-        await this.api.pluginsList(this.panelId).set(pluginList.filter(id => id !== this.pluginId))
     }
 
     async subscribeMeta(callback: Callback): Promise<SubscriptionManager> {
@@ -225,5 +228,23 @@ export class PluginClient {
 
     async subscribeConfig<T>(callback: Callback): Promise<SubscriptionManager> {
         return this.api.pluginConfig<T>(this.panelId, this.pluginId).subscribe(callback)
+    }
+}
+
+export class FileClient {
+    private client = new DualiesClient({
+        path: "/api"
+    })
+
+    async upload(data: Blob | Uint8Array | string): Promise<string> {
+        if(data instanceof Uint8Array) {
+            data = new Blob([data])
+        }
+        const fileId = await this.client.files().create(data)
+        return fileId
+    }
+
+    async downloadAsObjectURL(fileId: string): Promise<string> {
+        return await this.client.files().readAsObjectURL(fileId)
     }
 }

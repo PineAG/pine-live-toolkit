@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from "react"
-import { Plugin, usePluginSize } from "./base"
+import { Plugin } from "./base"
 import moment from "moment"
 
 interface ClockConfig {
@@ -46,13 +46,14 @@ const ClockConfiguration = () => {
 }
 
 const ClockPlugin: Plugin<ClockConfig> = {
+    title: "时钟",
     type: "builtin.clock",
     initialize: {
         defaultConfig: () => ({
             format: "HH:mm",
             color: "white"
         }),
-        defaultSize: () => ({width: 300, height: 200})
+        defaultSize: () => ({width: 500, height: 200})
     },
     render: {
         preview: (conf) => <Clock config={conf}/>,

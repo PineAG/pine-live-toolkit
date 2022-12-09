@@ -1,6 +1,6 @@
-import { ButtonGroup, IconButton } from "@mui/material"
+import { ButtonGroup, Dialog, DialogTitle, IconButton, DialogContent, DialogActions, Button, DialogContentText } from "@mui/material"
 import { ReactNode, useState, CSSProperties, useContext } from "react"
-import { EditableStateContext, PanelSizeContext, PluginStoreContext, useNotNullContext } from "../context"
+import { EditableStateContext, PanelSizeContext, PanelStoreContext, PluginStoreContext, useNotNullContext } from "../context"
 import { EditableState } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"
 import {
@@ -9,7 +9,8 @@ import {
     DeleteForever as DeleteIcon,
     Done as DoneIcon
 } from "@mui/icons-material"
-import { Rect, Size } from "../../store"
+import { PluginClient, Rect, Size } from "../../store"
+import { enabledPlugins } from "../../plugins"
 
 export type EditableBodyRenderer = {
     [K in EditableState]: () => ReactNode
@@ -29,22 +30,59 @@ function getEditableSwitchStyle(pluginSize: Rect, panelSize: Size): CSSPropertie
 }
 
 export const EditableSwitch = () => {
+    const plugin = useNotNullContext(PluginStoreContext)
     const {state, setState} = useContext(EditableStateContext);
     const panelSize = useContext(PanelSizeContext)
     const {size: pluginRect} = useNotNullContext(PluginStoreContext)
     const style = getEditableSwitchStyle(pluginRect, panelSize)
+    const [onDelete, setOnDelete] = useState(false)
+    const [onEditConfig, setOnEditConfig] = useState<any | null>(null)
+
+    const pluginTemplate = enabledPlugins[plugin.meta.pluginType]
+
     if(state === EditableState.Preview) {
-        return <ButtonGroup style={style}>
-            <IconButton size="small">
+        return <>
+        <ButtonGroup style={style}>
+            <IconButton onClick={() => setOnDelete(true)} size="small">
                 <DeleteIcon/>
             </IconButton>
-            <IconButton size="small">
+            <IconButton onClick={() => setOnEditConfig(plugin.config)} size="small">
                 <EditIcon/>
             </IconButton>
             <IconButton size="small" onClick={() => setState(EditableState.Move)}>
                 <MoveIcon/>
             </IconButton>
         </ButtonGroup>
+        <Dialog open={onDelete} onClose={() => setOnDelete(false)}>
+            <DialogTitle>删除组件</DialogTitle>
+            <DialogContentText>
+                确认要删除组件吗？
+            </DialogContentText>
+            <DialogActions>
+                <Button onClick={() => setOnDelete(false)}>取消</Button>
+                <Button onClick={async () => {
+                    await plugin.delete()
+                    setOnDelete(false)
+                }}>删除组件</Button>
+            </DialogActions>
+        </Dialog>
+
+        <Dialog fullWidth open={onEditConfig !== null} onClose={() => setOnEditConfig(null)}>
+            <DialogTitle>设置组件 {pluginTemplate.title}</DialogTitle>
+            <DialogContent>
+                {onEditConfig && pluginTemplate.render.config(onEditConfig, (newConfig) => setOnEditConfig(newConfig))}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOnEditConfig(null)}>取消</Button>
+                <Button onClick={async () => {
+                    if(onEditConfig !== null) {
+                        await plugin.setConfig(onEditConfig)
+                    }
+                    setOnEditConfig(null)
+                }}>保存</Button>
+            </DialogActions>
+        </Dialog>
+        </>
     } else {
         return <ButtonGroup style={style}>
             <IconButton size="small" onClick={() => setState(EditableState.Preview)}>

@@ -4,6 +4,7 @@ import { EditableStateContext, PluginStoreContext, useStateManager } from "../co
 import Loading from "../Loading"
 import { EditableState } from "./base"
 import { EditableBody } from "./editable"
+import { PreviewFramework } from "./frameworks"
 
 export interface ComponentProps {
     panelId: number
@@ -32,5 +33,17 @@ export const EditablePlugin = (props: ComponentProps) => {
 }
 
 export const PreviewPlugin = (props: ComponentProps) => {
-
+    const store = usePlugin(props.panelId, props.pluginId)
+    if(store === null){
+        return <Loading/>
+    }
+    const plugin = enabledPlugins[store.meta.pluginType]
+    if(!plugin) {
+        return <div>`Unsupported plugin: ${store.meta.pluginType}`</div>
+    }
+    return <PluginStoreContext.Provider value={store}>
+        <PreviewFramework rect={store.size}>
+            {plugin.render.preview(store.config)}
+        </PreviewFramework>
+    </PluginStoreContext.Provider>
 }
