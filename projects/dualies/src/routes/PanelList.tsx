@@ -55,7 +55,7 @@ export const PanelListPage = () => {
             </ListButton>
         ))}
     </Grid>
-    <Dialog open={newPanel !== null} onClose={() => setNewPanel(null)}>
+    <Dialog fullWidth open={newPanel !== null} onClose={() => setNewPanel(null)}>
         <DialogTitle>新建界面</DialogTitle>
         <DialogContent>
             <Grid container>

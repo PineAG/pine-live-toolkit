@@ -1,9 +1,11 @@
 import {Plugin} from "./base"
 import ClockPlugin from "./Clock"
 import ImageViewerPlugin from "./ImageViewer"
+import TextPlugin from "./Text"
 
 export const enabledPluginsList: Plugin<any>[] = [
     ClockPlugin,
+    TextPlugin,
     ImageViewerPlugin,
 ]
 

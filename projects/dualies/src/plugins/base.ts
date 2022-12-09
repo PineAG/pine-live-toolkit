@@ -27,3 +27,12 @@ export function usePluginSize(): Rect {
     }
     return context.size
 }
+
+export interface PropsWithConfig<Config> {
+    config: Config
+}
+
+export interface PropsWithSetConfig<Config> {
+    config: Config
+    setConfig: (c: Config) => void
+}

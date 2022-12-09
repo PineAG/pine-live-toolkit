@@ -1,10 +1,12 @@
 import {useState, useEffect, useRef} from "react"
-import { Plugin } from "./base"
+import { Plugin, PropsWithSetConfig } from "./base"
 import moment from "moment"
+import { Grid, Stack, TextField } from "@mui/material"
+import { TextStylePicker, getDefaultFontFamily, TextStyle, convertTextStyleToCSS } from "./utils"
 
 interface ClockConfig {
     format: string
-    color: string
+    textStyle: TextStyle
 }
 
 function getCurrentTimeOnFormat(format: string) {
@@ -35,14 +37,38 @@ const Clock = (props: ClockProps) => {
             width: "100%",
             height: "100%",
             fontSize: fontSize * 0.8, 
-            color: props.config.color
+            ...convertTextStyleToCSS(props.config.textStyle)
         }}>
         {date}
     </div>
 }
 
-const ClockConfiguration = () => {
-    return <div/>
+const ClockConfiguration = ({config, setConfig}: PropsWithSetConfig<ClockConfig>) => {
+    return <Stack direction="column">
+        <TextField
+            label="时间格式"
+            value={config.format}
+            onChange={evt => setConfig({...config, format: evt.target.value})}
+        />
+        <TextStylePicker
+            value={config.textStyle}
+            onChange={(textStyle) => {
+                setConfig({...config, textStyle})
+            }}
+        />
+        <div style={{height: "100px"}}>
+            <Clock config={config}/>
+        </div>
+    </Stack>
+}
+
+function getDefaultTextStyle(): TextStyle{
+    return {
+        fontFamily: getDefaultFontFamily(),
+        borderColor: "black",
+        borderWidth: 0,
+        textColor: "white",
+    }
 }
 
 const ClockPlugin: Plugin<ClockConfig> = {
@@ -51,14 +77,14 @@ const ClockPlugin: Plugin<ClockConfig> = {
     initialize: {
         defaultConfig: () => ({
             format: "HH:mm",
-            color: "white"
+            textStyle: getDefaultTextStyle()
         }),
         defaultSize: () => ({width: 500, height: 200})
     },
     render: {
         preview: (conf) => <Clock config={conf}/>,
         move: (conf) => <Clock config={conf}/>,
-        config: (config, setConfig) => <ClockConfiguration/>
+        config: (config, setConfig) => <ClockConfiguration {...{config, setConfig}}/>
     }
 }
 

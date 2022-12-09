@@ -53,14 +53,16 @@ export const EditableSwitch = () => {
                 <MoveIcon/>
             </IconButton>
         </ButtonGroup>
-        <Dialog open={onDelete} onClose={() => setOnDelete(false)}>
+        <Dialog open={onDelete} onClose={() => setOnDelete(false)} fullWidth>
             <DialogTitle>删除组件</DialogTitle>
-            <DialogContentText>
-                确认要删除组件吗？
-            </DialogContentText>
+            <DialogContent>
+                <DialogContentText>
+                    确认要删除组件吗？
+                </DialogContentText>
+            </DialogContent>
             <DialogActions>
-                <Button onClick={() => setOnDelete(false)}>取消</Button>
-                <Button onClick={async () => {
+                <Button color="inherit" onClick={() => setOnDelete(false)}>取消</Button>
+                <Button color="error" onClick={async () => {
                     await plugin.delete()
                     setOnDelete(false)
                 }}>删除组件</Button>
@@ -69,12 +71,12 @@ export const EditableSwitch = () => {
 
         <Dialog fullWidth open={onEditConfig !== null} onClose={() => setOnEditConfig(null)}>
             <DialogTitle>设置组件 {pluginTemplate.title}</DialogTitle>
-            <DialogContent>
-                {onEditConfig && pluginTemplate.render.config(onEditConfig, (newConfig) => setOnEditConfig(newConfig))}
+            <DialogContent style={{paddingTop: "20px", paddingBottom: "20px"}}>
+                {onEditConfig && pluginTemplate.render.config(onEditConfig, (newConfig) => {setOnEditConfig(newConfig)})}
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setOnEditConfig(null)}>取消</Button>
-                <Button onClick={async () => {
+                <Button color="inherit" onClick={() => setOnEditConfig(null)}>取消</Button>
+                <Button color="primary" onClick={async () => {
                     if(onEditConfig !== null) {
                         await plugin.setConfig(onEditConfig)
                     }

@@ -7,8 +7,8 @@ import { usePanelId } from "./utils"
 import "./Panel.css"
 import { PanelElementSizeContext, PanelStoreContext } from "../components/context"
 import { useRef, useState } from "react"
-import { Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Select, Typography } from "@mui/material"
-import {Add as AddIcon} from "@mui/icons-material"
+import { Alert, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Select, Snackbar, Typography } from "@mui/material"
+import {Add as AddIcon, Share as ShareIcon} from "@mui/icons-material"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
 
 
@@ -20,6 +20,22 @@ function convertDomRectToRect(rect: DOMRect | undefined): Rect {
     return {width, height, x, y}
 }
 
+function ShareButton() {
+    const [open, setOpen] = useState(false)
+    async function copyLink() {
+        const url = `${window.location.href}/exhibition`
+        await navigator.clipboard.writeText(url)
+        setOpen(true)
+    }
+    return <>
+        <Button startIcon={<ShareIcon/>} onClick={copyLink}>
+            展示页链接
+        </Button>
+        <Snackbar open={open} autoHideDuration={3000} onClose={() => setOpen(false)}>
+            <Alert severity="success">已复制展示页链接</Alert>
+        </Snackbar>
+    </>
+}
 
 
 export const PanelPage = () => {
@@ -37,7 +53,8 @@ export const PanelPage = () => {
             </Grid>
             <Grid xs={6}>
                 <ButtonGroup variant="contained">
-                    <Button startIcon={<AddIcon/>} onClick={() => setNewPluginType(enabledPluginsList[0].type)}>新建组件</Button>
+                    <Button startIcon={<AddIcon/>} onClick={() => setNewPluginType(enabledPluginsList[0].type)}>添加组件</Button>
+                    <ShareButton/>
                 </ButtonGroup>
             </Grid>
         </Grid>
@@ -59,21 +76,26 @@ export const PanelPage = () => {
             </PanelElementSizeContext.Provider>
             </PanelStoreContext.Provider>
         </div>
-        <Dialog open={newPluginType !== null} onClose={() => setNewPluginType(null)}>
-            <DialogTitle>新建组件</DialogTitle>
+        <Dialog fullWidth open={newPluginType !== null} onClose={() => setNewPluginType(null)}>
+            <DialogTitle>添加组件</DialogTitle>
             <DialogContent>
-                <Select
-                    value={newPluginType}
-                    onChange={(evt) => {setNewPluginType(evt.target.value)}}
-                >
-                    {enabledPluginsList.map(plugin => (
-                        <MenuItem value={plugin.type}>{plugin.title}</MenuItem>
-                    ))}
-                </Select>
+                <Grid container>
+                    <Grid xs={12}>
+                    <Select
+                        fullWidth
+                        value={newPluginType}
+                        onChange={(evt) => {setNewPluginType(evt.target.value)}}
+                    >
+                        {enabledPluginsList.map(plugin => (
+                            <MenuItem value={plugin.type}>{plugin.title}</MenuItem>
+                        ))}
+                    </Select>
+                    </Grid>
+                </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setNewPluginType(null)}>取消</Button>
-                <Button onClick={async () => {
+                <Button color="inherit" onClick={() => setNewPluginType(null)}>取消</Button>
+                <Button color="primary" onClick={async () => {
                     if(newPluginType === null) return;
                     const plugin = enabledPlugins[newPluginType]
                     await panel.createPlugin(plugin.type, {x: 0, y: 0, ...plugin.initialize.defaultSize()}, plugin.initialize.defaultConfig())
