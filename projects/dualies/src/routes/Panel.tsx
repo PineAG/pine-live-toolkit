@@ -46,6 +46,23 @@ export const PanelPage = () => {
     if(!panel){
         return <Loading/>
     }
+    console.log(ref.current)
+    const panelBody = ref.current === null ? null : (
+        <PanelElementSizeContext.Provider value={convertDomRectToRect(ref.current?.getBoundingClientRect())}>
+            <KeepRatio internalSize={panel.size}>
+                <TransparentBackground/>
+                <>
+                {panel.pluginsList.map(pluginId => (
+                    <EditablePlugin
+                        key={pluginId}
+                        panelId={panelId}
+                        pluginId={pluginId}
+                    />
+                ))}
+                </>
+            </KeepRatio>
+        </PanelElementSizeContext.Provider>
+    )
     return <div className="route-panel-root">
         <Grid container className="route-panel-header">
             <Grid xs={6}>
@@ -60,20 +77,7 @@ export const PanelPage = () => {
         </Grid>
         <div className="route-panel-body" ref={ref}>
             <PanelStoreContext.Provider value={panel}>
-            <PanelElementSizeContext.Provider value={convertDomRectToRect(ref.current?.getBoundingClientRect())}>
-            <KeepRatio internalSize={panel.size}>
-                <TransparentBackground/>
-                <>
-                {panel.pluginsList.map(pluginId => (
-                    <EditablePlugin
-                        key={pluginId}
-                        panelId={panelId}
-                        pluginId={pluginId}
-                    />
-                ))}
-                </>
-            </KeepRatio>
-            </PanelElementSizeContext.Provider>
+            {panelBody}
             </PanelStoreContext.Provider>
         </div>
         <Dialog fullWidth open={newPluginType !== null} onClose={() => setNewPluginType(null)}>
@@ -87,7 +91,7 @@ export const PanelPage = () => {
                         onChange={(evt) => {setNewPluginType(evt.target.value)}}
                     >
                         {enabledPluginsList.map(plugin => (
-                            <MenuItem value={plugin.type}>{plugin.title}</MenuItem>
+                            <MenuItem key={plugin.type} value={plugin.type}>{plugin.title}</MenuItem>
                         ))}
                     </Select>
                     </Grid>
