@@ -1,0 +1,19 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+      - '8000:80'
+    environment:
+      - DATA_SERVER_HOST=data:3000
+      - FILE_SERVER_HOST=file:8000
+    depends_on:
+      - data
+      - file
+    command: [sh, /docker/start.sh]
+  data:
+    image: pineag/boltbase:master
+    ports:
+      - 3000:3000
+  file:
+    image: pineag/blitzfile:master
