@@ -6,7 +6,7 @@ import { Rect, usePanel } from "../store"
 import { usePanelId } from "./utils"
 import "./Panel.css"
 import { PanelElementSizeContext, PanelStoreContext } from "../components/context"
-import { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Alert, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Select, Snackbar, Typography } from "@mui/material"
 import {Add as AddIcon, Share as ShareIcon} from "@mui/icons-material"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
@@ -43,12 +43,10 @@ export const PanelPage = () => {
     const panel = usePanel(panelId)
     const [newPluginType, setNewPluginType] = useState<string | null>(null)
     const ref = useRef<HTMLDivElement>(null)
-    if(!panel){
-        return <Loading/>
-    }
-    console.log(ref.current)
-    const panelBody = ref.current === null ? null : (
-        <PanelElementSizeContext.Provider value={convertDomRectToRect(ref.current?.getBoundingClientRect())}>
+    const [panelBody, setPanelBody] = useState<React.ReactElement | null>(null)
+    const createPanelBody = (element: HTMLDivElement) => {
+        if(!panel) return null;
+        return <PanelElementSizeContext.Provider value={convertDomRectToRect(element.getBoundingClientRect())}>
             <KeepRatio internalSize={panel.size}>
                 <TransparentBackground/>
                 <>
@@ -62,7 +60,16 @@ export const PanelPage = () => {
                 </>
             </KeepRatio>
         </PanelElementSizeContext.Provider>
-    )
+    }
+    useEffect(() => {
+        if(panel && ref.current) {
+            setPanelBody(createPanelBody(ref.current))
+        }
+    }, [panelId, !!panel, !!ref.current])
+    
+    if(!panel){
+        return <Loading/>
+    }
     return <div className="route-panel-root">
         <Grid container className="route-panel-header">
             <Grid xs={6}>
