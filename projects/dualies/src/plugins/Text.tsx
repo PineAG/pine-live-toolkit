@@ -22,6 +22,7 @@ function TextConfig({config, setConfig}: PropsWithSetConfig<Config>) {
             onChange={textStyle => setConfig({...config, textStyle})}
         />
         <TextField
+            label="字号"
             value={config.fontSize}
             type="number"
             onChange={evt => setConfig({...config, fontSize: parseInt(evt.target.value ?? "1")})}
@@ -58,6 +59,7 @@ export const TextPlugin: Plugin<Config> = {
     render: {
         preview: config => <Text config={config}/>,
         move: config => <Text config={config}/>,
+        edit: config => <Text config={config}/>,
         config: (config, setConfig) => <TextConfig config={config} setConfig={setConfig}/>
     }
 }

@@ -83,6 +83,7 @@ const ClockPlugin: Plugin<ClockConfig> = {
     },
     render: {
         preview: (conf) => <Clock config={conf}/>,
+        edit: (conf) => <Clock config={conf}/>,
         move: (conf) => <Clock config={conf}/>,
         config: (config, setConfig) => <ClockConfiguration {...{config, setConfig}}/>
     }

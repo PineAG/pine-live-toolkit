@@ -1,4 +1,3 @@
-import {zip, filter} from "lodash"
 
 import DualiesClient, { JsonDataClient, SubscriptionManager } from "@dualies/client";
 

@@ -38,6 +38,6 @@ export function useStateManager<T>(defaultValue: T): StateManager<T> {
     return {state, setState}
 }
 
-export const EditableStateContext = createContext(emptyStateManager<EditableState>(EditableState.Preview))
+export const EditableStateContext = createContext(emptyStateManager<EditableState>(EditableState.Edit))
 
 export const AutoScaleContext = createContext(1)

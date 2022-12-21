@@ -13,7 +13,7 @@ export interface ComponentProps {
 
 export const EditablePlugin = (props: ComponentProps) => {
     const store = usePlugin(props.panelId, props.pluginId)
-    const editableState = useStateManager(EditableState.Preview)
+    const editableState = useStateManager(EditableState.Edit)
     if(store === null){
         return <Loading/>
     }
@@ -25,7 +25,7 @@ export const EditablePlugin = (props: ComponentProps) => {
     return <PluginStoreContext.Provider value={store}>
             <EditableStateContext.Provider value={editableState}>
                 <EditableBody render={{
-                    preview: () => plugin.render.preview(store.config),
+                    edit: () => plugin.render.edit(store.config, conf => store.setConfig(conf)),
                     move: () => plugin.render.move(store.config)
                 }}/>
             </EditableStateContext.Provider>

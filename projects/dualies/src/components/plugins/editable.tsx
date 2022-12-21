@@ -40,7 +40,7 @@ export const EditableSwitch = () => {
 
     const pluginTemplate = enabledPlugins[plugin.meta.pluginType]
 
-    if(state === EditableState.Preview) {
+    if(state === EditableState.Edit) {
         return <>
         <ButtonGroup style={style}>
             <IconButton onClick={() => setOnDelete(true)} size="small">
@@ -87,7 +87,7 @@ export const EditableSwitch = () => {
         </>
     } else {
         return <ButtonGroup style={style}>
-            <IconButton size="small" onClick={() => setState(EditableState.Preview)}>
+            <IconButton size="small" onClick={() => setState(EditableState.Edit)}>
                 <DoneIcon/>
             </IconButton>
         </ButtonGroup>

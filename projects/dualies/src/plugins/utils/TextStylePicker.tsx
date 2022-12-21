@@ -14,7 +14,7 @@ export function convertTextStyleToCSS(textStyle: TextStyle): CSSProperties {
         color: textStyle.textColor,
         WebkitTextStrokeColor: textStyle.borderColor,
         WebkitTextStrokeWidth: textStyle.borderWidth,
-        fontFamily: textStyle.fontFamily
+        fontFamily: textStyle.fontFamily,
     }
 }
 

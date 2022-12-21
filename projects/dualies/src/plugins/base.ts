@@ -5,6 +5,7 @@ import { Rect, Size } from "../store"
 
 interface Renderer<Config> {
     move: (config: Config) => ReactNode
+    edit: (config: Config, setConfig: (c: Config) => void) => ReactNode
     preview: (config: Config) => ReactNode
     config: (config: Config, setConfig: (c: Config) => void) => ReactNode
 }

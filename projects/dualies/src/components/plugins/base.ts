@@ -6,6 +6,6 @@ export interface PluginProps {
 }
 
 export enum EditableState {
-    Preview = "preview",
+    Edit = "edit",
     Move = "move"
 }

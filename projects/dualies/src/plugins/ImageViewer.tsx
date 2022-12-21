@@ -71,6 +71,7 @@ export const ImageViewerPlugin: Plugin<Config> = {
     render: {
         config: (config, setConfig) => <ImageViewerConfig config={config} setConfig={setConfig}/>,
         move: (config) => <ImageViewer config={config}/>,
+        edit: (config) => <ImageViewer config={config}/>,
         preview: (config) => <ImageViewer config={config}/>
     }
 }
