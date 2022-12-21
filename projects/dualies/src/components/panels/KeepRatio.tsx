@@ -16,7 +16,7 @@ function useRatio(internalSize: Size): [number, React.Dispatch<React.SetStateAct
         const ratioHeight = height / internalSize.height
         const newRatio = Math.min(ratioWidth, ratioHeight);
         setRatio(newRatio)
-    }, [internalSize, ref.current?.clientWidth, ref.current?.clientHeight])
+    }, [internalSize, ref.current, ref.current?.clientWidth, ref.current?.clientHeight])
     return [ratio, setRatio, ref]
 }
 

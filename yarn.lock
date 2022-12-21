@@ -1335,6 +1335,21 @@
   resolved "https://registry.yarnpkg.com/@fontsource/roboto/-/roboto-4.5.8.tgz#56347764786079838faf43f0eeda22dd7328437f"
   integrity sha512-CnD7zLItIzt86q4Sj3kZUiLcBk1dSk81qcqgMGaZe7SQ1P8hFNxhMl5AZthK1zrDM5m74VVhaOpuMGIL4gagaA==
 
+"@fontsource/zcool-kuaile@^4.5.10":
+  version "4.5.10"
+  resolved "https://registry.yarnpkg.com/@fontsource/zcool-kuaile/-/zcool-kuaile-4.5.10.tgz#d034714268b35e3647c02e8105a4f9bac794d87f"
+  integrity sha512-Z7r2XNd+YNPNbB+8fGkfK8qd2fuKR7+6hcdXLLrId/LdCqCUyuYjIOhFTCDHkNXH+R0yeQKGUgJsjismfP6GSg==
+
+"@fontsource/zcool-qingke-huangyou@^4.5.12":
+  version "4.5.12"
+  resolved "https://registry.yarnpkg.com/@fontsource/zcool-qingke-huangyou/-/zcool-qingke-huangyou-4.5.12.tgz#725815732866267381a860bef1a25b3abbb1211c"
+  integrity sha512-tQq9khRVJjVkR7hNSJBW7PW370t/xyY3gXI4/3GKnwHF52qWxAXt5mSK0SkpZM2oXMMR8hQXxdxv7ETmBl97Vw==
+
+"@fontsource/zen-dots@^4.5.8":
+  version "4.5.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/zen-dots/-/zen-dots-4.5.8.tgz#0a867534682bd1ececba4a26df9b0892e4d96153"
+  integrity sha512-Fo1njHtPHUQk0Yr7dk4F8l/mNNJZVA4NJfwe7OayAGQWuZswEh5pCPGUDpblE/VBwno4fimFcX6sZCGx9sGK3A==
+
 "@humanwhocodes/config-array@^0.11.6":
   version "0.11.7"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.7.tgz"
