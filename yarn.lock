@@ -1320,6 +1320,11 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
+"@fontsource/baumans@^4.5.9":
+  version "4.5.9"
+  resolved "https://registry.yarnpkg.com/@fontsource/baumans/-/baumans-4.5.9.tgz#bbd22cf0f4f56f9a04c0351d14e440b59f70679e"
+  integrity sha512-FWpFhQdGyIQzYiLW0UFn7RHtkBYQE0hmWpLT1eLRcyMWySvTGqfDgAtUCAb5ANoVlhS+KCu0vovftiMf85ownw==
+
 "@fontsource/black-han-sans@^4.5.9":
   version "4.5.9"
   resolved "https://registry.yarnpkg.com/@fontsource/black-han-sans/-/black-han-sans-4.5.9.tgz#225e6b588825e1efbb020af2cf6d34bd1d2ffe2f"
@@ -1329,6 +1334,16 @@
   version "4.5.9"
   resolved "https://registry.yarnpkg.com/@fontsource/blinker/-/blinker-4.5.9.tgz#8f53a8b370a2033a4eed988d8de95fafcab0266a"
   integrity sha512-I+sqAYO+P0XpJv5eGq4XUEfRsT+nlWJI8sB9THhE3WDfvj08jl/lwmmD4m1R+ah+4pfslzHrUob57P+KK5s0pA==
+
+"@fontsource/noto-sans-sc@^4.5.12":
+  version "4.5.12"
+  resolved "https://registry.yarnpkg.com/@fontsource/noto-sans-sc/-/noto-sans-sc-4.5.12.tgz#e7e589455250cd63950337dbb7ac047ccb0e5bc0"
+  integrity sha512-KQ8Bn8KCGVS6RKrEw7fp65GJYpKyKEJ/TkePoKGxvNy7smSaHoKV7vrmpIiA46hkqQyYdENix/NKSprxs4Soyw==
+
+"@fontsource/noto-serif-sc@^4.5.12":
+  version "4.5.12"
+  resolved "https://registry.yarnpkg.com/@fontsource/noto-serif-sc/-/noto-serif-sc-4.5.12.tgz#1d0d9c2b0463984915c12bbf798e82abaed48843"
+  integrity sha512-ugmB/ukwUoAvHCU1CApV34hStdOfh3ovcmtn5SwN3WQumRzT8c80ax/4ZukqreUW8blfLT1YXpJS0aYDSzNaMQ==
 
 "@fontsource/roboto@^4.5.8":
   version "4.5.8"
@@ -1344,6 +1359,11 @@
   version "4.5.12"
   resolved "https://registry.yarnpkg.com/@fontsource/zcool-qingke-huangyou/-/zcool-qingke-huangyou-4.5.12.tgz#725815732866267381a860bef1a25b3abbb1211c"
   integrity sha512-tQq9khRVJjVkR7hNSJBW7PW370t/xyY3gXI4/3GKnwHF52qWxAXt5mSK0SkpZM2oXMMR8hQXxdxv7ETmBl97Vw==
+
+"@fontsource/zcool-xiaowei@^4.5.12":
+  version "4.5.12"
+  resolved "https://registry.yarnpkg.com/@fontsource/zcool-xiaowei/-/zcool-xiaowei-4.5.12.tgz#ca228741e024761d7511699900d987ea75619e05"
+  integrity sha512-QrHsw/qSZBusm0SlTI+oyrbx142a4zGQQcCVpEJ5ynBgW156YUDfmpzXH11E5ArW7cUJuuBVM3GXf+8Z+1WAvQ==
 
 "@fontsource/zen-dots@^4.5.8":
   version "4.5.8"

@@ -3,6 +3,7 @@ import { Plugin, PropsWithConfig, PropsWithSetConfig } from "./base";
 import { getDefaultFontFamily, TextStyle, convertTextStyleToCSS, TextStylePicker } from "./utils";
 import {Delete as DeleteIcon, Add as AddIcon} from "@mui/icons-material"
 import { CSSProperties, useState } from "react";
+import { Collapse } from '@mui/material';
 
 export interface ChecklistItem {
     done: boolean
@@ -15,8 +16,8 @@ export interface ChecklistConfig {
     items: ChecklistItem[]
 }
 
-function textStyle(item: ChecklistItem, config: ChecklistConfig): CSSProperties {
-    if(item.done) {
+function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
+    if(done) {
         return {
             opacity: 0.5,
             textDecoration: "line-through",
@@ -39,8 +40,8 @@ export function ChecklistPreview(props: PropsWithConfig<ChecklistConfig>) {
     return <List>
         {props.config.items.map((item, i) => (
             <ListItem key={i}>
-                <ListItemText style={textStyle(item, props.config)}>
-                    <span style={textStyle(item, props.config)}>
+                <ListItemText style={textStyle(item.done, props.config)}>
+                    <span style={textStyle(item.done, props.config)}>
                         {item.content}
                     </span>
                 </ListItemText>
@@ -50,6 +51,7 @@ export function ChecklistPreview(props: PropsWithConfig<ChecklistConfig>) {
 }
 
 export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
+    const [newItemValue, setNewItemValue] = useState("")
     function updateChecklistDone(i: number) {
         const prevItems = props.config.items.slice(0, i)
         const nextItems = props.config.items.slice(i+1, props.config.items.length)
@@ -68,12 +70,33 @@ export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
                     onChange={() => updateChecklistDone(i)}
                     />}>
                 <ListItemText>
-                    <span style={textStyle(item, props.config)}>
+                    <span style={textStyle(item.done, props.config)}>
                         {item.content}
                     </span>
                 </ListItemText>
             </ListItem>
         ))}
+        <ListItem
+            secondaryAction={
+                <IconButton edge="end" onClick={async () => {
+                    props.setConfig({
+                        ...props.config,
+                        items: [
+                            ...props.config.items,
+                            {
+                                content: newItemValue,
+                                done: false
+                            }
+                        ]
+                    })
+                    setNewItemValue("")
+                    }}>
+                    <AddIcon/>
+                </IconButton>
+            }
+        >
+            <TextField fullWidth variant="standard" value={newItemValue} onChange={evt => setNewItemValue(evt.target.value)}></TextField>
+        </ListItem>
     </List>
 }
 

@@ -4,6 +4,10 @@ import moment from "moment"
 import { Grid, Stack, TextField } from "@mui/material"
 import { TextStylePicker, getDefaultFontFamily, TextStyle, convertTextStyleToCSS } from "./utils"
 
+import "@fontsource/baumans"
+
+const DEFAULT_FONT = '"Baumans"'
+
 interface ClockConfig {
     format: string
     textStyle: TextStyle
@@ -64,9 +68,9 @@ const ClockConfiguration = ({config, setConfig}: PropsWithSetConfig<ClockConfig>
 
 function getDefaultTextStyle(): TextStyle{
     return {
-        fontFamily: getDefaultFontFamily(),
-        borderColor: "black",
-        borderWidth: 0,
+        fontFamily: DEFAULT_FONT,
+        borderColor: "#333333",
+        borderWidth: 2.5,
         textColor: "white",
     }
 }
@@ -79,7 +83,7 @@ const ClockPlugin: Plugin<ClockConfig> = {
             format: "HH:mm",
             textStyle: getDefaultTextStyle()
         }),
-        defaultSize: () => ({width: 500, height: 200})
+        defaultSize: () => ({width: 300, height: 150})
     },
     render: {
         preview: (conf) => <Clock config={conf}/>,
