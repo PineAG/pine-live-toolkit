@@ -52,7 +52,8 @@ export const TextPlugin: Plugin<Config> = {
                 borderColor: "black",
                 borderWidth: 2,
                 textColor: "white",
-                fontSize: 60
+                fontSize: 60,
+                alignment: "left"
             }
         }),
         defaultSize: () => ({width: 300, height: 200})

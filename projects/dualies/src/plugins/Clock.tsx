@@ -74,6 +74,7 @@ function getDefaultTextStyle(): TextStyle{
         borderColor: "#333333",
         borderWidth: 2.5,
         textColor: "white",
+        alignment: "left"
     }
 }
 

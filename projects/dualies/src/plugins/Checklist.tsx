@@ -1,5 +1,4 @@
-import { Icons, arrayBinding, Collapse, FormItem, NumberField, propertyBinding, StringField, useLocalDBinding } from "@dualies/components";
-import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Icons, arrayBinding, Collapse, FormItem, NumberField, propertyBinding, StringField, useLocalDBinding, QuickConfirm, Grid, IconButton, IconSwitch, Checkbox, DBinding, ButtonProps } from "@dualies/components";
 import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "./base";
 import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils";
@@ -10,6 +9,7 @@ const DEFAULT_FONT = '"ZCOOL KuaiLe"'
 
 export interface ChecklistItem {
     done: boolean
+    show: boolean
     content: string
 }
 
@@ -26,11 +26,15 @@ function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
             textDecorationColor: config.textStyle.borderColor,
             textDecorationStyle: "solid",
             textDecorationThickness: 0.1 * config.textStyle.fontSize,
+            width: "100%",
+            height: "100%",
             ...convertTextStyleToCSS(config.textStyle)
         }
     } else {
         return {
             opacity: 1,
+            width: "100%",
+            height: "100%",
             ...convertTextStyleToCSS(config.textStyle)
         }
     }
@@ -38,52 +42,71 @@ function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
 
 export function ChecklistPreview({configStore}: PropsWithConfig<ChecklistConfig>) {
     const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
-    return <List>
-        {itemsBinding.value.map((item, i) => (
-            <ListItem key={i}>
-                <ListItemText style={textStyle(item.done, configStore.value)}>
-                    <span style={textStyle(item.done, configStore.value)}>
-                        {item.content}
-                    </span>
-                </ListItemText>
-            </ListItem>
+    return <Grid container spacing={0}>
+        {itemsBinding.value.filter(it => it.show).map((item, i) => (
+            <Grid span={12} key={i}>
+                <div style={textStyle(item.done, configStore.value)}>
+                    {item.content}
+                </div>
+            </Grid>
         ))}
-    </List>
+    </Grid>
+}
+
+interface ChecklistIconButtonProps {
+    binding: DBinding<boolean>
+    size?: ButtonProps["size"]
+}
+
+function ChecklistDoneButton(props: ChecklistIconButtonProps) {
+    return <IconSwitch
+        binding={props.binding}
+        size={props.size}
+        enabledIcon={<Icons.Completed/>}
+        disabledIcon={<Icons.Pending/>}
+    />
+}
+
+function ChecklistVisibleButton(props: ChecklistIconButtonProps) {
+    return <IconSwitch
+        binding={props.binding}
+        size={props.size}
+        enabledIcon={<Icons.Show/>}
+        disabledIcon={<Icons.Hide/>}
+    />
 }
 
 export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
     const config = configStore.value
     const newItemBinding = useLocalDBinding("")
     const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
-    return (<List>
-        {itemsBinding.items.map((item, i) => (
-            <ListItem key={i}
-                secondaryAction={
-                <Checkbox
-                    edge="start"
-                    checked={item.value.done}
-                    onChange={() => propertyBinding(item, "done").update(!item.value.done)}
-                    />}>
-                <ListItemText>
-                    <span style={textStyle(item.value.done, config)}>
+    return (<Grid container spacing={0}>
+        {itemsBinding.items.filter(it => it.value.show).map((item, i) => (
+            <Grid container key={i} span={12}>
+                <Grid span={10}>
+                    <div style={textStyle(item.value.done, config)}>
                         {item.value.content}
-                    </span>
-                </ListItemText>
-            </ListItem>
+                    </div>
+                </Grid>
+                <Grid span={2}>
+                    <ChecklistDoneButton binding={propertyBinding(item, "done")} size="large"/>
+                </Grid>
+            </Grid>
         ))}
-        <ListItem
-            secondaryAction={
-                <IconButton edge="end" onClick={async () => {
-                    await itemsBinding.append({done: false, content: newItemBinding.value})
+        <Grid container span={12}>
+            <Grid span={10}>
+                <StringField binding={newItemBinding}/>
+            </Grid>
+            <Grid span={2}>
+                <IconButton onClick={async () => {
+                    await itemsBinding.append({done: false, content: newItemBinding.value, show: true})
                     newItemBinding.update("")
-                    }}>
-                    <Icons.Add/>
-                </IconButton>
-            }
-        >
-            <StringField binding={newItemBinding}/>
-        </ListItem>
-    </List>)
+                    }}
+                    icon={<Icons.Add/>}
+                    />
+            </Grid>
+        </Grid>
+    </Grid>)
 }
 
 export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistConfig>) {
@@ -95,45 +118,49 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
         if(newItemContentStore.value === "") return;
         const newItem: ChecklistItem = {
             content: newItemContentStore.value,
-            done: false
+            done: false,
+            show: true
         }
         itemsBinding.insert(0, newItem)
         newItemContentStore.update("")
     }
-    return <>
-    <List>
-    <ListItem
-        secondaryAction={
-            <IconButton edge="end" onClick={createItem}>
+    return <Grid container>
+    <Grid span={12} container>
+        <Grid span={10}>
+            <StringField binding={newItemContentStore}/>
+        </Grid>
+        <Grid span={2}>
+            <IconButton onClick={createItem}>
                 <Icons.Add/>
             </IconButton>
-        }
-    >
-        <StringField binding={newItemContentStore}/>
-    </ListItem>
+        </Grid>
+    </Grid>
     {itemsBinding.items.map((item, i) => (
-        <ListItem key={i} 
-            secondaryAction={
-                <IconButton edge="end" onClick={() => item.remove()}>
-                    <Icons.Delete/>
-                </IconButton>
-            }>
-            <ListItemButton onClick={() => propertyBinding(item, "done").update(!item.value.done)}>
-                <ListItemIcon>
-                    <Checkbox
-                        edge="start"
-                        checked={item.value.done}
-                    />
-                </ListItemIcon>
-            </ListItemButton>
-            <StringField binding={propertyBinding(item, "content")}/>
-        </ListItem>
+        <Grid container span={12} key={i}>
+            <Grid span={1}>
+                <ChecklistDoneButton binding={propertyBinding(item, "done")}/>
+            </Grid>
+            <Grid span={1}>
+                <ChecklistVisibleButton binding={propertyBinding(item, "show")}/>
+            </Grid>
+            <Grid span={9}>
+                <StringField binding={propertyBinding(item, "content")}/>
+            </Grid>
+            <Grid span={1}>
+                <QuickConfirm title="确认要删除吗" description="之后无法恢复" onConfirm={() => item.remove()}>
+                    <IconButton>
+                        <Icons.Delete/>
+                    </IconButton>
+                </QuickConfirm>
+            </Grid>
+        </Grid>
     ))}
-    </List>
-    <Collapse title="字体设置">
-        <TextStyleAndSizePicker binding={textStyle}/>
-    </Collapse>
-    </>
+    <Grid span={12}>    
+        <Collapse title="字体设置">
+            <TextStyleAndSizePicker binding={textStyle}/>
+        </Collapse>
+    </Grid>
+    </Grid>
 }
 
 export const ChecklistPlugin: Plugin<ChecklistConfig> = {
@@ -144,10 +171,11 @@ export const ChecklistPlugin: Plugin<ChecklistConfig> = {
         defaultConfig: () => ({
             textStyle: {
                 borderColor: "#333333",
-                borderWidth: 2,
+                borderWidth: 1.25,
                 fontFamily: DEFAULT_FONT,
                 textColor: "white",
-                fontSize: 45,
+                fontSize: 35,
+                alignment: "left"
             },
             items: []
         })

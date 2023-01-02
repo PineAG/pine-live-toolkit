@@ -1,15 +1,14 @@
 import {Select as AntdSelect} from "antd"
 import { DBinding } from "../../store"
 
-export interface SelectProps {
-    binding: DBinding<string>
-    options: OptionItem<string>[]
+export interface SelectProps<T> {
+    binding: DBinding<T>
+    options: OptionItem<T>[]
 }
 
-export function Select<T>(props: SelectProps) {
+export function Select<T>(props: SelectProps<T>) {
     return <AntdSelect
         defaultOpen={false}
-        defaultValue=""
         value={props.binding.value} 
         onChange={value => props.binding.update(value)} 
         options={props.options}
@@ -18,7 +17,6 @@ export function Select<T>(props: SelectProps) {
 }
 
 function defaultSelectFilter<T>(input: string, value: T | undefined, label: React.ReactNode | undefined): boolean {
-    return true
     const inputText = input?.toString().toLowerCase() ?? ""
     const valueText = value?.toString().toLowerCase() ?? ""
     const labelText = label?.toString().toLowerCase() ?? ""

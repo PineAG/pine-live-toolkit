@@ -14,6 +14,7 @@ export function Dialog(props: DialogProps) {
         open={props.open}
         onOk={props.onOk}
         onCancel={props.onCancel}
+        width="50%"
     >
         {props.children}
     </Modal>

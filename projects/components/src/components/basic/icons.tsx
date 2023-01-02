@@ -15,3 +15,15 @@ export const Minimize = () => <icons.LineOutlined/>
 export const Move = () => <icons.DragOutlined/>
 
 export const Share = () => <icons.ShareAltOutlined/>
+
+export const Show = () => <icons.EyeOutlined/>
+
+export const Hide = () => <icons.EyeInvisibleOutlined/>
+
+export const Pending = () => <icons.ClockCircleOutlined/>
+
+export const Completed = () => <icons.CheckOutlined/>
+
+export const Up = () => <icons.ArrowUpOutlined/>
+
+export const Down = () => <icons.ArrowDownOutlined/>

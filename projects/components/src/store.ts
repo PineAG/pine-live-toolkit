@@ -168,3 +168,15 @@ class ValidateBinding<T> implements DBinding<T> {
 export function validateBinding<T>(parent: DBinding<T>, validator: (v: T) => boolean): DBinding<T> {
     return new ValidateBinding(parent, validator)
 }
+
+interface MapBindingProps<T, R> {
+    forward: (value: T) => R
+    backward: (value: R, parent: T) => T
+}
+
+export function mapBinding<T, R>(parent: DBinding<T>, props: MapBindingProps<T, R>): DBinding<R> {
+    return {
+        get value() { return props.forward(parent.value) },
+        update: value => parent.update(props.backward(value, parent.value))
+    }
+}

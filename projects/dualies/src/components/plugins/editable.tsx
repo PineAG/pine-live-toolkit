@@ -1,5 +1,5 @@
-import { Dialog, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
-import { ButtonGroup, IconButton } from "@mui/material"
+import { Dialog, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
+import { ButtonGroup } from "@mui/material"
 import { CSSProperties, ReactNode, useContext } from "react"
 import { enabledPlugins } from "../../plugins"
 import { Rect, Size } from "../../store"
@@ -38,14 +38,12 @@ export const EditableSwitch = () => {
         return <>
         <ButtonGroup style={style}>
             <QuickConfirm title="删除组件" description="确认要删除组件吗？" onConfirm={() => plugin.delete()}>    
-                <IconButton size="small">
-                    <Icons.Delete/>
-                </IconButton>
+                <IconButton size="middle" icon={<Icons.Delete/>}/>
             </QuickConfirm>
-            <IconButton onClick={() => tmpConfigStore.update(plugin.config)} size="small">
+            <IconButton onClick={() => tmpConfigStore.update(plugin.config)} size="middle">
                 <Icons.Edit/>
             </IconButton>
-            <IconButton size="small" onClick={() => setState(EditableState.Move)}>
+            <IconButton size="middle" onClick={() => setState(EditableState.Move)}>
                 <Icons.Move/>
             </IconButton>
         </ButtonGroup>
@@ -65,7 +63,7 @@ export const EditableSwitch = () => {
         </>
     } else {
         return <ButtonGroup style={style}>
-            <IconButton size="small" onClick={() => setState(EditableState.Edit)}>
+            <IconButton size="middle" onClick={() => setState(EditableState.Edit)}>
                 <Icons.Ok/>
             </IconButton>
         </ButtonGroup>

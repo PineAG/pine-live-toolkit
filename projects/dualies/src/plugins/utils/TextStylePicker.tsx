@@ -1,4 +1,4 @@
-import { DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm } from "@dualies/components"
+import { DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm, mapBinding } from "@dualies/components"
 import { SelectWithFilter } from "@dualies/components"
 import { CSSProperties, useMemo } from "react"
 import { ColorPickerButton } from "./ColorPickerButton"
@@ -7,7 +7,8 @@ export interface TextStyle {
     fontFamily?: string,
     textColor: string,
     borderWidth: number,
-    borderColor: string
+    borderColor: string,
+    alignment: "left" | "right" | "center"
 }
 
 export interface TextStyleAndSize extends TextStyle {
@@ -20,7 +21,8 @@ export function convertTextStyleToCSS(textStyle: TextStyle & {fontSize?: number}
         WebkitTextStrokeColor: textStyle.borderColor,
         WebkitTextStrokeWidth: textStyle.borderWidth,
         fontFamily: textStyle.fontFamily,
-        fontSize: textStyle.fontSize
+        fontSize: textStyle.fontSize,
+        textAlign: textStyle.alignment
     }
 }
 
@@ -67,25 +69,13 @@ function FontSelect(props: {binding: DBinding<string | undefined>}) {
         />)
 }
 
-export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
-    const fontFamily = propertyBinding(props.binding, "fontFamily")
-    const borderWidth = propertyBinding(props.binding, "borderWidth")
-    const textColor = propertyBinding(props.binding, "textColor")
-    const borderColor = propertyBinding(props.binding, "borderColor")
-
-    return <div style={{width: "100%"}}>
-        <Grid container item span={12}>
-            <Grid span={8}>
-                <FormItem label="字体类型">
-                    <FontSelect binding={fontFamily}/>
-                </FormItem>
-            </Grid>
-        </Grid>
-        <Grid item container span={12}>
+function SharedTextEdit(props: TextStylePickerProps<TextStyle>) {
+    return <>
+        <Grid container span={12}>
             <Grid span={3}>
                 <FormItem label="文字颜色">
                 <ColorPickerButton
-                    store={textColor}
+                    store={propertyBinding(props.binding, "textColor")}
                 />
                 </FormItem>
             </Grid>
@@ -93,32 +83,58 @@ export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
             <Grid span={3}>
                 <FormItem label="边缘颜色">
                     <ColorPickerButton
-                        store={borderColor}
+                        store={propertyBinding(props.binding, "borderColor")}
                     />
                 </FormItem>
             </Grid>
             <Grid span={5}>
                 <FormItem label="边缘粗细">
                     <NumberField
-                        binding={borderWidth}
+                        binding={propertyBinding(props.binding, "borderWidth")}
                         min={0}
                         step={0.25}
                     />
                 </FormItem>
             </Grid>
         </Grid>
-    </div>
+        <Grid container span={12}>
+            <Grid span={8}>
+                <FormItem label="对齐方式">
+                    <Select<TextStyle["alignment"]> binding={propertyBinding(props.binding, "alignment")} options={[
+                        {value: "left", label: "左对齐"},
+                        {value: "right", label: "右对齐"},
+                        {value: "center", label: "居中对齐"},
+                    ]}/>
+                </FormItem>
+            </Grid>
+        </Grid>
+    </>
+}
+
+export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
+    return <Grid container>
+        <Grid container span={12}>
+            <Grid span={8}>
+                <FormItem label="字体类型">
+                    <FontSelect binding={propertyBinding(props.binding, "fontFamily")}/>
+                </FormItem>
+            </Grid>
+        </Grid>
+        <SharedTextEdit binding={props.binding}/>
+    </Grid>
 }
 
 export function TextStyleAndSizePicker(props: TextStylePickerProps<TextStyleAndSize>) {
     const fontFamily = propertyBinding(props.binding, "fontFamily")
-    const borderWidth = propertyBinding(props.binding, "borderWidth")
-    const textColor = propertyBinding(props.binding, "textColor")
-    const borderColor = propertyBinding(props.binding, "borderColor")
     const fontSize = propertyBinding(props.binding, "fontSize")
 
-    return <div style={{width: "100%"}}>
-        <Grid container item span={12}>
+    const sharedBinding = mapBinding(props.binding, {
+        forward: ({fontSize, ...rest}) => rest,
+        backward: (value, {fontSize}) => ({fontSize, ...value})
+    })
+
+    return <Grid container>
+        <Grid container span={12}>
             <Grid span={8}>
                 <FormItem label="字体类型">
                     <FontSelect binding={fontFamily}/>
@@ -134,32 +150,7 @@ export function TextStyleAndSizePicker(props: TextStylePickerProps<TextStyleAndS
                 </FormItem>
             </Grid>
         </Grid>
-        <Grid item container span={12}>
-            <Grid span={3}>
-                <FormItem label="文字颜色">
-                <ColorPickerButton
-                    store={textColor}
-                />
-                </FormItem>
-            </Grid>
-            <Grid span={1}><span></span></Grid>
-            <Grid span={3}>
-                <FormItem label="边缘颜色">
-                    <ColorPickerButton
-                        store={borderColor}
-                    />
-                </FormItem>
-            </Grid>
-            <Grid span={5}>
-                <FormItem label="边缘粗细">
-                    <NumberField
-                        binding={borderWidth}
-                        min={0}
-                        step={0.25}
-                    />
-                </FormItem>
-            </Grid>
-        </Grid>
-    </div>
+        <SharedTextEdit binding={sharedBinding}/>
+    </Grid>
 }
 

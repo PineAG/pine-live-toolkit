@@ -1,7 +1,6 @@
 import {Row, Col} from "antd"
 
-type GridChild = JSX.Element | string | null
-type GridChildren = GridChild | GridChild[]
+type GridChildren = JSX.Element | string | null | GridChildren[]
 
 interface GridPropsBase {
     style?: React.CSSProperties
@@ -17,35 +16,30 @@ export interface GridContainerProps extends GridPropsBase {
 
 export interface GridItemProps extends GridPropsBase{
     container?: false
-    item?: true
     span: number
 }
 
 export interface GridItemContainerProps extends GridPropsBase{
     container: true
-    item: true
     spacing?: number
     span: number
 }
 
-function isItemProps(props: GridContainerProps | GridItemProps | GridItemContainerProps): props is GridItemProps {
-    return (props.item === undefined || props.item) && !props.container
-}
-
-
 export function Grid(props: GridContainerProps | GridItemProps | GridItemContainerProps) {
     const elementProps = {style: props.style, className: props.className}
-    if(props.container && props.item) {
+    if(props.container && "span" in props) {
+        const spacing = props.spacing ?? 22
         return <Col {...elementProps} span={props.span * 2}>
-            <Row gutter={props.spacing ?? 10}>
+            <Row gutter={[spacing, spacing]} justify="space-around">
                 {props.children}
             </Row>
         </Col>
     } else if (props.container) {
-        return <Row {...elementProps} gutter={props.spacing ?? 10}>
+        const spacing = props.spacing ?? 22
+        return <Row {...elementProps} gutter={[spacing, spacing]}  justify="space-around">
             {props.children}
         </Row>
-    } else if (isItemProps(props)){
+    } else if ("span" in props){
         return <Col {...elementProps} span={props.span * 2}>
             {props.children}
         </Col>
