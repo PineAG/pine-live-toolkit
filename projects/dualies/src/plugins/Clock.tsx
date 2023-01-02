@@ -38,8 +38,8 @@ const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
     return <div ref={ref} style={{
             width: "100%",
             height: "100%",
-            fontSize: fontSize * 0.8, 
-            ...convertTextStyleToCSS(configStore.value.textStyle)
+            ...convertTextStyleToCSS(configStore.value.textStyle),
+            fontSize: fontSize * 0.8,
         }}>
         {date}
     </div>

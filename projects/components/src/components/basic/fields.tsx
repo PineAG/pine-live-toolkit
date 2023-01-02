@@ -10,8 +10,8 @@ export interface FieldBaseProps {
 export interface StringFieldProps extends FieldBaseProps {
     valueStore: DStore<string>
     maxLength?: number
-    prefix?: JSX.Element
-    suffix?: JSX.Element
+    prefix?: string | JSX.Element
+    suffix?: string | JSX.Element
 }
 
 export function StringField(props: StringFieldProps) {
@@ -42,7 +42,7 @@ export interface NumberFieldProps extends FieldBaseProps {
     min?: number
     max?: number
     step?: number
-    prefix?: JSX.Element
+    prefix?: string | JSX.Element
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -58,11 +58,21 @@ export function NumberField(props: NumberFieldProps) {
 }
 
 export interface FormProps {
+    children: JSX.Element | JSX.Element[]
+}
+
+export function InlineForm(props: FormProps) {
+    return <AntdForm layout="inline">
+        {props.children}
+    </AntdForm>
+}
+
+export interface FormItemProps {
     label: string
     children: JSX.Element
 }
 
-export function FormItem(props: FormProps) {
+export function FormItem(props: FormItemProps) {
     return <AntdForm.Item label={props.label}>
         {props.children}
     </AntdForm.Item>

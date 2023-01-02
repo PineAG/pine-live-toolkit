@@ -9,8 +9,8 @@ export interface ColorPreviewProps {
 
 export function ColorPreview({ color }: ColorPreviewProps) {
     return <div style={{
-        width: "50px",
-        height: "20px",
+        width: "2rem",
+        height: "1.5rem",
         backgroundColor: color,
         borderRadius: "5px",
         boxShadow: "inset 0px 0px 3px #888"

@@ -1,4 +1,4 @@
-import { DStore, NumberField, propertyStore, Grid, FormItem, defaultValueStore, Select } from "@dualies/components"
+import { DStore, NumberField, propertyStore, Grid, FormItem, defaultValueStore, Select, InlineForm } from "@dualies/components"
 import { SelectWithFilter } from "@dualies/components"
 import { CSSProperties, useMemo } from "react"
 import { ColorPickerButton } from "./ColorPickerButton"
@@ -10,17 +10,22 @@ export interface TextStyle {
     borderColor: string
 }
 
-export function convertTextStyleToCSS(textStyle: TextStyle): CSSProperties {
+export interface TextStyleAndSize extends TextStyle {
+    fontSize: number
+} 
+
+export function convertTextStyleToCSS(textStyle: TextStyle & {fontSize?: number}): CSSProperties {
     return {
         color: textStyle.textColor,
         WebkitTextStrokeColor: textStyle.borderColor,
         WebkitTextStrokeWidth: textStyle.borderWidth,
         fontFamily: textStyle.fontFamily,
+        fontSize: textStyle.fontSize
     }
 }
 
-export interface TextStylePickerProps {
-    valueStore: DStore<TextStyle>
+export interface TextStylePickerProps<T extends TextStyle | TextStyleAndSize> {
+    valueStore: DStore<T>
 }
 
 export function getFontsList(): string[] {
@@ -62,42 +67,98 @@ function FontSelect(props: {valueStore: DStore<string | undefined>}) {
         />)
 }
 
-export function TextStylePicker(props: TextStylePickerProps) {
+export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
     const fontFamily = propertyStore(props.valueStore, "fontFamily")
     const borderWidth = propertyStore(props.valueStore, "borderWidth")
     const textColor = propertyStore(props.valueStore, "textColor")
     const borderColor = propertyStore(props.valueStore, "borderColor")
 
-    return <Grid container style={{marginTop: "20px", marginBottom: "20px"}}>
-        <Grid span={6}>
-            <FormItem label="字体">
-                <FontSelect valueStore={fontFamily}/>
-            </FormItem>
+    return <div style={{width: "100%"}}>
+        <Grid container item span={12}>
+            <Grid span={8}>
+                <FormItem label="字体类型">
+                    <FontSelect valueStore={fontFamily}/>
+                </FormItem>
+            </Grid>
         </Grid>
-        <Grid span={6}>
-            <FormItem label="边缘粗细">
-                <NumberField
-                    valueStore={borderWidth}
-                    min={0}
-                    step={0.25}
-                />
-            </FormItem>
-        </Grid>
-        <Grid span={6}>
-            <FormItem label="文字颜色">
-            <ColorPickerButton
-                store={textColor}
-            />
-            </FormItem>
-        </Grid>
-        <Grid span={6}>
-            <FormItem label="边缘颜色">
+        <Grid item container span={12}>
+            <Grid span={3}>
+                <FormItem label="文字颜色">
                 <ColorPickerButton
-                    store={borderColor}
+                    store={textColor}
                 />
-            </FormItem>
+                </FormItem>
+            </Grid>
+            <Grid span={6}>
+                <FormItem label="边缘粗细">
+                    <NumberField
+                        valueStore={borderWidth}
+                        min={0}
+                        step={0.25}
+                    />
+                </FormItem>
+            </Grid>
+            <Grid span={3}>
+                <FormItem label="边缘颜色">
+                    <ColorPickerButton
+                        store={borderColor}
+                    />
+                </FormItem>
+            </Grid>
         </Grid>
-    </Grid >
+    </div>
 }
 
-export default TextStylePicker
+export function TextStyleAndSizePicker(props: TextStylePickerProps<TextStyleAndSize>) {
+    const fontFamily = propertyStore(props.valueStore, "fontFamily")
+    const borderWidth = propertyStore(props.valueStore, "borderWidth")
+    const textColor = propertyStore(props.valueStore, "textColor")
+    const borderColor = propertyStore(props.valueStore, "borderColor")
+    const fontSize = propertyStore(props.valueStore, "fontSize")
+
+    return <div style={{width: "100%"}}>
+        <Grid container item span={12}>
+            <Grid span={8}>
+                <FormItem label="字体类型">
+                    <FontSelect valueStore={fontFamily}/>
+                </FormItem>
+            </Grid>
+            <Grid span={4}>
+                <FormItem label="大小">
+                    <NumberField
+                        valueStore={fontSize}
+                        min={1}
+                        step={1}
+                    />
+                </FormItem>
+            </Grid>
+        </Grid>
+        <Grid item container span={12}>
+            <Grid span={3}>
+                <FormItem label="文字颜色">
+                <ColorPickerButton
+                    store={textColor}
+                />
+                </FormItem>
+            </Grid>
+            <Grid span={1}><span></span></Grid>
+            <Grid span={3}>
+                <FormItem label="边缘颜色">
+                    <ColorPickerButton
+                        store={borderColor}
+                    />
+                </FormItem>
+            </Grid>
+            <Grid span={5}>
+                <FormItem label="边缘粗细">
+                    <NumberField
+                        valueStore={borderWidth}
+                        min={0}
+                        step={0.25}
+                    />
+                </FormItem>
+            </Grid>
+        </Grid>
+    </div>
+}
+

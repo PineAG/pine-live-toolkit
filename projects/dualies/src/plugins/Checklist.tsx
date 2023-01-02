@@ -1,9 +1,13 @@
-import { Checkbox, IconButton, List, ListItem, ListItemButton, TextField, ListItemIcon, ListItemText } from "@mui/material";
+import { arrayStore, Collapse, FormItem, NumberField, propertyStore, StringField, useLocalDStore } from "@dualies/components";
+import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "./base";
-import { getDefaultFontFamily, TextStyle, convertTextStyleToCSS, TextStylePicker } from "./utils";
-import {Delete as DeleteIcon, Add as AddIcon} from "@mui/icons-material"
-import { CSSProperties, useState } from "react";
-import {arrayStore, createDStore, propertyStore, StringField, useLocalDStore, Collapse, NumberField, FormItem} from "@dualies/components"
+import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils";
+
+import "@fontsource/zcool-kuaile";
+
+const DEFAULT_FONT = '"ZCOOL KuaiLe"'
 
 export interface ChecklistItem {
     done: boolean
@@ -11,8 +15,7 @@ export interface ChecklistItem {
 }
 
 export interface ChecklistConfig {
-    fontSize: number
-    textStyle: TextStyle
+    textStyle: TextStyleAndSize
     items: ChecklistItem[]
 }
 
@@ -21,16 +24,14 @@ function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
         return {
             opacity: 0.5,
             textDecoration: "line-through",
-            fontSize: config.fontSize,
             textDecorationColor: config.textStyle.borderColor,
             textDecorationStyle: "solid",
-            textDecorationThickness: 0.1 * config.fontSize,
+            textDecorationThickness: 0.1 * config.textStyle.fontSize,
             ...convertTextStyleToCSS(config.textStyle)
         }
     } else {
         return {
             opacity: 1,
-            fontSize: config.fontSize,
             ...convertTextStyleToCSS(config.textStyle)
         }
     }
@@ -90,7 +91,6 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
     const newItemContentStore = useLocalDStore("")
     const itemsStore = arrayStore(propertyStore(configStore, "items"))
     const textStyle = propertyStore(configStore, "textStyle")
-    const fontSize = propertyStore(configStore, "fontSize")
 
     function createItem(){
         if(newItemContentStore.value === "") return;
@@ -132,12 +132,7 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
     ))}
     </List>
     <Collapse title="字体设置">
-        <TextStylePicker valueStore={textStyle}/>
-        <FormItem label="字号">
-            <NumberField
-                valueStore={fontSize}
-            />
-        </FormItem>
+        <TextStyleAndSizePicker valueStore={textStyle}/>
     </Collapse>
     </>
 }
@@ -148,12 +143,12 @@ export const ChecklistPlugin: Plugin<ChecklistConfig> = {
     initialize: {
         defaultSize: () => ({width: 300, height: 600}),
         defaultConfig: () => ({
-            fontSize: 45,
             textStyle: {
-                borderColor: "black",
-                borderWidth: 3,
-                fontFamily: getDefaultFontFamily(),
-                textColor: "white"
+                borderColor: "#333333",
+                borderWidth: 2,
+                fontFamily: DEFAULT_FONT,
+                textColor: "white",
+                fontSize: 45,
             },
             items: []
         })

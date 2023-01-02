@@ -1,7 +1,7 @@
-import { MultiLinesStringField, NumberField, propertyStore } from "@dualies/components"
+import { FormItem, MultiLinesStringField, NumberField, propertyStore } from "@dualies/components"
 import { Stack } from "@mui/system"
 import { Plugin, PropsWithConfig } from "./base"
-import { convertTextStyleToCSS, getDefaultFontFamily, TextStyle, TextStylePicker } from "./utils"
+import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils"
 
 import "@fontsource/zcool-kuaile"
 
@@ -9,35 +9,29 @@ const DEFAULT_FONT = '"ZCOOL KuaiLe"'
 
 export interface Config {
     content: string
-    fontSize: number
-    textStyle: TextStyle
+    textStyle: TextStyleAndSize
 }
 
 function Text({configStore}: PropsWithConfig<Config>) {
-    return <div style={{fontSize: configStore.value.fontSize, ...convertTextStyleToCSS(configStore.value.textStyle)}}>
+    return <div style={{...convertTextStyleToCSS(configStore.value.textStyle)}}>
         {configStore.value.content}
     </div>
 }
 
 function TextConfig(props: PropsWithConfig<Config>) {
     const contentStore = propertyStore(props.configStore, "content")
-    const fontSize = propertyStore(props.configStore, "fontSize")
     const textStyle = propertyStore(props.configStore, "textStyle")
 
     return <Stack direction="column">
-        <TextStylePicker
+        <TextStyleAndSizePicker
             valueStore={textStyle}
         />
-        <NumberField
-            placeholder="字号"
-            min={1}
-            valueStore={fontSize}
-        />
-        <MultiLinesStringField
-            placeholder="内容"
-            valueStore={contentStore}
-            rows={5}
-        />
+        <FormItem label="内容">
+            <MultiLinesStringField
+                valueStore={contentStore}
+                rows={5}
+            />
+        </FormItem>
         <Text {...props}/>
     </Stack>
 }
@@ -48,12 +42,12 @@ export const TextPlugin: Plugin<Config> = {
     initialize: {
         defaultConfig: () => ({
             content: "新文本",
-            fontSize: 60,
             textStyle: {
                 fontFamily: DEFAULT_FONT,
                 borderColor: "black",
                 borderWidth: 2,
-                textColor: "white"
+                textColor: "white",
+                fontSize: 60
             }
         }),
         defaultSize: () => ({width: 300, height: 200})

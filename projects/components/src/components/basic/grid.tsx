@@ -36,13 +36,13 @@ function isItemProps(props: GridContainerProps | GridItemProps | GridItemContain
 export function Grid(props: GridContainerProps | GridItemProps | GridItemContainerProps) {
     const elementProps = {style: props.style, className: props.className}
     if(props.container && props.item) {
-        return <Col {...elementProps} span={props.span}>
-            <Row gutter={props.spacing}>
+        return <Col {...elementProps} span={props.span * 2}>
+            <Row gutter={props.spacing ?? 10}>
                 {props.children}
             </Row>
         </Col>
     } else if (props.container) {
-        return <Row {...elementProps} gutter={props.spacing}>
+        return <Row {...elementProps} gutter={props.spacing ?? 10}>
             {props.children}
         </Row>
     } else if (isItemProps(props)){
