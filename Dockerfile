@@ -2,6 +2,8 @@ FROM node:lts as FrontendBuild
 COPY . /app
 RUN cd /app/projects/client &&\
     yarn install && yarn build &&\
+    cd /app/projects/components &&\
+    yarn install && yarn build &&\
     cd ../dualies &&\
     yarn install && yarn build
 RUN mv /app/projects/dualies/build /web

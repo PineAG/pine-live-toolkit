@@ -1,5 +1,17 @@
 
 import DualiesClient, { JsonDataClient, SubscriptionManager } from "@dualies/client";
+import features from "../features.json"
+import { MockAPIClient } from "./mock";
+
+function createClient(): DualiesClient {
+    if(features.Use_LocalStorage_Backend) {
+        return new MockAPIClient()
+    } else {
+        return new DualiesClient({
+            path: "/api"
+        })
+    }
+}
 
 export interface PanelMeta {
     title: string
@@ -23,9 +35,7 @@ export interface Rect {
 }
 
 class APIWrapper {
-    private client = new DualiesClient({
-        path: "/api"
-    })
+    private client = createClient()
 
     panelsCounter(): JsonDataClient<number> {
         return this.client.data("/panels/counter")
