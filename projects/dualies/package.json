@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@dualies/client": "*",
+    "@dualies/components": "*",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fontsource/baumans": "^4.5.9",
