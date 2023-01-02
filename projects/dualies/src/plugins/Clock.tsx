@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "./utils"
 
-import { propertyStore, StringField } from "@dualies/components"
+import { FormItem, propertyStore, StringField } from "@dualies/components"
 import "@fontsource/baumans"
 
 const DEFAULT_FONT = '"Baumans"'
@@ -49,10 +49,11 @@ const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
     const format = propertyStore(configStore, "format")
     const textStyle = propertyStore(configStore, "textStyle")
     return <Stack direction="column">
-        <StringField
-            placeholder="时间格式"
-            valueStore={format}
-        />
+        <FormItem label="时间格式">
+            <StringField
+                valueStore={format}
+            />
+        </FormItem>
         <TextStylePicker
             valueStore={textStyle}
         />

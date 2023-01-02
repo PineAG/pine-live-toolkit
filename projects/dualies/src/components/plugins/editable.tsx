@@ -1,9 +1,10 @@
-import { useLocalDStore } from "@dualies/components"
+import { QuickConfirm, useLocalDStore } from "@dualies/components"
 import {
     DeleteForever as DeleteIcon,
     Done as DoneIcon, Edit as EditIcon, OpenWith as MoveIcon
 } from "@mui/icons-material"
-import { Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material"
+import { Button, ButtonGroup, IconButton } from "@mui/material"
+import {Dialog} from "@dualies/components"
 import { CSSProperties, ReactNode, useContext, useState } from "react"
 import { enabledPlugins } from "../../plugins"
 import { Rect, Size } from "../../store"
@@ -34,7 +35,6 @@ export const EditableSwitch = () => {
     const panelSize = useContext(PanelSizeContext)
     const {size: pluginRect} = useNotNullContext(PluginStoreContext)
     const style = getEditableSwitchStyle(pluginRect, panelSize)
-    const [onDelete, setOnDelete] = useState(false)
     const tmpConfigStore = useLocalDStore<any | null>(null)
 
     const pluginTemplate = enabledPlugins[plugin.meta.pluginType]
@@ -42,9 +42,11 @@ export const EditableSwitch = () => {
     if(state === EditableState.Edit) {
         return <>
         <ButtonGroup style={style}>
-            <IconButton onClick={() => setOnDelete(true)} size="small">
-                <DeleteIcon/>
-            </IconButton>
+            <QuickConfirm title="删除组件" description="确认要删除组件吗？" onConfirm={() => plugin.delete()}>    
+                <IconButton size="small">
+                    <DeleteIcon/>
+                </IconButton>
+            </QuickConfirm>
             <IconButton onClick={() => tmpConfigStore.update(plugin.config)} size="small">
                 <EditIcon/>
             </IconButton>
@@ -52,36 +54,18 @@ export const EditableSwitch = () => {
                 <MoveIcon/>
             </IconButton>
         </ButtonGroup>
-        <Dialog open={onDelete} onClose={() => setOnDelete(false)} fullWidth>
-            <DialogTitle>删除组件</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    确认要删除组件吗？
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button color="inherit" onClick={() => setOnDelete(false)}>取消</Button>
-                <Button color="error" onClick={async () => {
-                    await plugin.delete()
-                    setOnDelete(false)
-                }}>删除组件</Button>
-            </DialogActions>
-        </Dialog>
 
-        <Dialog fullWidth open={tmpConfigStore.value !== null} onClose={() => tmpConfigStore.update(null)}>
-            <DialogTitle>设置组件 {pluginTemplate.title}</DialogTitle>
-            <DialogContent style={{paddingTop: "20px", paddingBottom: "20px"}}>
-                {tmpConfigStore.value && pluginTemplate.render.config(tmpConfigStore)}
-            </DialogContent>
-            <DialogActions>
-                <Button color="inherit" onClick={() => tmpConfigStore.update(null)}>取消</Button>
-                <Button color="primary" onClick={async () => {
-                    if(tmpConfigStore.value !== null) {
-                        await plugin.setConfig(tmpConfigStore.value)
-                    }
-                    await tmpConfigStore.update(null)
-                }}>保存</Button>
-            </DialogActions>
+        <Dialog 
+            title={`设置组件 ${pluginTemplate.title}`}
+            onOk={async () => {
+                if(tmpConfigStore.value !== null) {
+                    await plugin.setConfig(tmpConfigStore.value)
+                }
+                await tmpConfigStore.update(null)
+            }}
+            onCancel={() => tmpConfigStore.update(null)}
+            open={tmpConfigStore.value !== null}>
+            {tmpConfigStore.value && pluginTemplate.render.config(tmpConfigStore)}
         </Dialog>
         </>
     } else {

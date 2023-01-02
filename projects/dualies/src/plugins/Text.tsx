@@ -3,6 +3,10 @@ import { Stack } from "@mui/system"
 import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, getDefaultFontFamily, TextStyle, TextStylePicker } from "./utils"
 
+import "@fontsource/zcool-kuaile"
+
+const DEFAULT_FONT = '"ZCOOL KuaiLe"'
+
 export interface Config {
     content: string
     fontSize: number
@@ -10,7 +14,6 @@ export interface Config {
 }
 
 function Text({configStore}: PropsWithConfig<Config>) {
-    console.log(configStore)
     return <div style={{fontSize: configStore.value.fontSize, ...convertTextStyleToCSS(configStore.value.textStyle)}}>
         {configStore.value.content}
     </div>
@@ -47,7 +50,7 @@ export const TextPlugin: Plugin<Config> = {
             content: "新文本",
             fontSize: 60,
             textStyle: {
-                fontFamily: getDefaultFontFamily(),
+                fontFamily: DEFAULT_FONT,
                 borderColor: "black",
                 borderWidth: 2,
                 textColor: "white"

@@ -1,6 +1,6 @@
-import { DStore, NumberField, propertyStore, Grid, FormItem } from "@dualies/components"
-import { MenuItem, Select } from "@mui/material"
-import {CSSProperties, useMemo} from "react"
+import { DStore, NumberField, propertyStore, Grid, FormItem, defaultValueStore, Select } from "@dualies/components"
+import { SelectWithFilter } from "@dualies/components"
+import { CSSProperties, useMemo } from "react"
 import { ColorPickerButton } from "./ColorPickerButton"
 
 export interface TextStyle {
@@ -44,33 +44,34 @@ function removeQuotes(s: string): string {
     return s.replace(/^"/, "").replace(/"$/, "")
 }
 
-export function TextStylePicker(props: TextStylePickerProps) {
+function FontSelect(props: {valueStore: DStore<string | undefined>}) {
     const fontFamilies = useLoadedFontFamilies()
-    const defaultFontFamily = useMemo(() => getDefaultFontFamily(), [])
-    
+    const defaultFont = useMemo(() => getDefaultFontFamily(), [])
+    const binding = defaultValueStore<string>(props.valueStore, defaultFont)
+    return (<SelectWithFilter<string>
+        placeholder="选择字体"
+        valueStore={binding}
+        options={fontFamilies.map(family => ({
+            label: (
+                <span style={{fontFamily: family}}>
+                    {removeQuotes(family)}
+                </span>
+            ),
+            value: family
+        }))}
+        />)
+}
+
+export function TextStylePicker(props: TextStylePickerProps) {
     const fontFamily = propertyStore(props.valueStore, "fontFamily")
     const borderWidth = propertyStore(props.valueStore, "borderWidth")
     const textColor = propertyStore(props.valueStore, "textColor")
     const borderColor = propertyStore(props.valueStore, "borderColor")
 
-
     return <Grid container style={{marginTop: "20px", marginBottom: "20px"}}>
         <Grid span={6}>
             <FormItem label="字体">
-                <Select 
-                    labelId="font-family-selector"
-                    value={fontFamily.value ?? defaultFontFamily} 
-                    onChange={evt => {
-                        fontFamily.update(evt.target.value)
-                    }}>
-                    {fontFamilies.map((font) => (
-                        <MenuItem value={font} key={font}>
-                            <span style={{fontFamily: font}}>
-                                {removeQuotes(font)}
-                            </span>
-                        </MenuItem>
-                    ))}
-                </Select>
+                <FontSelect valueStore={fontFamily}/>
             </FormItem>
         </Grid>
         <Grid span={6}>
@@ -85,18 +86,18 @@ export function TextStylePicker(props: TextStylePickerProps) {
         <Grid span={6}>
             <FormItem label="文字颜色">
             <ColorPickerButton
-                label="文字颜色"
                 store={textColor}
             />
             </FormItem>
         </Grid>
         <Grid span={6}>
-            <ColorPickerButton
-                label="边缘颜色"
-                store={borderColor}
-            />
+            <FormItem label="边缘颜色">
+                <ColorPickerButton
+                    store={borderColor}
+                />
+            </FormItem>
         </Grid>
-    </Grid>
+    </Grid >
 }
 
 export default TextStylePicker

@@ -53,6 +53,13 @@ export function propertyStore<Parent extends MappingObject, Key extends keyof Pa
     return new PropertyStore(parent, key)
 }
 
+export function defaultValueStore<T>(parent: DStore<T | undefined> | DStore<T | null>, defaultValue: T): DStore<T> {
+    return {
+        get value() { return parent.value ?? defaultValue },
+        update: value => parent.update(value)
+    }
+}
+
 class MemoryStore<T> implements DStore<T> {
     constructor(private _value: T) {}
 

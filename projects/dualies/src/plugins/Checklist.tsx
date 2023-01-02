@@ -55,7 +55,7 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
     const config = configStore.value
     const newItemValueStore = useLocalDStore("")
     const itemsStore = arrayStore(propertyStore(configStore, "items"))
-    return <List>
+    return (<List>
         {itemsStore.items.map((item, i) => (
             <ListItem key={i}
                 secondaryAction={
@@ -83,7 +83,7 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
         >
             <StringField valueStore={newItemValueStore}/>
         </ListItem>
-    </List>
+    </List>)
 }
 
 export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistConfig>) {

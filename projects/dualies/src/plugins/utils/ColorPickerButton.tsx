@@ -18,7 +18,6 @@ export function ColorPreview({ color }: ColorPreviewProps) {
 }
 
 export interface ColorPickerButtonProps {
-    label: string
     store: DStore<string>
 }
 
