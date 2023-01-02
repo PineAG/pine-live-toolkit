@@ -3,7 +3,7 @@ import { Plugin, PropsWithConfig, PropsWithSetConfig } from "./base";
 import { getDefaultFontFamily, TextStyle, convertTextStyleToCSS, TextStylePicker } from "./utils";
 import {Delete as DeleteIcon, Add as AddIcon} from "@mui/icons-material"
 import { CSSProperties, useState } from "react";
-import {StringField, useLocalDStore} from "@dualies/components"
+import {arrayStore, createDStore, propertyStore, StringField, useLocalDStore} from "@dualies/components"
 
 export interface ChecklistItem {
     done: boolean
@@ -101,33 +101,19 @@ export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
 }
 
 export function ChecklistConfigPanel(props: PropsWithSetConfig<ChecklistConfig>) {
-    const [newItemContent, setNewItemContent] = useState("")
-    const updateItemAt = (i: number, updateItem: (item: ChecklistItem) => ChecklistItem) => () => {
-        const prevItems = props.config.items.slice(0, i)
-        const nextItems = props.config.items.slice(i+1, props.config.items.length)
-        const target = props.config.items[i]
-        const newTarget = updateItem(target)
-        const newList = [...prevItems, newTarget, ...nextItems]
-        console.log(newList)
-        props.setConfig({...props.config, items: newList})
-    }
-    const deleteItemAt = (i: number) => () => {
-        const prevItems = props.config.items.slice(0, i)
-        const nextItems = props.config.items.slice(i+1, props.config.items.length)
-        const newList = [...prevItems, ...nextItems]
-        props.setConfig({...props.config, items: newList})
-    }
-    const updateDone = (item: ChecklistItem) => ({...item, done: !item.done})
-    const updateContent = (newContent: string) => (item: ChecklistItem) => ({...item, content: newContent})
+    const newItemContentStore = useLocalDStore("")
+    const configStore = createDStore({value: props.config, update: props.setConfig})
+    const itemsStore = arrayStore(propertyStore(configStore, "items"))
+
     function createItem(){
-        if(newItemContent === "") return;
+        if(newItemContentStore.value === "") return;
         const newItem: ChecklistItem = {
-            content: newItemContent,
+            content: newItemContentStore.value,
             done: false
         }
         const newList = [newItem, ...props.config.items]
         props.setConfig({...props.config, items: newList})
-        setNewItemContent("")
+        newItemContentStore.update("")
     }
     return <>
     <List>
@@ -138,27 +124,24 @@ export function ChecklistConfigPanel(props: PropsWithSetConfig<ChecklistConfig>)
             </IconButton>
         }
     >
-        <TextField fullWidth variant="standard" value={newItemContent} onChange={evt => setNewItemContent(evt.target.value)}></TextField>
+        <StringField valueStore={newItemContentStore}/>
     </ListItem>
-    {props.config.items.map((item, i) => (
+    {itemsStore.items.map((item, i) => (
         <ListItem key={i} 
             secondaryAction={
-                <IconButton edge="end" onClick={deleteItemAt(i)}>
+                <IconButton edge="end" onClick={() => item.remove()}>
                     <DeleteIcon/>
                 </IconButton>
             }>
-            <ListItemButton onClick={updateItemAt(i, updateDone)}>
+            <ListItemButton onClick={() => propertyStore(item, "done").update(!item.value.done)}>
                 <ListItemIcon>
                     <Checkbox
                         edge="start"
-                        checked={item.done}
+                        checked={item.value.done}
                     />
                 </ListItemIcon>
             </ListItemButton>
-            <TextField fullWidth variant="standard" 
-                value={item.content} 
-                onChange={evt => updateItemAt(i, updateContent(evt.target.value))()}
-                ></TextField>
+            <StringField valueStore={propertyStore(item, "content")}/>
         </ListItem>
     ))}
     </List>
