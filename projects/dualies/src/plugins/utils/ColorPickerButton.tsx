@@ -1,4 +1,4 @@
-import { DStore, Grid } from "@dualies/components"
+import { DBinding, Grid } from "@dualies/components"
 import { ButtonBase, Popover } from "@mui/material"
 import { useRef, useState } from "react"
 import { CompactPicker } from "react-color"
@@ -18,7 +18,7 @@ export function ColorPreview({ color }: ColorPreviewProps) {
 }
 
 export interface ColorPickerButtonProps {
-    store: DStore<string>
+    store: DBinding<string>
 }
 
 export function ColorPickerButton(props: ColorPickerButtonProps) {

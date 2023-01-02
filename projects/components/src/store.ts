@@ -1,36 +1,36 @@
 import {useState} from "react"
 
-export interface DStore<T> {
+export interface DBinding<T> {
     value: T
     update: (value: T) => Promise<void>
 }
 
-interface CreateDStoreProps<T> {
+interface CreateDBindingProps<T> {
     value: T
     update: (value: T) => void | Promise<void>
 }
 
-export function createDStore<T>({value, update}: CreateDStoreProps<T>) : DStore<T> {
+export function createDBinding<T>({value, update}: CreateDBindingProps<T>) : DBinding<T> {
     return {
         value, 
         update: async v => update(v),
     }
 }
 
-export function createReadonlyDStore<T>(value: T) : DStore<T> {
-    return createDStore({value, update: () => {}})
+export function createReadonlyDBinding<T>(value: T) : DBinding<T> {
+    return createDBinding({value, update: () => {}})
 }
 
-export function useLocalDStore<T>(defaultValue: T): DStore<T> {
+export function useLocalDBinding<T>(defaultValue: T): DBinding<T> {
     const [value, update] = useState(defaultValue)
-    return createDStore<T>({value, update})
+    return createDBinding<T>({value, update})
 }
 
 type MappingObject = {[key: string]: any}
 
 
-class PropertyStore<T, K extends keyof T> implements DStore<T[K]> {
-    constructor(private store: DStore<T>, private key: K) {}
+class PropertyBinding<T, K extends keyof T> implements DBinding<T[K]> {
+    constructor(private store: DBinding<T>, private key: K) {}
 
     get value(): T[K] {
         return this.store.value[this.key]
@@ -43,24 +43,24 @@ class PropertyStore<T, K extends keyof T> implements DStore<T[K]> {
         })
     }
 
-    to<NewKey extends keyof T[K]>(key: NewKey): PropertyStore<T[K], NewKey> {
-        return new PropertyStore(this, key)
+    to<NewKey extends keyof T[K]>(key: NewKey): PropertyBinding<T[K], NewKey> {
+        return new PropertyBinding(this, key)
     }
 }
 
 
-export function propertyStore<Parent extends MappingObject, Key extends keyof Parent>(parent: DStore<Parent>, key: Key): PropertyStore<Parent, Key> {
-    return new PropertyStore(parent, key)
+export function propertyBinding<Parent extends MappingObject, Key extends keyof Parent>(parent: DBinding<Parent>, key: Key): PropertyBinding<Parent, Key> {
+    return new PropertyBinding(parent, key)
 }
 
-export function defaultValueStore<T>(parent: DStore<T | undefined> | DStore<T | null>, defaultValue: T): DStore<T> {
+export function defaultValueBinding<T>(parent: DBinding<T | undefined> | DBinding<T | null>, defaultValue: T): DBinding<T> {
     return {
         get value() { return parent.value ?? defaultValue },
         update: value => parent.update(value)
     }
 }
 
-class MemoryStore<T> implements DStore<T> {
+class MemoryBinding<T> implements DBinding<T> {
     constructor(private _value: T) {}
 
     get value() {
@@ -72,12 +72,12 @@ class MemoryStore<T> implements DStore<T> {
     }
 }
 
-export function memoryStore<T>(initialValue: T): MemoryStore<T> {
-    return new MemoryStore(initialValue)
+export function memoryBinding<T>(initialValue: T): MemoryBinding<T> {
+    return new MemoryBinding(initialValue)
 }
 
-class ArrayStore<Item> implements DStore<Item[]> {
-    constructor(private parent: DStore<Item[]>) {}
+class ArrayBinding<Item> implements DBinding<Item[]> {
+    constructor(private parent: DBinding<Item[]>) {}
 
     get value() {
         return this.parent.value
@@ -87,8 +87,8 @@ class ArrayStore<Item> implements DStore<Item[]> {
         await this.parent.update(value)
     }
 
-    get items(): ArrayItemStore<Item>[] {
-        return this.parent.value.map((v, i) => new ArrayItemStore(this, i))
+    get items(): ArrayItemBinding<Item>[] {
+        return this.parent.value.map((v, i) => new ArrayItemBinding(this, i))
     }
 
     private async warpInternalUpdate(updater: (items: Item[]) => void) {
@@ -129,8 +129,8 @@ class ArrayStore<Item> implements DStore<Item[]> {
     }
 }
 
-class ArrayItemStore<Item> implements DStore<Item> {
-    constructor(private parent: ArrayStore<Item>, private index: number) {}
+class ArrayItemBinding<Item> implements DBinding<Item> {
+    constructor(private parent: ArrayBinding<Item>, private index: number) {}
 
     get value() {
         return this.parent.value[this.index]
@@ -149,12 +149,12 @@ class ArrayItemStore<Item> implements DStore<Item> {
     }
 }
 
-export function arrayStore<Item>(parent: DStore<Item[]>): ArrayStore<Item> {
-    return new ArrayStore(parent)
+export function arrayBinding<Item>(parent: DBinding<Item[]>): ArrayBinding<Item> {
+    return new ArrayBinding(parent)
 }
 
-class ValidateStore<T> implements DStore<T> {
-    constructor(private parent: DStore<T>, private validator: (v: T) => boolean) {}
+class ValidateBinding<T> implements DBinding<T> {
+    constructor(private parent: DBinding<T>, private validator: (v: T) => boolean) {}
     get value() {
         return this.parent.value
     }
@@ -165,6 +165,6 @@ class ValidateStore<T> implements DStore<T> {
     }
 }
 
-export function validateStore<T>(parent: DStore<T>, validator: (v: T) => boolean): DStore<T> {
-    return new ValidateStore(parent, validator)
+export function validateBinding<T>(parent: DBinding<T>, validator: (v: T) => boolean): DBinding<T> {
+    return new ValidateBinding(parent, validator)
 }

@@ -1,4 +1,4 @@
-import { Icons, arrayStore, Collapse, FormItem, NumberField, propertyStore, StringField, useLocalDStore } from "@dualies/components";
+import { Icons, arrayBinding, Collapse, FormItem, NumberField, propertyBinding, StringField, useLocalDBinding } from "@dualies/components";
 import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "./base";
@@ -37,9 +37,9 @@ function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
 }
 
 export function ChecklistPreview({configStore}: PropsWithConfig<ChecklistConfig>) {
-    const itemsStore = arrayStore(propertyStore(configStore, "items"))
+    const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
     return <List>
-        {itemsStore.value.map((item, i) => (
+        {itemsBinding.value.map((item, i) => (
             <ListItem key={i}>
                 <ListItemText style={textStyle(item.done, configStore.value)}>
                     <span style={textStyle(item.done, configStore.value)}>
@@ -53,16 +53,16 @@ export function ChecklistPreview({configStore}: PropsWithConfig<ChecklistConfig>
 
 export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
     const config = configStore.value
-    const newItemValueStore = useLocalDStore("")
-    const itemsStore = arrayStore(propertyStore(configStore, "items"))
+    const newItemBinding = useLocalDBinding("")
+    const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
     return (<List>
-        {itemsStore.items.map((item, i) => (
+        {itemsBinding.items.map((item, i) => (
             <ListItem key={i}
                 secondaryAction={
                 <Checkbox
                     edge="start"
                     checked={item.value.done}
-                    onChange={() => propertyStore(item, "done").update(!item.value.done)}
+                    onChange={() => propertyBinding(item, "done").update(!item.value.done)}
                     />}>
                 <ListItemText>
                     <span style={textStyle(item.value.done, config)}>
@@ -74,22 +74,22 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
         <ListItem
             secondaryAction={
                 <IconButton edge="end" onClick={async () => {
-                    await itemsStore.append({done: false, content: newItemValueStore.value})
-                    newItemValueStore.update("")
+                    await itemsBinding.append({done: false, content: newItembinding.value})
+                    newItembinding.update("")
                     }}>
                     <Icons.Add/>
                 </IconButton>
             }
         >
-            <StringField valueStore={newItemValueStore}/>
+            <StringField binding={newItemBinding}/>
         </ListItem>
     </List>)
 }
 
 export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistConfig>) {
-    const newItemContentStore = useLocalDStore("")
-    const itemsStore = arrayStore(propertyStore(configStore, "items"))
-    const textStyle = propertyStore(configStore, "textStyle")
+    const newItemContentStore = useLocalDBinding("")
+    const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
+    const textStyle = propertyBinding(configStore, "textStyle")
 
     function createItem(){
         if(newItemContentStore.value === "") return;
@@ -97,7 +97,7 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
             content: newItemContentStore.value,
             done: false
         }
-        itemsStore.insert(0, newItem)
+        itemsBinding.insert(0, newItem)
         newItemContentStore.update("")
     }
     return <>
@@ -109,16 +109,16 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
             </IconButton>
         }
     >
-        <StringField valueStore={newItemContentStore}/>
+        <StringField binding={newItemContentStore}/>
     </ListItem>
-    {itemsStore.items.map((item, i) => (
+    {itemsBinding.items.map((item, i) => (
         <ListItem key={i} 
             secondaryAction={
                 <IconButton edge="end" onClick={() => item.remove()}>
                     <Icons.Delete/>
                 </IconButton>
             }>
-            <ListItemButton onClick={() => propertyStore(item, "done").update(!item.value.done)}>
+            <ListItemButton onClick={() => propertyBinding(item, "done").update(!item.value.done)}>
                 <ListItemIcon>
                     <Checkbox
                         edge="start"
@@ -126,12 +126,12 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
                     />
                 </ListItemIcon>
             </ListItemButton>
-            <StringField valueStore={propertyStore(item, "content")}/>
+            <StringField binding={propertyBinding(item, "content")}/>
         </ListItem>
     ))}
     </List>
     <Collapse title="字体设置">
-        <TextStyleAndSizePicker valueStore={textStyle}/>
+        <TextStyleAndSizePicker binding={textStyle}/>
     </Collapse>
     </>
 }

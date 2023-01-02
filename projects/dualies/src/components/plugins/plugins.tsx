@@ -1,4 +1,4 @@
-import { createDStore, createReadonlyDStore } from "@dualies/components"
+import { createDBinding, createReadonlyDBinding } from "@dualies/components"
 import { enabledPlugins } from "../../plugins"
 import { usePlugin } from "../../store"
 import { EditableStateContext, PluginStoreContext, useStateManager } from "../context"
@@ -23,7 +23,7 @@ export const EditablePlugin = (props: ComponentProps) => {
         throw new Error(`Unsupported plugin: ${store.meta.pluginType}`)
     }
 
-    const storeBinding = createDStore({value: store.config, update: value => store.setConfig(value)})
+    const storeBinding = createDBinding({value: store.config, update: value => store.setConfig(value)})
 
     return <PluginStoreContext.Provider value={store}>
             <EditableStateContext.Provider value={editableState}>
@@ -40,7 +40,7 @@ export const PreviewPlugin = (props: ComponentProps) => {
     if(store === null){
         return <Loading/>
     }
-    const configBinding = createReadonlyDStore(store.config)
+    const configBinding = createReadonlyDBinding(store.config)
     const plugin = enabledPlugins[store.meta.pluginType]
     if(!plugin) {
         return <div>`Unsupported plugin: ${store.meta.pluginType}`</div>

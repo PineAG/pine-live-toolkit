@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "./utils"
 
-import { FormItem, Grid, propertyStore, StringField } from "@dualies/components"
+import { FormItem, Grid, propertyBinding, StringField } from "@dualies/components"
 import "@fontsource/baumans"
 
 const DEFAULT_FONT = '"Baumans"'
@@ -45,19 +45,19 @@ const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
 }
 
 const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
-    const format = propertyStore(configStore, "format")
-    const textStyle = propertyStore(configStore, "textStyle")
+    const format = propertyBinding(configStore, "format")
+    const textStyle = propertyBinding(configStore, "textStyle")
     return <Grid container>
         <Grid span={12}>
             <FormItem label="时间格式">
                 <StringField
-                    valueStore={format}
+                    binding={format}
                 />
             </FormItem>
         </Grid>
         <Grid span={12}>
             <TextStylePicker
-                valueStore={textStyle}
+                binding={textStyle}
             />
         </Grid>
         <Grid span={12}>

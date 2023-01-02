@@ -1,8 +1,8 @@
 import {Select as AntdSelect} from "antd"
-import { DStore } from "../../store"
+import { DBinding } from "../../store"
 
 export interface SelectProps {
-    valueStore: DStore<string>
+    binding: DBinding<string>
     options: OptionItem<string>[]
 }
 
@@ -10,8 +10,8 @@ export function Select<T>(props: SelectProps) {
     return <AntdSelect
         defaultOpen={false}
         defaultValue=""
-        value={props.valueStore.value} 
-        onChange={value => props.valueStore.update(value)} 
+        value={props.binding.value} 
+        onChange={value => props.binding.update(value)} 
         options={props.options}
         >
         </AntdSelect>
@@ -31,7 +31,7 @@ interface OptionItem<T> {
 }
 
 export interface SelectWithFilterProps<T> {
-    valueStore: DStore<T>
+    binding: DBinding<T>
     placeholder: string
     optionFilter?: (input: string, value: T | undefined, label: React.ReactNode | undefined) => boolean
     options: OptionItem<T>[]
@@ -40,10 +40,10 @@ export interface SelectWithFilterProps<T> {
 export function SelectWithFilter<T extends string | number>(props: SelectWithFilterProps<T>) {
     const optionFilter = props.optionFilter ?? defaultSelectFilter
     return <AntdSelect<T, {value: T, label: React.ReactNode}>
-            value={props.valueStore.value}
+            value={props.binding.value}
             placeholder={props.placeholder}
             onChange={value => {
-                props.valueStore.update(value)
+                props.binding.update(value)
             }}
             optionFilterProp="children"
             filterOption={(input, option) => optionFilter(input, option?.value, option?.label)}

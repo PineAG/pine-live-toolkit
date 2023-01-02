@@ -1,18 +1,18 @@
 import * as Antd from "antd"
-import { DStore } from "../../store"
+import { DBinding } from "../../store"
 
 export interface SwitchProps {
-    valueStore: DStore<boolean>
+    binding: DBinding<boolean>
 }
 
-export function Switch({valueStore}: SwitchProps){
-    return <Antd.Switch checked={valueStore.value} onChange={value => valueStore.update(value)}/>
+export function Switch({binding}: SwitchProps){
+    return <Antd.Switch checked={binding.value} onChange={value => binding.update(value)}/>
 }
 
 export interface CheckboxProps {
-    valueStore: DStore<boolean>
+    binding: DBinding<boolean>
 }
 
-export function Checkbox({valueStore}: CheckboxProps) {
-    return <Antd.Checkbox checked={valueStore.value} onChange={evt => valueStore.update(evt.target.checked)}/>
+export function Checkbox({binding}: CheckboxProps) {
+    return <Antd.Checkbox checked={binding.value} onChange={evt => binding.update(evt.target.checked)}/>
 }

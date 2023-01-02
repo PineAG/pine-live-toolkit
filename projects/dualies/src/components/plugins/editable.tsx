@@ -1,4 +1,4 @@
-import { Dialog, Icons, QuickConfirm, useLocalDStore } from "@dualies/components"
+import { Dialog, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
 import { ButtonGroup, IconButton } from "@mui/material"
 import { CSSProperties, ReactNode, useContext } from "react"
 import { enabledPlugins } from "../../plugins"
@@ -30,7 +30,7 @@ export const EditableSwitch = () => {
     const panelSize = useContext(PanelSizeContext)
     const {size: pluginRect} = useNotNullContext(PluginStoreContext)
     const style = getEditableSwitchStyle(pluginRect, panelSize)
-    const tmpConfigStore = useLocalDStore<any | null>(null)
+    const tmpConfigStore = useLocalDBinding<any | null>(null)
 
     const pluginTemplate = enabledPlugins[plugin.meta.pluginType]
 

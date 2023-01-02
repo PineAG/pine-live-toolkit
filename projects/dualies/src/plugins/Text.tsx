@@ -1,4 +1,4 @@
-import { FormItem, Grid, MultiLinesStringField, NumberField, propertyStore } from "@dualies/components"
+import { FormItem, Grid, MultiLinesStringField, NumberField, propertyBinding } from "@dualies/components"
 import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils"
 
@@ -18,19 +18,19 @@ function Text({configStore}: PropsWithConfig<Config>) {
 }
 
 function TextConfig(props: PropsWithConfig<Config>) {
-    const contentStore = propertyStore(props.configStore, "content")
-    const textStyle = propertyStore(props.configStore, "textStyle")
+    const contentStore = propertyBinding(props.configStore, "content")
+    const textStyle = propertyBinding(props.configStore, "textStyle")
 
     return <Grid container>
         <Grid span={12}>
             <TextStyleAndSizePicker
-                valueStore={textStyle}
+                binding={textStyle}
             />
         </Grid>
         <Grid span={12}>
             <FormItem label="内容">
                 <MultiLinesStringField
-                    valueStore={contentStore}
+                    binding={contentStore}
                     rows={5}
                 />
             </FormItem>

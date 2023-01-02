@@ -5,7 +5,7 @@ import Loading from "../components/Loading"
 import { Button } from "@mui/material"
 import {UploadFile as UploadIcon} from "@mui/icons-material"
 import { useState } from "react"
-import { Grid, propertyStore } from "@dualies/components"
+import { Grid, propertyBinding } from "@dualies/components"
 
 export interface Config {
     fileId: string | null
@@ -35,7 +35,7 @@ function ImageViewer({configStore}: PropsWithConfig<Config>) {
 }
 
 function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
-    const fileIdStore = propertyStore(configStore, "fileId")
+    const fileIdStore = propertyBinding(configStore, "fileId")
     const fileURL = useFileId(fileIdStore.value)
     return <>
         <Grid container>

@@ -1,4 +1,4 @@
-import { DStore, NumberField, propertyStore, Grid, FormItem, defaultValueStore, Select, InlineForm } from "@dualies/components"
+import { DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm } from "@dualies/components"
 import { SelectWithFilter } from "@dualies/components"
 import { CSSProperties, useMemo } from "react"
 import { ColorPickerButton } from "./ColorPickerButton"
@@ -25,7 +25,7 @@ export function convertTextStyleToCSS(textStyle: TextStyle & {fontSize?: number}
 }
 
 export interface TextStylePickerProps<T extends TextStyle | TextStyleAndSize> {
-    valueStore: DStore<T>
+    binding: DBinding<T>
 }
 
 export function getFontsList(): string[] {
@@ -49,13 +49,13 @@ function removeQuotes(s: string): string {
     return s.replace(/^"/, "").replace(/"$/, "")
 }
 
-function FontSelect(props: {valueStore: DStore<string | undefined>}) {
+function FontSelect(props: {binding: DBinding<string | undefined>}) {
     const fontFamilies = useLoadedFontFamilies()
     const defaultFont = useMemo(() => getDefaultFontFamily(), [])
-    const binding = defaultValueStore<string>(props.valueStore, defaultFont)
+    const binding = defaultValueBinding<string>(props.binding, defaultFont)
     return (<SelectWithFilter<string>
         placeholder="选择字体"
-        valueStore={binding}
+        binding={binding}
         options={fontFamilies.map(family => ({
             label: (
                 <span style={{fontFamily: family}}>
@@ -68,16 +68,16 @@ function FontSelect(props: {valueStore: DStore<string | undefined>}) {
 }
 
 export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
-    const fontFamily = propertyStore(props.valueStore, "fontFamily")
-    const borderWidth = propertyStore(props.valueStore, "borderWidth")
-    const textColor = propertyStore(props.valueStore, "textColor")
-    const borderColor = propertyStore(props.valueStore, "borderColor")
+    const fontFamily = propertyBinding(props.binding, "fontFamily")
+    const borderWidth = propertyBinding(props.binding, "borderWidth")
+    const textColor = propertyBinding(props.binding, "textColor")
+    const borderColor = propertyBinding(props.binding, "borderColor")
 
     return <div style={{width: "100%"}}>
         <Grid container item span={12}>
             <Grid span={8}>
                 <FormItem label="字体类型">
-                    <FontSelect valueStore={fontFamily}/>
+                    <FontSelect binding={fontFamily}/>
                 </FormItem>
             </Grid>
         </Grid>
@@ -100,7 +100,7 @@ export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
             <Grid span={5}>
                 <FormItem label="边缘粗细">
                     <NumberField
-                        valueStore={borderWidth}
+                        binding={borderWidth}
                         min={0}
                         step={0.25}
                     />
@@ -111,23 +111,23 @@ export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
 }
 
 export function TextStyleAndSizePicker(props: TextStylePickerProps<TextStyleAndSize>) {
-    const fontFamily = propertyStore(props.valueStore, "fontFamily")
-    const borderWidth = propertyStore(props.valueStore, "borderWidth")
-    const textColor = propertyStore(props.valueStore, "textColor")
-    const borderColor = propertyStore(props.valueStore, "borderColor")
-    const fontSize = propertyStore(props.valueStore, "fontSize")
+    const fontFamily = propertyBinding(props.binding, "fontFamily")
+    const borderWidth = propertyBinding(props.binding, "borderWidth")
+    const textColor = propertyBinding(props.binding, "textColor")
+    const borderColor = propertyBinding(props.binding, "borderColor")
+    const fontSize = propertyBinding(props.binding, "fontSize")
 
     return <div style={{width: "100%"}}>
         <Grid container item span={12}>
             <Grid span={8}>
                 <FormItem label="字体类型">
-                    <FontSelect valueStore={fontFamily}/>
+                    <FontSelect binding={fontFamily}/>
                 </FormItem>
             </Grid>
             <Grid span={4}>
                 <FormItem label="大小">
                     <NumberField
-                        valueStore={fontSize}
+                        binding={fontSize}
                         min={1}
                         step={1}
                     />
@@ -153,7 +153,7 @@ export function TextStyleAndSizePicker(props: TextStylePickerProps<TextStyleAndS
             <Grid span={5}>
                 <FormItem label="边缘粗细">
                     <NumberField
-                        valueStore={borderWidth}
+                        binding={borderWidth}
                         min={0}
                         step={0.25}
                     />

@@ -1,13 +1,13 @@
-import { DStore } from "@dualies/components"
+import { DBinding } from "@dualies/components"
 import { ReactNode, useContext } from "react"
 import { PluginStoreContext } from "../components/context"
 import { Rect, Size } from "../store"
 
 interface Renderer<Config> {
-    move: (configStore: DStore<Config>) => ReactNode
-    edit: (configStore: DStore<Config>) => ReactNode
-    preview: (configStore: DStore<Config>) => ReactNode
-    config: (configStore: DStore<Config>) => ReactNode
+    move: (configStore: DBinding<Config>) => ReactNode
+    edit: (configStore: DBinding<Config>) => ReactNode
+    preview: (configStore: DBinding<Config>) => ReactNode
+    config: (configStore: DBinding<Config>) => ReactNode
 }
 
 export interface Plugin<Config> {
@@ -30,5 +30,5 @@ export function usePluginSize(): Rect {
 }
 
 export interface PropsWithConfig<Config> {
-    configStore: DStore<Config>
+    configStore: DBinding<Config>
 }

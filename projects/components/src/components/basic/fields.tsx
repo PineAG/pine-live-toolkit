@@ -1,6 +1,6 @@
 import {Input, InputNumber, Form as AntdForm} from "antd"
 import TextArea from "antd/es/input/TextArea"
-import { DStore } from "../../store"
+import { DBinding } from "../../store"
 
 export interface FieldBaseProps {
     placeholder?: string
@@ -8,7 +8,7 @@ export interface FieldBaseProps {
 }
 
 export interface StringFieldProps extends FieldBaseProps {
-    valueStore: DStore<string>
+    binding: DBinding<string>
     maxLength?: number
     prefix?: string | JSX.Element
     suffix?: string | JSX.Element
@@ -16,8 +16,8 @@ export interface StringFieldProps extends FieldBaseProps {
 
 export function StringField(props: StringFieldProps) {
     return <Input
-        value={props.valueStore.value}
-        onChange={evt => props.valueStore.update(evt.target.value ?? "")}
+        value={props.binding.value}
+        onChange={evt => props.binding.update(evt.target.value ?? "")}
         placeholder={props.placeholder}
         prefix={props.prefix}
         suffix={props.suffix}
@@ -30,15 +30,15 @@ export interface MultiLinesStringFieldProps extends Omit<StringFieldProps, "pref
 
 export function MultiLinesStringField(props: MultiLinesStringFieldProps) {
     return <TextArea
-        value={props.valueStore.value}
-        onChange={evt => props.valueStore.update(evt.target.value ?? "")}
+        value={props.binding.value}
+        onChange={evt => props.binding.update(evt.target.value ?? "")}
         placeholder={props.placeholder}
         rows={props.rows}
     />
 }
 
 export interface NumberFieldProps extends FieldBaseProps {
-    valueStore: DStore<number>
+    binding: DBinding<number>
     min?: number
     max?: number
     step?: number
@@ -47,8 +47,8 @@ export interface NumberFieldProps extends FieldBaseProps {
 
 export function NumberField(props: NumberFieldProps) {
     return <InputNumber
-        value={props.valueStore.value}
-        onChange={newValue => props.valueStore.update(newValue ?? 0)}
+        value={props.binding.value}
+        onChange={newValue => props.binding.update(newValue ?? 0)}
         placeholder={props.placeholder}
         prefix={props.prefix}
         min={props.min}
