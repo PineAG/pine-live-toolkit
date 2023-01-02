@@ -1,6 +1,6 @@
 import {Input, InputNumber} from "antd"
 import TextArea from "antd/es/input/TextArea"
-import { DStore } from "../store"
+import { DStore } from "../../store"
 
 export interface FieldBaseProps {
     placeholder?: string
