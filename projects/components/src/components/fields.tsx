@@ -17,7 +17,7 @@ export interface StringFieldProps extends FieldBaseProps {
 export function StringField(props: StringFieldProps) {
     return <Input
         value={props.valueStore.value}
-        onChange={evt => props.valueStore.update(evt.target.value)}
+        onChange={evt => props.valueStore.update(evt.target.value ?? "")}
         placeholder={props.placeholder}
         prefix={props.prefix}
         suffix={props.suffix}
@@ -31,7 +31,7 @@ export interface MultiLinesStringFieldProps extends Omit<StringFieldProps, "pref
 export function MultiLinesStringField(props: MultiLinesStringFieldProps) {
     return <TextArea
         value={props.valueStore.value}
-        onChange={evt => props.valueStore.update(evt.target.value)}
+        onChange={evt => props.valueStore.update(evt.target.value ?? "")}
         placeholder={props.placeholder}
         rows={props.rows}
     />
@@ -48,7 +48,7 @@ export interface NumberFieldProps extends FieldBaseProps {
 export function NumberField(props: NumberFieldProps) {
     return <InputNumber
         value={props.valueStore.value}
-        onChange={props.valueStore.update}
+        onChange={newValue => props.valueStore.update(newValue ?? 0)}
         placeholder={props.placeholder}
         prefix={props.prefix}
         min={props.min}

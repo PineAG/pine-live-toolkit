@@ -1,9 +1,9 @@
-import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField } from "@mui/material";
+import { Checkbox, IconButton, List, ListItem, ListItemButton, TextField, ListItemIcon, ListItemText } from "@mui/material";
 import { Plugin, PropsWithConfig, PropsWithSetConfig } from "./base";
 import { getDefaultFontFamily, TextStyle, convertTextStyleToCSS, TextStylePicker } from "./utils";
 import {Delete as DeleteIcon, Add as AddIcon} from "@mui/icons-material"
 import { CSSProperties, useState } from "react";
-import { Collapse } from '@mui/material';
+import {StringField, useLocalDStore} from "@dualies/components"
 
 export interface ChecklistItem {
     done: boolean
@@ -51,7 +51,7 @@ export function ChecklistPreview(props: PropsWithConfig<ChecklistConfig>) {
 }
 
 export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
-    const [newItemValue, setNewItemValue] = useState("")
+    const newItemValueStore = useLocalDStore("")
     function updateChecklistDone(i: number) {
         const prevItems = props.config.items.slice(0, i)
         const nextItems = props.config.items.slice(i+1, props.config.items.length)
@@ -84,18 +84,18 @@ export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
                         items: [
                             ...props.config.items,
                             {
-                                content: newItemValue,
+                                content: newItemValueStore.value,
                                 done: false
                             }
                         ]
                     })
-                    setNewItemValue("")
+                    newItemValueStore.update("")
                     }}>
                     <AddIcon/>
                 </IconButton>
             }
         >
-            <TextField fullWidth variant="standard" value={newItemValue} onChange={evt => setNewItemValue(evt.target.value)}></TextField>
+            <StringField valueStore={newItemValueStore}/>
         </ListItem>
     </List>
 }

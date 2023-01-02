@@ -13,7 +13,7 @@ export interface GridItemProps{
 }
 
 function isGridContainerProps(props: GridContainerProps | GridItemProps): props is GridContainerProps {
-    return props.container
+    return !!props.container
 }
 
 function isGridItemProps(props: GridContainerProps | GridItemProps): props is GridItemProps {

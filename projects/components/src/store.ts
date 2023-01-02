@@ -25,7 +25,7 @@ export function useLocalDStore<T>(defaultValue: T): DStore<T> {
 type MappingObject = {[key: string]: any}
 
 
-class PropertyStore<T extends MappingObject, K extends keyof T> implements DStore<T[K]> {
+class PropertyStore<T, K extends keyof T> implements DStore<T[K]> {
     constructor(private store: DStore<T>, private key: K) {}
 
     get value(): T[K] {
@@ -39,9 +39,14 @@ class PropertyStore<T extends MappingObject, K extends keyof T> implements DStor
         })
     }
 
-    get to(): T[K] extends MappingObject ? <SubKey extends keyof T[K]>(key: SubKey) => PropertyStore<T[K], SubKey> : never {
-        return (key) => new PropertyStore(this, key)
+    to<NewKey extends keyof T[K]>(key: NewKey): PropertyStore<T[K], NewKey> {
+        return new PropertyStore(this, key)
     }
+}
+
+
+export function propertyStore<Parent extends MappingObject, Key extends keyof Parent>(parent: DStore<Parent>, key: Key): PropertyStore<Parent, Key> {
+    return new PropertyStore(parent, key)
 }
 
 class MemoryStore<T> implements DStore<T> {
@@ -58,11 +63,6 @@ class MemoryStore<T> implements DStore<T> {
 
 export function memoryStore<T>(initialValue: T): MemoryStore<T> {
     return new MemoryStore(initialValue)
-}
-
-
-export function propertyStore<Parent extends MappingObject, Key extends keyof Parent>(parent: DStore<Parent>, key: Key): PropertyStore<Parent, Key> {
-    return new PropertyStore(parent, key)
 }
 
 class ArrayStore<Item> implements DStore<Item[]> {
