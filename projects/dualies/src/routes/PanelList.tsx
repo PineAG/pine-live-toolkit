@@ -1,5 +1,5 @@
-import { Icons } from "@dualies/components"
-import { Button, ButtonBase, Card, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@mui/material"
+import { Dialog, Grid, Icons, nullablePropertyBinding, defaultValueBinding, propertyBinding, StringField, useLocalDBinding, FormItem, NumberField } from "@dualies/components"
+import { Button, ButtonBase, Card } from "@mui/material"
 import { ReactElement, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
@@ -12,7 +12,7 @@ type PageListButtonProps = {
     children: ReactElement
 }
 const ListButton = (props: PageListButtonProps) => {
-    return <Grid xs={4} lg={2}>
+    return <Grid span={4}>
         <Card className="list-button">
             <ButtonBase className="fill" onAnimationEnd={props.onClick}>
                 {props.children}
@@ -38,13 +38,13 @@ function defaultNewPanel(): NewPanelInfo {
 export const PanelListPage = () => {
     const navigate = useNavigate()
     const store = useGlobal()
-    const [newPanel, setNewPanel] = useState<NewPanelInfo | null>(null)
+    const newPanel = useLocalDBinding<NewPanelInfo | null>(null)
     if(!store){
         return <Loading/>
     }
     return <>
     <Grid container>
-        <ListButton onClick={() => setNewPanel(defaultNewPanel())}>
+        <ListButton onClick={() => newPanel.update(defaultNewPanel())}>
             <Icons.Add/>
         </ListButton>
         {store.panels.map(p => (
@@ -55,66 +55,37 @@ export const PanelListPage = () => {
             </ListButton>
         ))}
     </Grid>
-    <Dialog fullWidth open={newPanel !== null} onClose={() => setNewPanel(null)}>
-        <DialogTitle>新建界面</DialogTitle>
-        <DialogContent>
+    <Dialog title="新建界面" open={newPanel.value !== null} 
+        onOk={async () => {
+            if(newPanel.value === null) return;
+            const {title, width, height} = newPanel.value
+            await store.createPanel(title, {width, height})
+            newPanel.update(null)
+        }} 
+        onCancel={() => newPanel.update(null)}>
             <Grid container>
-                <Grid xs={12}>
-                    <TextField
-                        fullWidth
-                        margin="dense"
-                        autoFocus
-                        type="text"
-                        value={newPanel?.title ?? ""}
-                        onChange={evt => newPanel && setNewPanel({...newPanel, title: evt.target.value ?? ""})}
-                        label="标题"
-                    />
+                <Grid span={12}>
+                    <FormItem label="标题">
+                        <StringField
+                            binding={defaultValueBinding<string>(nullablePropertyBinding(newPanel, "title"), "")}
+                        />
+                    </FormItem>
                 </Grid>
-                <Grid xs={6}>
-                    <TextField
-                        type="number"
-                        fullWidth
-                        margin="dense"
-                        label="宽度"
-                        value={newPanel?.width}
-                        onChange={evt => {
-                            if(!newPanel) return;
-                            const value = parseInt(evt.target.value)
-                            if(isNaN(value) || value < 1){
-                                return;
-                            }
-                            setNewPanel({...newPanel, width: value})
-                        }}
-                    />
+                <Grid span={6}>
+                    <FormItem label="宽度">
+                        <NumberField
+                            binding={defaultValueBinding<number>(nullablePropertyBinding(newPanel, "width"), 1)}
+                        />
+                    </FormItem>
                 </Grid>
-                <Grid xs={6}>
-                    <TextField
-                        type="number"
-                        fullWidth
-                        value={newPanel?.height}
-                        margin="dense"
-                        label="高度"
-                        onChange={evt => {
-                            if(!newPanel) return;
-                            const value = parseInt(evt.target.value)
-                            if(isNaN(value) || value < 1){
-                                return;
-                            }
-                            setNewPanel({...newPanel, height: value})
-                        }}
-                    />
+                <Grid span={6}>
+                    <FormItem label="高度">
+                        <NumberField
+                            binding={defaultValueBinding<number>(nullablePropertyBinding(newPanel, "height"), 1)}
+                        />
+                    </FormItem>
                 </Grid>
             </Grid>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setNewPanel(null)}>取消</Button>
-            <Button onClick={async () => {
-                if(newPanel === null) return;
-                const {title, width, height} = newPanel
-                await store.createPanel(title, {width, height})
-                setNewPanel(null)
-            }}>创建</Button>
-        </DialogActions>
     </Dialog>
     </>
 }

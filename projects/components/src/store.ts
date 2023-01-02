@@ -180,3 +180,28 @@ export function mapBinding<T, R>(parent: DBinding<T>, props: MapBindingProps<T, 
         update: value => parent.update(props.backward(value, parent.value))
     }
 }
+
+class NullablePropertyBinding<T extends MappingObject, K extends keyof T> implements DBinding<T[K] | null> {
+    constructor(private store: DBinding<T | null>, private key: K) {}
+
+    get value(): T[K] | null {
+        if(this.store.value === null) return null;
+        return this.store.value[this.key]
+    }
+
+    async update(value: T[K] | null): Promise<void> {
+        if(this.store.value === null) return;
+        await this.store.update({
+            ...this.store.value,
+            [this.key]: value
+        })
+    }
+
+    to<NewKey extends keyof T[K]>(key: NewKey): NullablePropertyBinding<T[K], NewKey> {
+        return new NullablePropertyBinding(this, key)
+    }
+}
+
+export function nullablePropertyBinding<T extends MappingObject, K extends keyof T>(parent: DBinding<T | null>, key: K): NullablePropertyBinding<T, K> {
+    return new NullablePropertyBinding(parent, key)
+}

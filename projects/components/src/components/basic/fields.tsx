@@ -16,7 +16,7 @@ export interface StringFieldProps extends FieldBaseProps {
 
 export function StringField(props: StringFieldProps) {
     return <Input
-        value={props.binding.value}
+        value={props.binding.value ?? ""}
         onChange={evt => props.binding.update(evt.target.value ?? "")}
         placeholder={props.placeholder}
         prefix={props.prefix}
