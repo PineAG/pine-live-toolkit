@@ -1,35 +1,52 @@
 import {Row, Col} from "antd"
 
-export interface GridContainerProps {
+interface GridPropsBase {
+    style?: React.CSSProperties
+    className?: string
+    children: JSX.Element | JSX.Element[]
+}
+
+export interface GridContainerProps extends GridPropsBase {
     container: true
+    item?: false
     spacing?: number
-    children: JSX.Element
 }
 
-export interface GridItemProps{
+export interface GridItemProps extends GridPropsBase{
     container?: false
+    item?: true
     span: number
-    children: JSX.Element
 }
 
-function isGridContainerProps(props: GridContainerProps | GridItemProps): props is GridContainerProps {
-    return !!props.container
+export interface GridItemContainerProps extends GridPropsBase{
+    container: true
+    item: true
+    spacing?: number
+    span: number
 }
 
-function isGridItemProps(props: GridContainerProps | GridItemProps): props is GridItemProps {
-    return !props.container
+function isItemProps(props: GridContainerProps | GridItemProps | GridItemContainerProps): props is GridItemProps {
+    return (props.item === undefined || props.item) && !props.container
 }
 
-export function Grid(props: GridContainerProps | GridItemProps) {
-    if(isGridContainerProps(props)) {
-        return <Row gutter={props.spacing}>
+
+export function Grid(props: GridContainerProps | GridItemProps | GridItemContainerProps) {
+    const elementProps = {style: props.style, className: props.className}
+    if(props.container && props.item) {
+        return <Col {...elementProps} span={props.span}>
+            <Row gutter={props.spacing}>
+                {props.children}
+            </Row>
+        </Col>
+    } else if (props.container) {
+        return <Row {...elementProps} gutter={props.spacing}>
             {props.children}
         </Row>
-    } else if (isGridItemProps(props)) {
-        return <Col span={props.span * 2}>
+    } else if (isItemProps(props)){
+        return <Col {...elementProps} span={props.span * 2}>
             {props.children}
         </Col>
     } else {
-        throw new Error(props)
+        throw new Error(`Invalid props: container=${props["container"] ?? false}, item=${props["item"] ?? false}`)
     }
 }

@@ -7,9 +7,10 @@ import { usePanelId } from "./utils"
 import "./Panel.css"
 import { PanelElementSizeContext, PanelStoreContext } from "../components/context"
 import React, { useEffect, useRef, useState } from "react"
-import { Alert, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Select, Snackbar, Typography } from "@mui/material"
+import { Alert, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Snackbar, Typography } from "@mui/material"
 import {Add as AddIcon, Share as ShareIcon} from "@mui/icons-material"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
+import {Grid} from "@dualies/components"
 
 
 function convertDomRectToRect(rect: DOMRect | undefined): Rect {
@@ -72,10 +73,10 @@ export const PanelPage = () => {
     }
     return <div className="route-panel-root">
         <Grid container className="route-panel-header">
-            <Grid xs={6}>
+            <Grid span={6}>
                 <Typography>{panel.meta.title}</Typography>
             </Grid>
-            <Grid xs={6}>
+            <Grid span={6}>
                 <ButtonGroup variant="contained">
                     <Button startIcon={<AddIcon/>} onClick={() => setNewPluginType(enabledPluginsList[0].type)}>添加组件</Button>
                     <ShareButton/>
@@ -91,7 +92,7 @@ export const PanelPage = () => {
             <DialogTitle>添加组件</DialogTitle>
             <DialogContent>
                 <Grid container>
-                    <Grid xs={12}>
+                    <Grid span={12}>
                     <Select
                         fullWidth
                         value={newPluginType}
