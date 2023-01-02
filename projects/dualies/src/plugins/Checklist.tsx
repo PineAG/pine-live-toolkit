@@ -74,8 +74,8 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
         <ListItem
             secondaryAction={
                 <IconButton edge="end" onClick={async () => {
-                    await itemsBinding.append({done: false, content: newItembinding.value})
-                    newItembinding.update("")
+                    await itemsBinding.append({done: false, content: newItemBinding.value})
+                    newItemBinding.update("")
                     }}>
                     <Icons.Add/>
                 </IconButton>
