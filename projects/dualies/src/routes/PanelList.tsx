@@ -1,8 +1,8 @@
+import { Icons } from "@dualies/components"
 import { Button, ButtonBase, Card, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@mui/material"
 import { ReactElement, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
-import {Add as AddIcon} from "@mui/icons-material"
 import { PanelMeta, useGlobal } from "../store"
 import "./PanelList.css"
 
@@ -45,7 +45,7 @@ export const PanelListPage = () => {
     return <>
     <Grid container>
         <ListButton onClick={() => setNewPanel(defaultNewPanel())}>
-            <AddIcon fontSize="large"/>
+            <Icons.Add/>
         </ListButton>
         {store.panels.map(p => (
             <ListButton onClick={() => navigate(`/panel/${p.id}`)}>

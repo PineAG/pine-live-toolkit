@@ -1,5 +1,7 @@
 import * as icons from "@ant-design/icons"
 
+export const Add = () => <icons.PlusOutlined/>
+
 export const Edit = () => <icons.EditOutlined/>
 
 export const Delete = () => <icons.DeleteOutlined/>
@@ -10,6 +12,6 @@ export const Close = () => <icons.DeleteOutlined/>
 
 export const Minimize = () => <icons.LineOutlined/>
 
-export const Move = () => <icons.ArrowsAltOutlined/>
+export const Move = () => <icons.DragOutlined/>
 
 export const Share = () => <icons.ShareAltOutlined/>

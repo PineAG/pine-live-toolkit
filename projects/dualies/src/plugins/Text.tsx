@@ -1,5 +1,4 @@
-import { FormItem, MultiLinesStringField, NumberField, propertyStore } from "@dualies/components"
-import { Stack } from "@mui/system"
+import { FormItem, Grid, MultiLinesStringField, NumberField, propertyStore } from "@dualies/components"
 import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils"
 
@@ -22,18 +21,24 @@ function TextConfig(props: PropsWithConfig<Config>) {
     const contentStore = propertyStore(props.configStore, "content")
     const textStyle = propertyStore(props.configStore, "textStyle")
 
-    return <Stack direction="column">
-        <TextStyleAndSizePicker
-            valueStore={textStyle}
-        />
-        <FormItem label="内容">
-            <MultiLinesStringField
-                valueStore={contentStore}
-                rows={5}
+    return <Grid container>
+        <Grid span={12}>
+            <TextStyleAndSizePicker
+                valueStore={textStyle}
             />
-        </FormItem>
-        <Text {...props}/>
-    </Stack>
+        </Grid>
+        <Grid span={12}>
+            <FormItem label="内容">
+                <MultiLinesStringField
+                    valueStore={contentStore}
+                    rows={5}
+                />
+            </FormItem>
+        </Grid>
+        <Grid span={12}>
+            <Text {...props}/>
+        </Grid>
+    </Grid>
 }
 
 export const TextPlugin: Plugin<Config> = {

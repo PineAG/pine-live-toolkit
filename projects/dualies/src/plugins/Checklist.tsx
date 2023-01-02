@@ -1,5 +1,4 @@
-import { arrayStore, Collapse, FormItem, NumberField, propertyStore, StringField, useLocalDStore } from "@dualies/components";
-import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { Icons, arrayStore, Collapse, FormItem, NumberField, propertyStore, StringField, useLocalDStore } from "@dualies/components";
 import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "./base";
@@ -78,7 +77,7 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
                     await itemsStore.append({done: false, content: newItemValueStore.value})
                     newItemValueStore.update("")
                     }}>
-                    <AddIcon/>
+                    <Icons.Add/>
                 </IconButton>
             }
         >
@@ -106,7 +105,7 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
     <ListItem
         secondaryAction={
             <IconButton edge="end" onClick={createItem}>
-                <AddIcon/>
+                <Icons.Add/>
             </IconButton>
         }
     >
@@ -116,7 +115,7 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
         <ListItem key={i} 
             secondaryAction={
                 <IconButton edge="end" onClick={() => item.remove()}>
-                    <DeleteIcon/>
+                    <Icons.Delete/>
                 </IconButton>
             }>
             <ListItemButton onClick={() => propertyStore(item, "done").update(!item.value.done)}>

@@ -1,9 +1,12 @@
 import React from 'react';
 import { RouterRoot } from './routes';
+import { InternationalProvider } from '@dualies/components';
 
 function App() {
   return (
-    <RouterRoot/>
+    <InternationalProvider language='zhCN'>
+      <RouterRoot/>
+    </InternationalProvider>
   );
 }
 

@@ -1,10 +1,9 @@
-import { Stack } from "@mui/material"
 import moment from "moment"
 import { useEffect, useRef, useState } from "react"
 import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "./utils"
 
-import { FormItem, propertyStore, StringField } from "@dualies/components"
+import { FormItem, Grid, propertyStore, StringField } from "@dualies/components"
 import "@fontsource/baumans"
 
 const DEFAULT_FONT = '"Baumans"'
@@ -48,19 +47,25 @@ const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
 const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
     const format = propertyStore(configStore, "format")
     const textStyle = propertyStore(configStore, "textStyle")
-    return <Stack direction="column">
-        <FormItem label="时间格式">
-            <StringField
-                valueStore={format}
+    return <Grid container>
+        <Grid span={12}>
+            <FormItem label="时间格式">
+                <StringField
+                    valueStore={format}
+                />
+            </FormItem>
+        </Grid>
+        <Grid span={12}>
+            <TextStylePicker
+                valueStore={textStyle}
             />
-        </FormItem>
-        <TextStylePicker
-            valueStore={textStyle}
-        />
-        <div style={{height: "100px"}}>
-            <Clock configStore={configStore}/>
-        </div>
-    </Stack>
+        </Grid>
+        <Grid span={12}>
+            <div style={{height: "100px"}}>
+                <Clock configStore={configStore}/>
+            </div>
+        </Grid>
+    </Grid>
 }
 
 function getDefaultTextStyle(): TextStyle{

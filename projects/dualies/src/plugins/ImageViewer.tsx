@@ -2,10 +2,10 @@ import { Plugin, PropsWithConfig } from "./base"
 import {Image as ImageIcon} from "@mui/icons-material"
 import { FileClient, useFileId } from "../store"
 import Loading from "../components/Loading"
-import { Button, Grid } from "@mui/material"
+import { Button } from "@mui/material"
 import {UploadFile as UploadIcon} from "@mui/icons-material"
 import { useState } from "react"
-import { propertyStore } from "@dualies/components"
+import { Grid, propertyStore } from "@dualies/components"
 
 export interface Config {
     fileId: string | null
@@ -39,7 +39,7 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
     const fileURL = useFileId(fileIdStore.value)
     return <>
         <Grid container>
-            <Grid xs={12}>
+            <Grid span={12}>
                 <Button startIcon={<UploadIcon/>} variant="contained" component="label">
                     上传文件
                     <input 
@@ -56,7 +56,7 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
                         }}/>
                 </Button>
             </Grid>
-            <Grid xs={12}>
+            <Grid span={12}>
                 {fileURL ? <img src={fileURL}></img> : null}
             </Grid>
         </Grid>

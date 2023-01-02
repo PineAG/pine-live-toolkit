@@ -8,9 +8,8 @@ import "./Panel.css"
 import { PanelElementSizeContext, PanelStoreContext } from "../components/context"
 import React, { useEffect, useRef, useState } from "react"
 import { Alert, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Snackbar, Typography } from "@mui/material"
-import {Add as AddIcon, Share as ShareIcon} from "@mui/icons-material"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
-import {Grid} from "@dualies/components"
+import {Grid, Icons} from "@dualies/components"
 
 
 function convertDomRectToRect(rect: DOMRect | undefined): Rect {
@@ -29,7 +28,7 @@ function ShareButton() {
         setOpen(true)
     }
     return <>
-        <Button startIcon={<ShareIcon/>} onClick={copyLink}>
+        <Button startIcon={<Icons.Share/>} onClick={copyLink}>
             展示页链接
         </Button>
         <Snackbar open={open} autoHideDuration={3000} onClose={() => setOpen(false)}>
@@ -78,7 +77,7 @@ export const PanelPage = () => {
             </Grid>
             <Grid span={6}>
                 <ButtonGroup variant="contained">
-                    <Button startIcon={<AddIcon/>} onClick={() => setNewPluginType(enabledPluginsList[0].type)}>添加组件</Button>
+                    <Button startIcon={<Icons.Add/>} onClick={() => setNewPluginType(enabledPluginsList[0].type)}>添加组件</Button>
                     <ShareButton/>
                 </ButtonGroup>
             </Grid>

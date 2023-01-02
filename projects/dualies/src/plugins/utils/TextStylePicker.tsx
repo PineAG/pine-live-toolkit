@@ -89,19 +89,20 @@ export function TextStylePicker(props: TextStylePickerProps<TextStyle>) {
                 />
                 </FormItem>
             </Grid>
-            <Grid span={6}>
+            <Grid span={1}><span></span></Grid>
+            <Grid span={3}>
+                <FormItem label="边缘颜色">
+                    <ColorPickerButton
+                        store={borderColor}
+                    />
+                </FormItem>
+            </Grid>
+            <Grid span={5}>
                 <FormItem label="边缘粗细">
                     <NumberField
                         valueStore={borderWidth}
                         min={0}
                         step={0.25}
-                    />
-                </FormItem>
-            </Grid>
-            <Grid span={3}>
-                <FormItem label="边缘颜色">
-                    <ColorPickerButton
-                        store={borderColor}
                     />
                 </FormItem>
             </Grid>

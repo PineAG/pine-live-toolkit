@@ -1,11 +1,6 @@
-import { QuickConfirm, useLocalDStore } from "@dualies/components"
-import {
-    DeleteForever as DeleteIcon,
-    Done as DoneIcon, Edit as EditIcon, OpenWith as MoveIcon
-} from "@mui/icons-material"
-import { Button, ButtonGroup, IconButton } from "@mui/material"
-import {Dialog} from "@dualies/components"
-import { CSSProperties, ReactNode, useContext, useState } from "react"
+import { Dialog, Icons, QuickConfirm, useLocalDStore } from "@dualies/components"
+import { ButtonGroup, IconButton } from "@mui/material"
+import { CSSProperties, ReactNode, useContext } from "react"
 import { enabledPlugins } from "../../plugins"
 import { Rect, Size } from "../../store"
 import { EditableStateContext, PanelSizeContext, PluginStoreContext, useNotNullContext } from "../context"
@@ -44,14 +39,14 @@ export const EditableSwitch = () => {
         <ButtonGroup style={style}>
             <QuickConfirm title="删除组件" description="确认要删除组件吗？" onConfirm={() => plugin.delete()}>    
                 <IconButton size="small">
-                    <DeleteIcon/>
+                    <Icons.Delete/>
                 </IconButton>
             </QuickConfirm>
             <IconButton onClick={() => tmpConfigStore.update(plugin.config)} size="small">
-                <EditIcon/>
+                <Icons.Edit/>
             </IconButton>
             <IconButton size="small" onClick={() => setState(EditableState.Move)}>
-                <MoveIcon/>
+                <Icons.Move/>
             </IconButton>
         </ButtonGroup>
 
@@ -71,7 +66,7 @@ export const EditableSwitch = () => {
     } else {
         return <ButtonGroup style={style}>
             <IconButton size="small" onClick={() => setState(EditableState.Edit)}>
-                <DoneIcon/>
+                <Icons.Ok/>
             </IconButton>
         </ButtonGroup>
     }

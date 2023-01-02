@@ -1,5 +1,5 @@
-import { Backdrop, CircularProgress } from "@mui/material"
+import { Loading } from "@dualies/components"
 
 export default () => {
-    return <CircularProgress/>
+    return <Loading/>
 }
