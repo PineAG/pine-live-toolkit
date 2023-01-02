@@ -1,4 +1,5 @@
-import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { DStore, NumberField, propertyStore, Grid } from "@dualies/components"
+import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import {CSSProperties, useMemo} from "react"
 import { ColorPickerButton } from "./ColorPickerButton"
 
@@ -19,8 +20,7 @@ export function convertTextStyleToCSS(textStyle: TextStyle): CSSProperties {
 }
 
 export interface TextStylePickerProps {
-    value: TextStyle
-    onChange: (style: TextStyle) => void
+    valueStore: DStore<TextStyle>
 }
 
 export function getFontsList(): string[] {
@@ -47,18 +47,22 @@ function removeQuotes(s: string): string {
 export function TextStylePicker(props: TextStylePickerProps) {
     const fontFamilies = useLoadedFontFamilies()
     const defaultFontFamily = useMemo(() => getDefaultFontFamily(), [])
-    function patchConfig<K extends keyof TextStyle>(key: K, value: TextStyle[K]) {
-        props.onChange({...props.value, [key]: value})
-    }
+    
+    const fontFamily = propertyStore(props.valueStore, "fontFamily")
+    const borderWidth = propertyStore(props.valueStore, "borderWidth")
+    const textColor = propertyStore(props.valueStore, "textColor")
+    const borderColor = propertyStore(props.valueStore, "borderColor")
+
+
     return <Grid container style={{marginTop: "20px", marginBottom: "20px"}}>
-        <Grid xs={6}>
+        <Grid span={6}>
             <FormControl fullWidth>
                 <InputLabel id="font-family-selector">字体</InputLabel>
                 <Select 
                     labelId="font-family-selector"
-                    value={props.value.fontFamily ?? defaultFontFamily} 
+                    value={fontFamily.value ?? defaultFontFamily} 
                     onChange={evt => {
-                        patchConfig("fontFamily", evt.target.value)
+                        fontFamily.update(evt.target.value)
                     }}>
                     {fontFamilies.map((font) => (
                         <MenuItem value={font} key={font}>
@@ -70,33 +74,24 @@ export function TextStylePicker(props: TextStylePickerProps) {
                 </Select>
             </FormControl>
         </Grid>
-        <Grid xs={6}>
-            <TextField
-                fullWidth
-                label="边缘粗细"
-                value={props.value.borderWidth}
-                type="number"
-                onChange={evt => patchConfig("borderWidth", parseFloat(evt.target.value ?? "0"))}
-                InputProps={{
-                    inputProps: { 
-                        min: 0,
-                        step: 0.25
-                    }
-                }}
+        <Grid span={6}>
+            <NumberField
+                placeholder="边缘粗细"
+                valueStore={borderWidth}
+                min={0}
+                step={0.25}
             />
         </Grid>
-        <Grid xs={6}>
+        <Grid span={6}>
             <ColorPickerButton
                 label="文字颜色"
-                color={props.value.textColor}
-                onChange={(newColor) => patchConfig("textColor", newColor)}
+                store={textColor}
             />
         </Grid>
-        <Grid xs={6}>
+        <Grid span={6}>
             <ColorPickerButton
                 label="边缘颜色"
-                color={props.value.borderColor}
-                onChange={(newColor) => patchConfig("borderColor", newColor)}
+                store={borderColor}
             />
         </Grid>
     </Grid>

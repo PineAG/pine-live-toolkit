@@ -1,9 +1,10 @@
-import {useState, useEffect, useRef} from "react"
-import { Plugin, PropsWithSetConfig } from "./base"
+import { Stack } from "@mui/material"
 import moment from "moment"
-import { Grid, Stack, TextField } from "@mui/material"
-import { TextStylePicker, getDefaultFontFamily, TextStyle, convertTextStyleToCSS } from "./utils"
+import { useEffect, useRef, useState } from "react"
+import { Plugin, PropsWithConfig } from "./base"
+import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "./utils"
 
+import { propertyStore, StringField } from "@dualies/components"
 import "@fontsource/baumans"
 
 const DEFAULT_FONT = '"Baumans"'
@@ -26,13 +27,10 @@ function useDate(format: string) {
     return date
 }
 
-interface ClockProps {
-    config: ClockConfig
-}
 
-const Clock = (props: ClockProps) => {
+const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
     const ref = useRef<HTMLDivElement>(null)
-    const date = useDate(props.config.format)
+    const date = useDate(configStore.value.format)
     const [fontSize, setFontSize] = useState<number>(100)
     useEffect(() => {
         setFontSize(ref.current?.clientHeight ?? 100)
@@ -41,27 +39,25 @@ const Clock = (props: ClockProps) => {
             width: "100%",
             height: "100%",
             fontSize: fontSize * 0.8, 
-            ...convertTextStyleToCSS(props.config.textStyle)
+            ...convertTextStyleToCSS(configStore.value.textStyle)
         }}>
         {date}
     </div>
 }
 
-const ClockConfiguration = ({config, setConfig}: PropsWithSetConfig<ClockConfig>) => {
+const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
+    const format = propertyStore(configStore, "format")
+    const textStyle = propertyStore(configStore, "textStyle")
     return <Stack direction="column">
-        <TextField
-            label="时间格式"
-            value={config.format}
-            onChange={evt => setConfig({...config, format: evt.target.value})}
+        <StringField
+            placeholder="时间格式"
+            valueStore={format}
         />
         <TextStylePicker
-            value={config.textStyle}
-            onChange={(textStyle) => {
-                setConfig({...config, textStyle})
-            }}
+            valueStore={textStyle}
         />
         <div style={{height: "100px"}}>
-            <Clock config={config}/>
+            <Clock configStore={configStore}/>
         </div>
     </Stack>
 }
@@ -86,10 +82,10 @@ const ClockPlugin: Plugin<ClockConfig> = {
         defaultSize: () => ({width: 300, height: 150})
     },
     render: {
-        preview: (conf) => <Clock config={conf}/>,
-        edit: (conf) => <Clock config={conf}/>,
-        move: (conf) => <Clock config={conf}/>,
-        config: (config, setConfig) => <ClockConfiguration {...{config, setConfig}}/>
+        preview: (configStore) => <Clock configStore={configStore}/>,
+        edit: (configStore) => <Clock configStore={configStore}/>,
+        move: (configStore) => <Clock configStore={configStore}/>,
+        config: (configStore) => <ClockConfiguration configStore={configStore}/>
     }
 }
 

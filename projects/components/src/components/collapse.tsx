@@ -1,8 +1,8 @@
 import {Collapse as AntCollapse} from "antd"
 
 export interface CollapseProps {
-    title: JSX.Element
-    children: JSX.Element
+    title: string | JSX.Element
+    children: JSX.Element | JSX.Element[]
 }
 
 export function Collapse(props: CollapseProps) {

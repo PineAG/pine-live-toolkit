@@ -17,6 +17,10 @@ export function createDStore<T>({value, update}: CreateDStoreProps<T>) : DStore<
     }
 }
 
+export function createReadonlyDStore<T>(value: T) : DStore<T> {
+    return createDStore({value, update: () => {}})
+}
+
 export function useLocalDStore<T>(defaultValue: T): DStore<T> {
     const [value, update] = useState(defaultValue)
     return createDStore<T>({value, update})

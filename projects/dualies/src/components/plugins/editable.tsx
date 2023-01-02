@@ -1,16 +1,15 @@
-import { ButtonGroup, Dialog, DialogTitle, IconButton, DialogContent, DialogActions, Button, DialogContentText } from "@mui/material"
-import { ReactNode, useState, CSSProperties, useContext } from "react"
-import { EditableStateContext, PanelSizeContext, PanelStoreContext, PluginStoreContext, useNotNullContext } from "../context"
+import { useLocalDStore } from "@dualies/components"
+import {
+    DeleteForever as DeleteIcon,
+    Done as DoneIcon, Edit as EditIcon, OpenWith as MoveIcon
+} from "@mui/icons-material"
+import { Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material"
+import { CSSProperties, ReactNode, useContext, useState } from "react"
+import { enabledPlugins } from "../../plugins"
+import { Rect, Size } from "../../store"
+import { EditableStateContext, PanelSizeContext, PluginStoreContext, useNotNullContext } from "../context"
 import { EditableState } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"
-import {
-    OpenWith as MoveIcon,
-    Edit as EditIcon,
-    DeleteForever as DeleteIcon,
-    Done as DoneIcon
-} from "@mui/icons-material"
-import { PluginClient, Rect, Size } from "../../store"
-import { enabledPlugins } from "../../plugins"
 
 export type EditableBodyRenderer = {
     [K in EditableState]: () => ReactNode
@@ -36,7 +35,7 @@ export const EditableSwitch = () => {
     const {size: pluginRect} = useNotNullContext(PluginStoreContext)
     const style = getEditableSwitchStyle(pluginRect, panelSize)
     const [onDelete, setOnDelete] = useState(false)
-    const [onEditConfig, setOnEditConfig] = useState<any | null>(null)
+    const tmpConfigStore = useLocalDStore<any | null>(null)
 
     const pluginTemplate = enabledPlugins[plugin.meta.pluginType]
 
@@ -46,7 +45,7 @@ export const EditableSwitch = () => {
             <IconButton onClick={() => setOnDelete(true)} size="small">
                 <DeleteIcon/>
             </IconButton>
-            <IconButton onClick={() => setOnEditConfig(plugin.config)} size="small">
+            <IconButton onClick={() => tmpConfigStore.update(plugin.config)} size="small">
                 <EditIcon/>
             </IconButton>
             <IconButton size="small" onClick={() => setState(EditableState.Move)}>
@@ -69,18 +68,18 @@ export const EditableSwitch = () => {
             </DialogActions>
         </Dialog>
 
-        <Dialog fullWidth open={onEditConfig !== null} onClose={() => setOnEditConfig(null)}>
+        <Dialog fullWidth open={tmpConfigStore.value !== null} onClose={() => tmpConfigStore.update(null)}>
             <DialogTitle>设置组件 {pluginTemplate.title}</DialogTitle>
             <DialogContent style={{paddingTop: "20px", paddingBottom: "20px"}}>
-                {onEditConfig && pluginTemplate.render.config(onEditConfig, (newConfig) => {setOnEditConfig(newConfig)})}
+                {tmpConfigStore.value && pluginTemplate.render.config(tmpConfigStore)}
             </DialogContent>
             <DialogActions>
-                <Button color="inherit" onClick={() => setOnEditConfig(null)}>取消</Button>
+                <Button color="inherit" onClick={() => tmpConfigStore.update(null)}>取消</Button>
                 <Button color="primary" onClick={async () => {
-                    if(onEditConfig !== null) {
-                        await plugin.setConfig(onEditConfig)
+                    if(tmpConfigStore.value !== null) {
+                        await plugin.setConfig(tmpConfigStore.value)
                     }
-                    setOnEditConfig(null)
+                    await tmpConfigStore.update(null)
                 }}>保存</Button>
             </DialogActions>
         </Dialog>

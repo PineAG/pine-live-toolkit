@@ -1,13 +1,13 @@
+import { DStore } from "@dualies/components"
 import { ReactNode, useContext } from "react"
 import { PluginStoreContext } from "../components/context"
-import { EditableState } from "../components/plugins/base"
 import { Rect, Size } from "../store"
 
 interface Renderer<Config> {
-    move: (config: Config) => ReactNode
-    edit: (config: Config, setConfig: (c: Config) => void) => ReactNode
-    preview: (config: Config) => ReactNode
-    config: (config: Config, setConfig: (c: Config) => void) => ReactNode
+    move: (configStore: DStore<Config>) => ReactNode
+    edit: (configStore: DStore<Config>) => ReactNode
+    preview: (configStore: DStore<Config>) => ReactNode
+    config: (configStore: DStore<Config>) => ReactNode
 }
 
 export interface Plugin<Config> {
@@ -30,10 +30,5 @@ export function usePluginSize(): Rect {
 }
 
 export interface PropsWithConfig<Config> {
-    config: Config
-}
-
-export interface PropsWithSetConfig<Config> {
-    config: Config
-    setConfig: (c: Config) => void
+    configStore: DStore<Config>
 }

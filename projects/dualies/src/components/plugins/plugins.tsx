@@ -1,3 +1,4 @@
+import { createReadonlyDStore } from "@dualies/components"
 import { enabledPlugins } from "../../plugins"
 import { usePlugin } from "../../store"
 import { EditableStateContext, PluginStoreContext, useStateManager } from "../context"
@@ -22,11 +23,13 @@ export const EditablePlugin = (props: ComponentProps) => {
         throw new Error(`Unsupported plugin: ${store.meta.pluginType}`)
     }
 
+    const storeBinding = createReadonlyDStore(store.config)
+
     return <PluginStoreContext.Provider value={store}>
             <EditableStateContext.Provider value={editableState}>
                 <EditableBody render={{
-                    edit: () => plugin.render.edit(store.config, conf => store.setConfig(conf)),
-                    move: () => plugin.render.move(store.config)
+                    edit: () => plugin.render.preview(storeBinding),
+                    move: () => plugin.render.move(storeBinding)
                 }}/>
             </EditableStateContext.Provider>
         </PluginStoreContext.Provider>
@@ -37,13 +40,14 @@ export const PreviewPlugin = (props: ComponentProps) => {
     if(store === null){
         return <Loading/>
     }
+    const configBinding = createReadonlyDStore(store.config)
     const plugin = enabledPlugins[store.meta.pluginType]
     if(!plugin) {
         return <div>`Unsupported plugin: ${store.meta.pluginType}`</div>
     }
     return <PluginStoreContext.Provider value={store}>
         <PreviewFramework rect={store.size}>
-            {plugin.render.preview(store.config)}
+            {plugin.render.preview(configBinding)}
         </PreviewFramework>
     </PluginStoreContext.Provider>
 }

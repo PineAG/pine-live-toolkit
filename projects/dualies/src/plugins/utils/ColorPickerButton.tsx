@@ -1,3 +1,4 @@
+import { DStore } from "@dualies/components"
 import { ButtonBase, FormControl, Grid, InputLabel, Popover, Typography } from "@mui/material"
 import { Box, Stack } from "@mui/system"
 import { useRef, useState } from "react"
@@ -19,8 +20,7 @@ export function ColorPreview({ color }: ColorPreviewProps) {
 
 export interface ColorPickerButtonProps {
     label: string
-    color: string
-    onChange: (color: string) => void
+    store: DStore<string>
 }
 
 export function ColorPickerButton(props: ColorPickerButtonProps) {
@@ -28,8 +28,8 @@ export function ColorPickerButton(props: ColorPickerButtonProps) {
     const [open, setOpen] = useState(false)
     const popover = !ref.current ? null : (
             <Popover anchorEl={ref.current} open={open} onClose={() => setOpen(false)}>
-                <CompactPicker color={props.color} onChange={res => {
-                    props.onChange(res.hex)
+                <CompactPicker color={props.store.value} onChange={res => {
+                    props.store.update(res.hex)
                     setOpen(false)
                 }} />
             </Popover>
@@ -41,7 +41,7 @@ export function ColorPickerButton(props: ColorPickerButtonProps) {
         <Grid xs={1}/>
         <Grid xs={8}>
             <ButtonBase ref={ref} onClick={() => setOpen(true)}>
-                <ColorPreview color={props.color} />
+                <ColorPreview color={props.store.value} />
             </ButtonBase>
             {popover}
         </Grid>

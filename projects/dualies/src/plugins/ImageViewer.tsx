@@ -1,18 +1,19 @@
-import { Plugin } from "./base"
+import { Plugin, PropsWithConfig } from "./base"
 import {Image as ImageIcon} from "@mui/icons-material"
 import { FileClient, useFileId } from "../store"
 import Loading from "../components/Loading"
 import { Button, Grid } from "@mui/material"
 import {UploadFile as UploadIcon} from "@mui/icons-material"
 import { useState } from "react"
+import { propertyStore } from "@dualies/components"
 
 export interface Config {
     fileId: string | null
 }
 
-function ImageViewer({config}: {config: Config}) {
-    const fileURL = useFileId(config.fileId)
-    if(config.fileId === null) {
+function ImageViewer({configStore}: PropsWithConfig<Config>) {
+    const fileURL = useFileId(configStore.value.fileId)
+    if(configStore.value.fileId === null) {
         return <div style={{opacity: 0.5}}>
             <ImageIcon fontSize="large"/>
         </div>
@@ -33,8 +34,9 @@ function ImageViewer({config}: {config: Config}) {
     />
 }
 
-function ImageViewerConfig({config, setConfig}: {config: Config, setConfig: (c:Config) => void}) {
-    const fileURL = useFileId(config.fileId)
+function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
+    const fileIdStore = propertyStore(configStore, "fileId")
+    const fileURL = useFileId(fileIdStore.value)
     return <>
         <Grid container>
             <Grid xs={12}>
@@ -45,11 +47,11 @@ function ImageViewerConfig({config, setConfig}: {config: Config, setConfig: (c:C
                         onChange={async (evt) => {
                             const file = evt.target.files?.item(0)
                             if(!file) return;
-                            setConfig({...config, fileId: null})
+                            await fileIdStore.update(null)
                             const res = await file.stream().getReader().read()
                             if(res.value){
                                 const fileId = await new FileClient().upload(res.value)
-                                setConfig({...config, fileId})
+                                await fileIdStore.update(fileId)
                             }
                         }}/>
                 </Button>
@@ -69,10 +71,10 @@ export const ImageViewerPlugin: Plugin<Config> = {
         defaultConfig: () => ({fileId: null})
     },
     render: {
-        config: (config, setConfig) => <ImageViewerConfig config={config} setConfig={setConfig}/>,
-        move: (config) => <ImageViewer config={config}/>,
-        edit: (config) => <ImageViewer config={config}/>,
-        preview: (config) => <ImageViewer config={config}/>
+        config: (configStore) => <ImageViewerConfig configStore={configStore}/>,
+        move: (configStore) => <ImageViewer configStore={configStore}/>,
+        edit: (configStore) => <ImageViewer configStore={configStore}/>,
+        preview: (configStore) => <ImageViewer configStore={configStore}/>
     }
 }
 

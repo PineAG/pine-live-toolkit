@@ -1,9 +1,9 @@
 import { Checkbox, IconButton, List, ListItem, ListItemButton, TextField, ListItemIcon, ListItemText } from "@mui/material";
-import { Plugin, PropsWithConfig, PropsWithSetConfig } from "./base";
+import { Plugin, PropsWithConfig } from "./base";
 import { getDefaultFontFamily, TextStyle, convertTextStyleToCSS, TextStylePicker } from "./utils";
 import {Delete as DeleteIcon, Add as AddIcon} from "@mui/icons-material"
 import { CSSProperties, useState } from "react";
-import {arrayStore, createDStore, propertyStore, StringField, useLocalDStore} from "@dualies/components"
+import {arrayStore, createDStore, propertyStore, StringField, useLocalDStore, Collapse, NumberField} from "@dualies/components"
 
 export interface ChecklistItem {
     done: boolean
@@ -36,12 +36,13 @@ function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
     }
 }
 
-export function ChecklistPreview(props: PropsWithConfig<ChecklistConfig>) {
+export function ChecklistPreview({configStore}: PropsWithConfig<ChecklistConfig>) {
+    const itemsStore = arrayStore(propertyStore(configStore, "items"))
     return <List>
-        {props.config.items.map((item, i) => (
+        {itemsStore.value.map((item, i) => (
             <ListItem key={i}>
-                <ListItemText style={textStyle(item.done, props.config)}>
-                    <span style={textStyle(item.done, props.config)}>
+                <ListItemText style={textStyle(item.done, configStore.value)}>
+                    <span style={textStyle(item.done, configStore.value)}>
                         {item.content}
                     </span>
                 </ListItemText>
@@ -50,28 +51,22 @@ export function ChecklistPreview(props: PropsWithConfig<ChecklistConfig>) {
     </List>
 }
 
-export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
+export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
+    const config = configStore.value
     const newItemValueStore = useLocalDStore("")
-    function updateChecklistDone(i: number) {
-        const prevItems = props.config.items.slice(0, i)
-        const nextItems = props.config.items.slice(i+1, props.config.items.length)
-        const {content, done} = props.config.items[i]
-        const newTarget = {content, done: !done}
-        const newList = [...prevItems, newTarget, ...nextItems]
-        props.setConfig({...props.config, items: newList})
-    }
+    const itemsStore = arrayStore(propertyStore(configStore, "items"))
     return <List>
-        {props.config.items.map((item, i) => (
+        {itemsStore.items.map((item, i) => (
             <ListItem key={i}
                 secondaryAction={
                 <Checkbox
                     edge="start"
-                    checked={item.done}
-                    onChange={() => updateChecklistDone(i)}
+                    checked={item.value.done}
+                    onChange={() => propertyStore(item, "done").update(!item.value.done)}
                     />}>
                 <ListItemText>
-                    <span style={textStyle(item.done, props.config)}>
-                        {item.content}
+                    <span style={textStyle(item.value.done, config)}>
+                        {item.value.content}
                     </span>
                 </ListItemText>
             </ListItem>
@@ -79,16 +74,7 @@ export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
         <ListItem
             secondaryAction={
                 <IconButton edge="end" onClick={async () => {
-                    props.setConfig({
-                        ...props.config,
-                        items: [
-                            ...props.config.items,
-                            {
-                                content: newItemValueStore.value,
-                                done: false
-                            }
-                        ]
-                    })
+                    await itemsStore.append({done: false, content: newItemValueStore.value})
                     newItemValueStore.update("")
                     }}>
                     <AddIcon/>
@@ -100,10 +86,11 @@ export function ChecklistEdit(props: PropsWithSetConfig<ChecklistConfig>) {
     </List>
 }
 
-export function ChecklistConfigPanel(props: PropsWithSetConfig<ChecklistConfig>) {
+export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistConfig>) {
     const newItemContentStore = useLocalDStore("")
-    const configStore = createDStore({value: props.config, update: props.setConfig})
     const itemsStore = arrayStore(propertyStore(configStore, "items"))
+    const textStyle = propertyStore(configStore, "textStyle")
+    const fontSize = propertyStore(configStore, "fontSize")
 
     function createItem(){
         if(newItemContentStore.value === "") return;
@@ -111,8 +98,7 @@ export function ChecklistConfigPanel(props: PropsWithSetConfig<ChecklistConfig>)
             content: newItemContentStore.value,
             done: false
         }
-        const newList = [newItem, ...props.config.items]
-        props.setConfig({...props.config, items: newList})
+        itemsStore.insert(0, newItem)
         newItemContentStore.update("")
     }
     return <>
@@ -145,19 +131,13 @@ export function ChecklistConfigPanel(props: PropsWithSetConfig<ChecklistConfig>)
         </ListItem>
     ))}
     </List>
-    <TextStylePicker
-        value={props.config.textStyle}
-        onChange={(textStyle) => {
-            props.setConfig({...props.config, textStyle})
-        }}
+    <Collapse title="字体设置">
+    <TextStylePicker valueStore={textStyle}/>
+    <NumberField
+        placeholder="字号"
+        valueStore={fontSize}
     />
-    <TextField
-            label="字号"
-            value={props.config.fontSize}
-            type="number"
-            onChange={evt => props.setConfig({...props.config, fontSize: parseInt(evt.target.value ?? "1")})}
-            InputProps={{inputProps: {min: 1}}}
-        />
+    </Collapse>
     </>
 }
 
@@ -178,10 +158,10 @@ export const ChecklistPlugin: Plugin<ChecklistConfig> = {
         })
     },
     render: {
-        edit: (config, setConfig) => <ChecklistEdit config={config} setConfig={setConfig}/>,
-        preview: (config) => <ChecklistPreview config={config}/>,
-        move: (config) => <ChecklistPreview config={config}/>,
-        config: (config, setConfig) => <ChecklistConfigPanel config={config} setConfig={setConfig}/>
+        edit: (configStore) => <ChecklistEdit configStore={configStore}/>,
+        preview: (configStore) => <ChecklistPreview configStore={configStore}/>,
+        move: (configStore) => <ChecklistPreview configStore={configStore}/>,
+        config: (configStore) => <ChecklistConfigPanel configStore={configStore}/>
     }
 }
 

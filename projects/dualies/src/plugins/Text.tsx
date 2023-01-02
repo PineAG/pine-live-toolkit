@@ -1,6 +1,6 @@
-import { Grid, TextField } from "@mui/material"
+import { MultiLinesStringField, NumberField, propertyStore } from "@dualies/components"
 import { Stack } from "@mui/system"
-import {Plugin, PropsWithConfig, PropsWithSetConfig} from "./base"
+import { Plugin, PropsWithConfig } from "./base"
 import { convertTextStyleToCSS, getDefaultFontFamily, TextStyle, TextStylePicker } from "./utils"
 
 export interface Config {
@@ -9,34 +9,33 @@ export interface Config {
     textStyle: TextStyle
 }
 
-function Text({config}: PropsWithConfig<Config>) {
-    return <div style={{fontSize: config.fontSize, ...convertTextStyleToCSS(config.textStyle)}}>
-        {config.content}
+function Text({configStore}: PropsWithConfig<Config>) {
+    console.log(configStore)
+    return <div style={{fontSize: configStore.value.fontSize, ...convertTextStyleToCSS(configStore.value.textStyle)}}>
+        {configStore.value.content}
     </div>
 }
 
-function TextConfig({config, setConfig}: PropsWithSetConfig<Config>) {
+function TextConfig(props: PropsWithConfig<Config>) {
+    const contentStore = propertyStore(props.configStore, "content")
+    const fontSize = propertyStore(props.configStore, "fontSize")
+    const textStyle = propertyStore(props.configStore, "textStyle")
+
     return <Stack direction="column">
         <TextStylePicker
-            value={config.textStyle}
-            onChange={textStyle => setConfig({...config, textStyle})}
+            valueStore={textStyle}
         />
-        <TextField
-            label="字号"
-            value={config.fontSize}
-            type="number"
-            onChange={evt => setConfig({...config, fontSize: parseInt(evt.target.value ?? "1")})}
-            InputProps={{inputProps: {min: 1}}}
+        <NumberField
+            placeholder="字号"
+            min={1}
+            valueStore={fontSize}
         />
-        <TextField
-            label="内容"
-            value={config.content}
-            multiline
+        <MultiLinesStringField
+            placeholder="内容"
+            valueStore={contentStore}
             rows={5}
-            fullWidth
-            onChange={evt => setConfig({...config, content: evt.currentTarget.value})}
         />
-        <Text config={config}/>
+        <Text {...props}/>
     </Stack>
 }
 
@@ -57,10 +56,10 @@ export const TextPlugin: Plugin<Config> = {
         defaultSize: () => ({width: 300, height: 200})
     },
     render: {
-        preview: config => <Text config={config}/>,
-        move: config => <Text config={config}/>,
-        edit: config => <Text config={config}/>,
-        config: (config, setConfig) => <TextConfig config={config} setConfig={setConfig}/>
+        preview: configStore => <Text configStore={configStore}/>,
+        move: configStore => <Text configStore={configStore}/>,
+        edit: configStore => <Text configStore={configStore}/>,
+        config: configStore => <TextConfig configStore={configStore}/>
     }
 }
 
