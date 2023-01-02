@@ -1,8 +1,7 @@
-import { DStore } from "@dualies/components"
-import { ButtonBase, FormControl, Grid, InputLabel, Popover, Typography } from "@mui/material"
-import { Box, Stack } from "@mui/system"
+import { DStore, Grid } from "@dualies/components"
+import { ButtonBase, Popover } from "@mui/material"
 import { useRef, useState } from "react"
-import { CompactPicker, SwatchesPicker } from "react-color"
+import { CompactPicker } from "react-color"
 
 export interface ColorPreviewProps {
     color: string
@@ -34,12 +33,8 @@ export function ColorPickerButton(props: ColorPickerButtonProps) {
                 }} />
             </Popover>
     )
-    return <Grid container style={{marginTop: "10px", marginBottom: "10px"}}>
-        <Grid xs={3} style={{display: "grid", placeItems: "center", color: "rgba(0, 0, 0, 0.6)"}}>
-            <Typography style={{fontSize: "0.8rem"}}>{props.label}</Typography>
-        </Grid>
-        <Grid xs={1}/>
-        <Grid xs={8}>
+    return <Grid container>
+        <Grid span={12}>
             <ButtonBase ref={ref} onClick={() => setOpen(true)}>
                 <ColorPreview color={props.store.value} />
             </ButtonBase>

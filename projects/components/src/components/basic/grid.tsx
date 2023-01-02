@@ -1,9 +1,12 @@
 import {Row, Col} from "antd"
 
+type GridChild = JSX.Element | string | null
+type GridChildren = GridChild | GridChild[]
+
 interface GridPropsBase {
     style?: React.CSSProperties
     className?: string
-    children: JSX.Element | JSX.Element[]
+    children: GridChildren
 }
 
 export interface GridContainerProps extends GridPropsBase {

@@ -1,4 +1,4 @@
-import {Input, InputNumber} from "antd"
+import {Input, InputNumber, Form as AntdForm} from "antd"
 import TextArea from "antd/es/input/TextArea"
 import { DStore } from "../../store"
 
@@ -55,4 +55,15 @@ export function NumberField(props: NumberFieldProps) {
         max={props.max}
         step={props.step}
     />
+}
+
+export interface FormProps {
+    label: string
+    children: JSX.Element
+}
+
+export function FormItem(props: FormProps) {
+    return <AntdForm.Item label={props.label}>
+        {props.children}
+    </AntdForm.Item>
 }

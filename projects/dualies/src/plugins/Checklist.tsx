@@ -3,7 +3,7 @@ import { Plugin, PropsWithConfig } from "./base";
 import { getDefaultFontFamily, TextStyle, convertTextStyleToCSS, TextStylePicker } from "./utils";
 import {Delete as DeleteIcon, Add as AddIcon} from "@mui/icons-material"
 import { CSSProperties, useState } from "react";
-import {arrayStore, createDStore, propertyStore, StringField, useLocalDStore, Collapse, NumberField} from "@dualies/components"
+import {arrayStore, createDStore, propertyStore, StringField, useLocalDStore, Collapse, NumberField, FormItem} from "@dualies/components"
 
 export interface ChecklistItem {
     done: boolean
@@ -132,11 +132,12 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
     ))}
     </List>
     <Collapse title="字体设置">
-    <TextStylePicker valueStore={textStyle}/>
-    <NumberField
-        placeholder="字号"
-        valueStore={fontSize}
-    />
+        <TextStylePicker valueStore={textStyle}/>
+        <FormItem label="字号">
+            <NumberField
+                valueStore={fontSize}
+            />
+        </FormItem>
     </Collapse>
     </>
 }

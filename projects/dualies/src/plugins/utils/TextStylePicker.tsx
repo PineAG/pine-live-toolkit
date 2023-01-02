@@ -1,5 +1,5 @@
-import { DStore, NumberField, propertyStore, Grid } from "@dualies/components"
-import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { DStore, NumberField, propertyStore, Grid, FormItem } from "@dualies/components"
+import { MenuItem, Select } from "@mui/material"
 import {CSSProperties, useMemo} from "react"
 import { ColorPickerButton } from "./ColorPickerButton"
 
@@ -56,8 +56,7 @@ export function TextStylePicker(props: TextStylePickerProps) {
 
     return <Grid container style={{marginTop: "20px", marginBottom: "20px"}}>
         <Grid span={6}>
-            <FormControl fullWidth>
-                <InputLabel id="font-family-selector">字体</InputLabel>
+            <FormItem label="字体">
                 <Select 
                     labelId="font-family-selector"
                     value={fontFamily.value ?? defaultFontFamily} 
@@ -72,21 +71,24 @@ export function TextStylePicker(props: TextStylePickerProps) {
                         </MenuItem>
                     ))}
                 </Select>
-            </FormControl>
+            </FormItem>
         </Grid>
         <Grid span={6}>
-            <NumberField
-                placeholder="边缘粗细"
-                valueStore={borderWidth}
-                min={0}
-                step={0.25}
-            />
+            <FormItem label="边缘粗细">
+                <NumberField
+                    valueStore={borderWidth}
+                    min={0}
+                    step={0.25}
+                />
+            </FormItem>
         </Grid>
         <Grid span={6}>
+            <FormItem label="文字颜色">
             <ColorPickerButton
                 label="文字颜色"
                 store={textColor}
             />
+            </FormItem>
         </Grid>
         <Grid span={6}>
             <ColorPickerButton
