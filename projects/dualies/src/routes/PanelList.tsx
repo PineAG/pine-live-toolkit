@@ -1,5 +1,5 @@
 import { Dialog, Grid, Icons, nullablePropertyBinding, defaultValueBinding, propertyBinding, StringField, useLocalDBinding, FormItem, NumberField } from "@dualies/components"
-import { Button, ButtonBase, Card } from "@mui/material"
+import { ButtonBase, Card } from "@mui/material"
 import { ReactElement, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
@@ -43,7 +43,7 @@ export const PanelListPage = () => {
         return <Loading/>
     }
     return <>
-    <Grid container>
+    <Grid container alignment="left">
         <ListButton onClick={() => newPanel.update(defaultNewPanel())}>
             <Icons.Add size="middle"/>
         </ListButton>
@@ -63,7 +63,7 @@ export const PanelListPage = () => {
             newPanel.update(null)
         }} 
         onCancel={() => newPanel.update(null)}>
-            <Grid container alignment="left">
+            <Grid container>
                 <Grid span={12}>
                     <FormItem label="标题">
                         <StringField

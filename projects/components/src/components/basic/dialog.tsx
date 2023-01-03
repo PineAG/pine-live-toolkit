@@ -1,4 +1,6 @@
-import { Modal, Popconfirm, Tooltip as AntdTooltip } from "antd"
+import { Modal, Popconfirm, Tooltip as AntdTooltip, notification } from "antd"
+import { useEffect } from "react"
+import { DBinding } from "../../store"
 
 export interface DialogProps {
     title: string
@@ -48,3 +50,28 @@ export function Tooltip(props: TooltipProps) {
     </AntdTooltip>
 }
 
+export interface NotificationProps {
+    binding: DBinding<boolean>
+    title: string
+    content?: string | JSX.Element | JSX.Element[] | null
+    icon?: JSX.Element
+}
+
+export function Notification(props: NotificationProps) {
+    const [api, contextHolder] = notification.useNotification()
+    useEffect(() => {
+        if(props.binding.value) {
+            api.open({
+                message: props.title,
+                description: props.content,
+                icon: props.icon,
+                onClose: () => {
+                    props.binding.update(false)
+                }
+            })
+        }
+    }, [props.binding.value])
+    return <>
+        {contextHolder}
+    </>
+}

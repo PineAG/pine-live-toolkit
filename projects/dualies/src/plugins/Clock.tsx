@@ -47,7 +47,7 @@ const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
 const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
     const format = propertyBinding(configStore, "format")
     const textStyle = propertyBinding(configStore, "textStyle")
-    return <Grid container>
+    return <Grid container alignment="left">
         <Grid span={12}>
             <FormItem label="时间格式">
                 <StringField

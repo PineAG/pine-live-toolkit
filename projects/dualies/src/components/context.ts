@@ -1,3 +1,4 @@
+import { DBinding, memoryBinding } from "@dualies/components";
 import { createContext, Context, useContext, useState } from "react";
 import { PanelInfo, PluginInfo, Rect } from "../store";
 import { EditableState } from "./plugins/base";
@@ -23,21 +24,8 @@ export function useNotNullContext<T>(context: Context<T|null>): T {
     return value
 }
 
+export const EditableStateContext = createContext<DBinding<EditableState>>(memoryBinding<EditableState>(EditableState.Edit))
 
-export interface StateManager<T> {
-    state: T
-    setState: (s: T) => void
-}
-
-export function emptyStateManager<T>(defaultState: T): StateManager<T> {
-    return {state: defaultState, setState: (s: T) => {}}
-}
-
-export function useStateManager<T>(defaultValue: T): StateManager<T> {
-    const [state, setState] = useState(defaultValue)
-    return {state, setState}
-}
-
-export const EditableStateContext = createContext(emptyStateManager<EditableState>(EditableState.Edit))
+export const PreviewModeContext = createContext(false)
 
 export const AutoScaleContext = createContext(1)

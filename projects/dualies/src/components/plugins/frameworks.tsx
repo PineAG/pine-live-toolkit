@@ -1,19 +1,15 @@
 import {CSSProperties} from "react"
 import * as rnd from "react-rnd"
 import {useContext, useState, useEffect} from "react"
-import { Position, Rect, Size } from "../../store"
+import { Rect, Size } from "../../store"
 import { PanelElementSizeContext, PanelSizeContext } from "../context"
 
-const editableFrameworkStyles: rnd.Props["style"] = {
-    borderStyle: "solid", 
-    borderWidth: 1, 
-    borderColor: "black"
-}
 
 export interface FrameworkProps {
     rect: Rect
     children: React.ReactNode | React.ReactNode[]
     attachments?: React.ReactElement | React.ReactElement[]
+    style?: React.CSSProperties
 }
 
 export const PreviewFramework = (props: FrameworkProps) => {
@@ -25,7 +21,8 @@ export const PreviewFramework = (props: FrameworkProps) => {
         width: width * scale,
         height: height * scale,
         position: "absolute",
-        overflow: "hidden"
+        overflow: "hidden",
+        ...props.style
     }
     const wrapperStyle: CSSProperties = {
         position: "absolute",
@@ -43,6 +40,7 @@ export const PreviewFramework = (props: FrameworkProps) => {
     </div>
 }
 
+
 export const ScaledFramework = (props: FrameworkProps) => {
     const {scale} = useContext(PanelSizeContext)
     const {x, y, width, height} = props.rect
@@ -52,10 +50,7 @@ export const ScaledFramework = (props: FrameworkProps) => {
         width: width * scale,
         height: height * scale,
         position: "absolute",
-        borderStyle: "dashed",
-        borderWidth: "1px",
-        borderColor: "black",
-        overflow: "hidden"
+        ...props.style
     }
     const wrapperStyle: CSSProperties = {
         position: "absolute",
@@ -63,7 +58,8 @@ export const ScaledFramework = (props: FrameworkProps) => {
         width: `${100 / scale}%`,
         height: `${100 / scale}%`,
         transform: `scale(${scale})`,
-        transformOrigin: "left top"
+        transformOrigin: "left top",
+        overflow: "hidden",
     }
     return <div style={style}>
         <div style={wrapperStyle}>
@@ -131,7 +127,7 @@ export const ResizableFramework = (props: ResizableFrameworkProps) => {
     }
     const {x, y, width, height} = rect
     return <rnd.Rnd 
-        style={editableFrameworkStyles} 
+        style={props.style} 
         size={{width, height}}
         position={{x, y}}
         onResize={(e, direction, ref, delta, position) => {

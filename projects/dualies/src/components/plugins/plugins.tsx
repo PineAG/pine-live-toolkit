@@ -1,7 +1,7 @@
-import { createDBinding, createReadonlyDBinding } from "@dualies/components"
+import { createDBinding, createReadonlyDBinding, useLocalDBinding } from "@dualies/components"
 import { enabledPlugins } from "../../plugins"
 import { usePlugin } from "../../store"
-import { EditableStateContext, PluginStoreContext, useStateManager } from "../context"
+import { EditableStateContext, PluginStoreContext} from "../context"
 import Loading from "../Loading"
 import { EditableState } from "./base"
 import { EditableBody } from "./editable"
@@ -14,7 +14,7 @@ export interface ComponentProps {
 
 export const EditablePlugin = (props: ComponentProps) => {
     const store = usePlugin(props.panelId, props.pluginId)
-    const editableState = useStateManager(EditableState.Edit)
+    const stateBinding = useLocalDBinding(EditableState.Edit)
     if(store === null){
         return <Loading/>
     }
@@ -26,8 +26,9 @@ export const EditablePlugin = (props: ComponentProps) => {
     const storeBinding = createDBinding({value: store.config, update: value => store.setConfig(value)})
 
     return <PluginStoreContext.Provider value={store}>
-            <EditableStateContext.Provider value={editableState}>
+            <EditableStateContext.Provider value={stateBinding}>
                 <EditableBody render={{
+                    preview: () => plugin.render.preview(storeBinding),
                     edit: () => plugin.render.edit(storeBinding),
                     move: () => plugin.render.move(storeBinding)
                 }}/>

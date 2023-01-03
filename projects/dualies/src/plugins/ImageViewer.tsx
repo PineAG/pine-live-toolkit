@@ -2,10 +2,7 @@ import { Plugin, PropsWithConfig } from "./base"
 import {Image as ImageIcon} from "@mui/icons-material"
 import { FileClient, useFileId } from "../store"
 import Loading from "../components/Loading"
-import { Button } from "@mui/material"
-import {UploadFile as UploadIcon} from "@mui/icons-material"
-import { useState } from "react"
-import { Grid, propertyBinding } from "@dualies/components"
+import { Grid, Icons, propertyBinding, UploadButton } from "@dualies/components"
 
 export interface Config {
     fileId: string | null
@@ -40,21 +37,22 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
     return <>
         <Grid container>
             <Grid span={12}>
-                <Button startIcon={<UploadIcon/>} variant="contained" component="label">
-                    上传文件
-                    <input 
-                        hidden accept="image/*" type="file" 
-                        onChange={async (evt) => {
-                            const file = evt.target.files?.item(0)
-                            if(!file) return;
-                            await fileIdStore.update(null)
-                            const res = await file.stream().getReader().read()
-                            if(res.value){
-                                const fileId = await new FileClient().upload(res.value)
-                                await fileIdStore.update(fileId)
-                            }
-                        }}/>
-                </Button>
+                <UploadButton
+                    acceptFiles="image/*"
+                    icon={<Icons.Upload/>}
+                    onChange={async (files) => {
+                        const file = files[0]
+                        if(!file) return;
+                        await fileIdStore.update(null)
+                        const res = await file.stream().getReader().read()
+                        if(res.value){
+                            const fileId = await new FileClient().upload(res.value)
+                            await fileIdStore.update(fileId)
+                        }
+                    }}
+                >
+                    上传图片
+                </UploadButton>
             </Grid>
             <Grid span={12}>
                 {fileURL ? <img src={fileURL}></img> : null}

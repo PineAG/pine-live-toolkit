@@ -7,7 +7,7 @@ export interface SwitchProps {
 }
 
 export function Switch({binding}: SwitchProps){
-    return <Antd.Switch checked={binding.value} onChange={value => binding.update(value)}/>
+    return <Antd.Switch checked={binding.value} onClick={value => binding.update(value)}/>
 }
 
 export interface CheckboxProps {

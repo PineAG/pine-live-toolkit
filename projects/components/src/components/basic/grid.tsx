@@ -36,7 +36,7 @@ export interface GridItemContainerProps extends GridPropsBase{
     alignment?: GridAlignment
 }
 
-const GridAlignmentContext = createContext<GridAlignment>("evenly")
+const GridAlignmentContext = createContext<GridAlignment>("left")
 
 export function Grid(props: GridContainerProps | GridItemProps | GridItemContainerProps) {
     let alignment = useContext(GridAlignmentContext)
@@ -69,4 +69,45 @@ export function Grid(props: GridContainerProps | GridItemProps | GridItemContain
     } else {
         throw new Error(`Invalid props: container=${props["container"] ?? false}, item=${props["item"] ?? false}`)
     }
+}
+
+const stackDirectionMapping = {
+    horizontal: "row",
+    vertical: "column"
+} as const
+
+const stackAlignmentMapping = {
+    start: "flex-start",
+    end: "flex-end",
+    center: "flex-center",
+    evenly: "space-around",
+} as const
+
+export interface StackProps {
+    direction?: keyof typeof stackDirectionMapping
+    reverse?: boolean
+    children: JSX.Element | JSX.Element[]
+    spacing?: number
+    alignment?: keyof typeof stackAlignmentMapping
+    nowrap?: boolean
+    style?: React.CSSProperties
+}
+
+export function Stack(props: StackProps) {
+    const direction = props.direction ?? "horizontal"
+    const reverse = props.reverse ?? false
+    const wrap = !props.nowrap
+    const alignment = props.alignment ?? "start"
+    const children = Array.isArray(props.children) ? props.children : [props.children]
+    const style: React.CSSProperties = {
+        display: "flex",
+        flexDirection: `${stackDirectionMapping[direction]}${ reverse ? "-reverse" : "" }`,
+        gap: props.spacing,
+        flexWrap: wrap ? "wrap" : "nowrap",
+        justifyContent: stackAlignmentMapping[alignment],
+        ...props.style
+    }
+    return <div style={style}>
+        {children}
+    </div>
 }

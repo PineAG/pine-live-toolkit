@@ -5,11 +5,10 @@ import { EditablePlugin } from "../components/plugins"
 import { Rect, usePanel } from "../store"
 import { usePanelId } from "./utils"
 import "./Panel.css"
-import { PanelElementSizeContext, PanelStoreContext } from "../components/context"
+import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
 import React, { useEffect, useRef, useState } from "react"
-import { Alert, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Snackbar, Typography } from "@mui/material"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
-import {Grid, Icons} from "@dualies/components"
+import {ActionButton, Switch, Dialog, FormItem, Grid, Icons, Notification, Select, useLocalDBinding, Stack} from "@dualies/components"
 
 
 function convertDomRectToRect(rect: DOMRect | undefined): Rect {
@@ -21,19 +20,20 @@ function convertDomRectToRect(rect: DOMRect | undefined): Rect {
 }
 
 function ShareButton() {
-    const [open, setOpen] = useState(false)
+    const displayNotification = useLocalDBinding(false)
     async function copyLink() {
         const url = `${window.location.href}/exhibition`
         await navigator.clipboard.writeText(url)
-        setOpen(true)
+        displayNotification.update(true)
     }
     return <>
-        <Button startIcon={<Icons.Share/>} onClick={copyLink}>
+        <ActionButton icon={<Icons.Share/>} onClick={copyLink}>
             展示页链接
-        </Button>
-        <Snackbar open={open} autoHideDuration={3000} onClose={() => setOpen(false)}>
-            <Alert severity="success">已复制展示页链接</Alert>
-        </Snackbar>
+        </ActionButton>
+        <Notification
+            title="已复制展示页链接"
+            binding={displayNotification}
+        />
     </>
 }
 
@@ -41,9 +41,15 @@ function ShareButton() {
 export const PanelPage = () => {
     const panelId = usePanelId()
     const panel = usePanel(panelId)
-    const [newPluginType, setNewPluginType] = useState<string | null>(null)
+    const newPluginTypeBinding = useLocalDBinding<string | null>(null)
     const ref = useRef<HTMLDivElement>(null)
     const [panelBody, setPanelBody] = useState<React.ReactElement | null>(null)
+    const previewModeBinding = useLocalDBinding(false)
+    useEffect(() => {
+        if(panel && ref.current) {
+            setPanelBody(createPanelBody(ref.current))
+        }
+    }, [panelId, !!panel, !!ref.current])
     const createPanelBody = (element: HTMLDivElement) => {
         if(!panel) return null;
         return <PanelElementSizeContext.Provider value={convertDomRectToRect(element.getBoundingClientRect())}>
@@ -61,58 +67,53 @@ export const PanelPage = () => {
             </KeepRatio>
         </PanelElementSizeContext.Provider>
     }
-    useEffect(() => {
-        if(panel && ref.current) {
-            setPanelBody(createPanelBody(ref.current))
-        }
-    }, [panelId, !!panel, !!ref.current])
     
     if(!panel){
         return <Loading/>
     }
     return <div className="route-panel-root">
-        <Grid container className="route-panel-header">
-            <Grid span={6}>
-                <Typography>{panel.meta.title}</Typography>
-            </Grid>
-            <Grid span={6}>
-                <ButtonGroup variant="contained">
-                    <Button startIcon={<Icons.Add/>} onClick={() => setNewPluginType(enabledPluginsList[0].type)}>添加组件</Button>
-                    <ShareButton/>
-                </ButtonGroup>
-            </Grid>
-        </Grid>
-        <div className="route-panel-body" ref={ref}>
-            <PanelStoreContext.Provider value={panel}>
-            {panelBody}
-            </PanelStoreContext.Provider>
-        </div>
-        <Dialog fullWidth open={newPluginType !== null} onClose={() => setNewPluginType(null)}>
-            <DialogTitle>添加组件</DialogTitle>
-            <DialogContent>
-                <Grid container>
-                    <Grid span={12}>
-                    <Select
-                        fullWidth
-                        value={newPluginType}
-                        onChange={(evt) => {setNewPluginType(evt.target.value)}}
-                    >
-                        {enabledPluginsList.map(plugin => (
-                            <MenuItem key={plugin.type} value={plugin.type}>{plugin.title}</MenuItem>
-                        ))}
-                    </Select>
-                    </Grid>
+        <PreviewModeContext.Provider value={previewModeBinding.value}>
+            <Grid container className="route-panel-header" alignment="left">
+                <Grid span={6}>
+                    <div style={{fontSize: "2rem"}}>{panel.meta.title}</div>
                 </Grid>
-            </DialogContent>
-            <DialogActions>
-                <Button color="inherit" onClick={() => setNewPluginType(null)}>取消</Button>
-                <Button color="primary" onClick={async () => {
-                    if(newPluginType === null) return;
-                    const plugin = enabledPlugins[newPluginType]
+                <Grid span={6}>
+                    <Stack direction="horizontal" alignment="evenly">
+                        <ActionButton icon={<Icons.Add/>} onClick={() => newPluginTypeBinding.update(enabledPluginsList[0].type)}>添加组件</ActionButton>
+                        <FormItem label="预览模式">
+                            <Switch binding={previewModeBinding}/>
+                        </FormItem>
+                        <ShareButton/>
+                    </Stack>
+                </Grid>
+            </Grid>
+            <div className="route-panel-body" ref={ref}>
+                <PanelStoreContext.Provider value={panel}>
+                {panelBody}
+                </PanelStoreContext.Provider>
+            </div>
+        </PreviewModeContext.Provider>
+        <Dialog title="添加组件" open={newPluginTypeBinding.value !== null} 
+                onOk={async () => {
+                    if(newPluginTypeBinding.value === null) return;
+                    const plugin = enabledPlugins[newPluginTypeBinding.value]
                     await panel.createPlugin(plugin.type, {x: 0, y: 0, ...plugin.initialize.defaultSize()}, plugin.initialize.defaultConfig())
-                    setNewPluginType(null)
-                }}>创建</Button>
-            </DialogActions>
+                    newPluginTypeBinding.update(null)
+                }} 
+                onCancel={() => newPluginTypeBinding.update(null)}>
+            <Grid container>
+                <Grid span={12}>
+                    <FormItem label="组件类型">
+                        <Select
+                            binding={newPluginTypeBinding}
+                            options={enabledPluginsList.map(plugin => ({
+                                value: plugin.type,
+                                label: plugin.title
+                            }))}
+                        />
+                    </FormItem>
+                </Grid>
+            </Grid>
         </Dialog>
     </div>
 }
