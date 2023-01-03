@@ -102,7 +102,7 @@ export const EditableBody = (props: EditableBodyProps) => {
     const previewMode = useContext(PreviewModeContext)
     const store = useNotNullContext(PluginStoreContext)
     const editableStateBinding = useContext(EditableStateContext);
-    const content = props.render[editableStateBinding.value]()
+    const content = previewMode ? props.render.preview() : props.render[editableStateBinding.value]()
     const editableSwitch = <EditableSwitch/>
     if(previewMode) {
         return <ScaledFramework rect={store.size}>
