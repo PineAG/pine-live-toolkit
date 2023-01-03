@@ -1,25 +1,10 @@
-import { Dialog, Grid, Icons, nullablePropertyBinding, defaultValueBinding, propertyBinding, StringField, useLocalDBinding, FormItem, NumberField } from "@dualies/components"
-import { ButtonBase, Card } from "@mui/material"
-import { ReactElement, useState } from "react"
+import { Dialog, Grid, Icons, nullablePropertyBinding, defaultValueBinding, propertyBinding, StringField, useLocalDBinding, FormItem, NumberField, DBinding, Stack, ActionButton, CardGrid } from "@dualies/components"
+import { ReactElement } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
-import { PanelMeta, useGlobal } from "../store"
+import { GlobalInfo, useGlobal } from "../store"
 import "./PanelList.css"
 
-
-type PageListButtonProps = {
-    onClick: () => void
-    children: ReactElement
-}
-const ListButton = (props: PageListButtonProps) => {
-    return <Grid span={2}>
-        <Card className="list-button">
-            <ButtonBase className="fill" onAnimationEnd={props.onClick}>
-                {props.children}
-            </ButtonBase>
-        </Card>
-    </Grid>
-}
 
 interface NewPanelInfo {
     title: string
@@ -35,57 +20,75 @@ function defaultNewPanel(): NewPanelInfo {
     }
 }
 
-export const PanelListPage = () => {
-    const navigate = useNavigate()
-    const store = useGlobal()
-    const newPanel = useLocalDBinding<NewPanelInfo | null>(null)
-    if(!store){
-        return <Loading/>
-    }
-    return <>
-    <Grid container alignment="left">
-        <ListButton onClick={() => newPanel.update(defaultNewPanel())}>
-            <Icons.Add size="middle"/>
-        </ListButton>
-        {store.panels.map(p => (
-            <ListButton onClick={() => navigate(`/panel/${p.id}`)}>
-                <span style={{fontSize: "1.8rem"}}>
-                    {p.title}
-                </span>
-            </ListButton>
-        ))}
-    </Grid>
-    <Dialog title="新建界面" open={newPanel.value !== null} 
+function NewPanelDialog({binding, store}: {binding: DBinding<NewPanelInfo | null>, store: GlobalInfo | null}) {
+    if(store === null) return <></>;
+    return <Dialog title="新建界面" open={binding.value !== null} 
         onOk={async () => {
-            if(newPanel.value === null) return;
-            const {title, width, height} = newPanel.value
+            if(binding.value === null) return;
+            const {title, width, height} = binding.value
             await store.createPanel(title, {width, height})
-            newPanel.update(null)
+            binding.update(null)
         }} 
-        onCancel={() => newPanel.update(null)}>
+        onCancel={() => binding.update(null)}>
             <Grid container>
                 <Grid span={12}>
                     <FormItem label="标题">
                         <StringField
-                            binding={defaultValueBinding<string>(nullablePropertyBinding(newPanel, "title"), "")}
+                            binding={defaultValueBinding<string>(nullablePropertyBinding(binding, "title"), "")}
                         />
                     </FormItem>
                 </Grid>
                 <Grid span={6}>
                     <FormItem label="宽度">
                         <NumberField
-                            binding={defaultValueBinding<number>(nullablePropertyBinding(newPanel, "width"), 1)}
+                            binding={defaultValueBinding<number>(nullablePropertyBinding(binding, "width"), 1)}
                         />
                     </FormItem>
                 </Grid>
                 <Grid span={6}>
                     <FormItem label="高度">
                         <NumberField
-                            binding={defaultValueBinding<number>(nullablePropertyBinding(newPanel, "height"), 1)}
+                            binding={defaultValueBinding<number>(nullablePropertyBinding(binding, "height"), 1)}
                         />
                     </FormItem>
                 </Grid>
             </Grid>
     </Dialog>
-    </>
+}
+
+export const RenderPanelListPageBody = ({store}: {store: GlobalInfo | null}) => {
+    const navigate = useNavigate()
+    if(store === null){
+        return <Loading/>
+    }
+    return <CardGrid
+        columns={4}
+        items={store.panels.map(p => ({
+            key: p.id,
+            onClick: () => navigate(`/panel/${p.id}`),
+            content: (
+                <span style={{fontSize: "1.8rem"}}>
+                    {p.title}
+                </span>
+            ),
+        }))}
+    />
+}
+
+export const PanelListPage = () => {
+    const store = useGlobal()
+    const newPanel = useLocalDBinding<NewPanelInfo | null>(null)
+    return <div style={{margin: "50px"}}>
+    <Grid container alignment="left">
+        <Grid span={12}>
+            <Stack>
+                <ActionButton icon={<Icons.Add/>} onClick={() => newPanel.update(defaultNewPanel())}>创建新面板</ActionButton>
+            </Stack>
+        </Grid>
+        <Grid span={12}>
+            <RenderPanelListPageBody store={store}/>
+        </Grid>
+    </Grid>
+    <NewPanelDialog binding={newPanel} store={store}/>
+    </div>
 }

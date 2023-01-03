@@ -1,7 +1,6 @@
-import { DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm, mapBinding } from "@dualies/components"
+import { DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm, mapBinding, ColorPicker } from "@dualies/components"
 import { SelectWithFilter } from "@dualies/components"
 import { CSSProperties, useMemo } from "react"
-import { ColorPickerButton } from "./ColorPickerButton"
 
 export interface TextStyle {
     fontFamily?: string,
@@ -74,16 +73,16 @@ function SharedTextEdit(props: TextStylePickerProps<TextStyle>) {
         <Grid container span={12}>
             <Grid span={3}>
                 <FormItem label="文字颜色">
-                <ColorPickerButton
-                    store={propertyBinding(props.binding, "textColor")}
+                <ColorPicker
+                    binding={propertyBinding(props.binding, "textColor")}
                 />
                 </FormItem>
             </Grid>
             <Grid span={1}><span></span></Grid>
             <Grid span={3}>
                 <FormItem label="边缘颜色">
-                    <ColorPickerButton
-                        store={propertyBinding(props.binding, "borderColor")}
+                    <ColorPicker
+                        binding={propertyBinding(props.binding, "borderColor")}
                     />
                 </FormItem>
             </Grid>

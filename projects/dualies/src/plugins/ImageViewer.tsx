@@ -1,5 +1,4 @@
 import { Plugin, PropsWithConfig } from "./base"
-import {Image as ImageIcon} from "@mui/icons-material"
 import { FileClient, useFileId } from "../store"
 import Loading from "../components/Loading"
 import { Grid, Icons, propertyBinding, UploadButton } from "@dualies/components"
@@ -11,8 +10,8 @@ export interface Config {
 function ImageViewer({configStore}: PropsWithConfig<Config>) {
     const fileURL = useFileId(configStore.value.fileId)
     if(configStore.value.fileId === null) {
-        return <div style={{opacity: 0.5}}>
-            <ImageIcon fontSize="large"/>
+        return <div style={{opacity: 0.5, placeItems: "center", display: "grid", width: "100%", height: "100%"}}>
+            <Icons.Image size="large"/>
         </div>
     }
     if(fileURL === null) {
@@ -41,6 +40,7 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
                     acceptFiles="image/*"
                     icon={<Icons.Upload/>}
                     onChange={async (files) => {
+                        if(files === null) return;
                         const file = files[0]
                         if(!file) return;
                         await fileIdStore.update(null)

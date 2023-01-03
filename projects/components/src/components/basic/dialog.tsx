@@ -1,6 +1,7 @@
-import { Modal, Popconfirm, Tooltip as AntdTooltip, notification } from "antd"
+import { Modal, Popconfirm, Tooltip as AntdTooltip, notification, Popover as AntdPopover, Button as AntdButton } from "antd"
 import { useEffect } from "react"
 import { DBinding } from "../../store"
+import {CompactPicker} from "react-color"
 
 export interface DialogProps {
     title: string
@@ -74,4 +75,18 @@ export function Notification(props: NotificationProps) {
     return <>
         {contextHolder}
     </>
+}
+
+export interface ColorPickerProps {
+    binding: DBinding<string>
+    block?: boolean
+}
+
+export function ColorPicker(props: ColorPickerProps) {
+    const content = <CompactPicker color={props.binding.value} onChange={res => props.binding.update(res.hex)}/>
+    return <AntdPopover title="选择颜色" content={content} trigger="click">
+        <AntdButton type="default" style={{backgroundColor: props.binding.value, boxShadow: "inset 0px 0px 3px #888"}}>
+
+        </AntdButton>
+    </AntdPopover>
 }

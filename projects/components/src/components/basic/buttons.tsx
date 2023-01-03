@@ -1,7 +1,5 @@
-import {Button as AntdButton, Upload} from "antd"
-import { UploadChangeParam, UploadFile } from "antd/es/upload"
+import {Button as AntdButton} from "antd"
 import { useRef } from "react"
-import { Icons } from "."
 
 export interface ButtonProps {
     onClick?: () => void
@@ -32,11 +30,11 @@ export interface UploadButtonProps {
     children?: string | JSX.Element | JSX.Element[]
     multiple?: boolean
     acceptFiles?: string
-    onChange: (input: FileList) => void
+    onChange: (input: FileList | null) => void
 }
 
 export function UploadButton(props: UploadButtonProps) {
-    const ref = useRef<HTMLInputElement>()
+    const ref = useRef<HTMLInputElement>(null)
     return <AntdButton icon={props.icon} size={props.size} onClick={() => ref.current?.click()}>
         {props.children}
         <input
