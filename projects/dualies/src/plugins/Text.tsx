@@ -1,6 +1,6 @@
-import { FormItem, Grid, MultiLinesStringField, NumberField, propertyBinding } from "@dualies/components"
+import { FormItem, Grid, MultiLinesStringField, propertyBinding } from "@dualies/components"
 import { Plugin, PropsWithConfig } from "./base"
-import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils"
+import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "@dualies/components"
 
 import "@fontsource/zcool-kuaile"
 

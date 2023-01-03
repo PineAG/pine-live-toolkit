@@ -3,7 +3,7 @@ import * as Websockify from "koa-websocket"
 import * as ws from "ws"
 import { v4 as uuid4 } from "uuid"
 import * as BodyParser from "koa-bodyparser"
-import mockData from "./mockData"
+// import mockData from "./mockData"
 
 const app = Websockify(new Koa())
 app.use(BodyParser())
@@ -90,8 +90,8 @@ app.use(async ctx => {
     ctx.body = ctx.request.URL.pathname
 })
 
-for(const [k, v] of Object.entries(mockData)) {
-    globalDataStore.set(k, JSON.stringify(v))
-}
+// for(const [k, v] of Object.entries(mockData)) {
+//     globalDataStore.set(k, JSON.stringify(v))
+// }
 
 app.listen(3001)

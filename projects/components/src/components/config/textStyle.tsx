@@ -1,5 +1,4 @@
-import { DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm, mapBinding, ColorPicker } from "@dualies/components"
-import { SelectWithFilter } from "@dualies/components"
+import { SelectWithFilter, DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm, mapBinding, ColorPicker } from "../../"
 import { CSSProperties, useMemo } from "react"
 
 export interface TextStyle {

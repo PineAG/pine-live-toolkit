@@ -1,7 +1,7 @@
 import moment from "moment"
 import { useEffect, useRef, useState } from "react"
 import { Plugin, PropsWithConfig } from "./base"
-import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "./utils"
+import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "@dualies/components"
 
 import { FormItem, Grid, propertyBinding, StringField } from "@dualies/components"
 import "@fontsource/baumans"

@@ -1,7 +1,7 @@
-import { Icons, arrayBinding, Collapse, FormItem, NumberField, propertyBinding, StringField, useLocalDBinding, QuickConfirm, Grid, IconButton, IconSwitch, Checkbox, DBinding, ButtonProps } from "@dualies/components";
+import { Icons, arrayBinding, Collapse, propertyBinding, StringField, useLocalDBinding, QuickConfirm, Grid, IconButton, IconSwitch, Checkbox, DBinding, ButtonProps } from "@dualies/components";
 import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "./base";
-import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "./utils";
+import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "@dualies/components";
 
 import "@fontsource/zcool-kuaile";
 
