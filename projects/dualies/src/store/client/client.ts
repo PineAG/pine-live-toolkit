@@ -1,17 +1,6 @@
 
-import DualiesClient, { JsonDataClient, SubscriptionManager } from "@dualies/client";
-import features from "../features.json"
-import { MockAPIClient } from "./mock";
-
-function createClient(): DualiesClient {
-    if(features.Use_LocalStorage_Backend) {
-        return new MockAPIClient()
-    } else {
-        return new DualiesClient({
-            path: "/api"
-        })
-    }
-}
+import DualiesClient, { SubscriptionManager } from "@dualies/client";
+import { IBackend, IDataClient } from "./base";
 
 export interface PanelMeta {
     title: string
@@ -34,42 +23,42 @@ export interface Rect {
     width: number, height: number
 }
 
-class APIWrapper {
-    private client = createClient()
+export class APIWrapper {
+    constructor(private client: IBackend){}
 
-    panelsCounter(): JsonDataClient<number> {
+    panelsCounter(): IDataClient<number> {
         return this.client.data("/panels/counter")
     }
 
-    panelsList(): JsonDataClient<number[]> {
+    panelsList(): IDataClient<number[]> {
         return this.client.data("/panels/enabled")
     }
 
-    panelMeta(panelId: number): JsonDataClient<PanelMeta> {
+    panelMeta(panelId: number): IDataClient<PanelMeta> {
         return this.client.data(`/panel/${panelId}/meta`)
     }
 
-    panelSize(panelId: number): JsonDataClient<Size> {
+    panelSize(panelId: number): IDataClient<Size> {
         return this.client.data(`/panel/${panelId}/size`)
     }
 
-    pluginsCounter(panelId: number): JsonDataClient<number> {
+    pluginsCounter(panelId: number): IDataClient<number> {
         return this.client.data(`/panel/${panelId}/plugins/counter`)
     }
 
-    pluginsList(panelId: number): JsonDataClient<number[]> {
+    pluginsList(panelId: number): IDataClient<number[]> {
         return this.client.data(`/panel/${panelId}/plugins/enabled`)
     }
 
-    pluginMeta(panelId: number, pluginId: number): JsonDataClient<PluginMeta> {
+    pluginMeta(panelId: number, pluginId: number): IDataClient<PluginMeta> {
         return this.client.data(`/panel/${panelId}/plugin/${pluginId}/meta`)
     }
     
-    pluginRect(panelId: number, pluginId: number): JsonDataClient<Rect> {
+    pluginRect(panelId: number, pluginId: number): IDataClient<Rect> {
         return this.client.data(`/panel/${panelId}/plugin/${pluginId}/rect`)
     }
 
-    pluginConfig<T>(panelId: number, pluginId: number): JsonDataClient<T> {
+    pluginConfig<T>(panelId: number, pluginId: number): IDataClient<T> {
         return this.client.data(`/panel/${panelId}/plugin/${pluginId}/config`)
     }
 }
@@ -85,7 +74,7 @@ export interface PanelIndex extends PanelMeta {
 }
 
 export class GlobalClient {
-    private api = new APIWrapper()
+    constructor(private api: APIWrapper){}
 
     async panels(): Promise<PanelIndex[]> {
         let idList = await this.api.panelsList().get()
@@ -117,9 +106,7 @@ export class GlobalClient {
 }
 
 export class PanelClient {
-    private api = new APIWrapper()
-
-    constructor(private panelId: number) {}
+    constructor(private api: APIWrapper, private panelId: number) {}
 
     async meta(): Promise<PanelMeta> {
         const meta = await this.api.panelMeta(this.panelId).get()
@@ -164,7 +151,7 @@ export class PanelClient {
         const pluginList = await this.api.pluginsList(this.panelId).get() ?? []
         await this.api.panelsList().set(panelList)
         for(const pluginId of pluginList){
-            await new PluginClient(this.panelId, pluginId).delete()
+            await new PluginClient(this.api, this.panelId, pluginId).delete()
         }
         await this.api.pluginsCounter(this.panelId).delete()
         await this.api.pluginsList(this.panelId).delete()
@@ -187,9 +174,7 @@ export class PanelClient {
 }
 
 export class PluginClient {
-    private api = new APIWrapper()
-
-    constructor(private panelId: number, private pluginId: number) {}
+    constructor(private api: APIWrapper, private panelId: number, private pluginId: number) {}
 
     async meta(): Promise<PluginMeta> {
         const meta = await this.api.pluginMeta(this.panelId, this.pluginId).get()

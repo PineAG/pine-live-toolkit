@@ -1,7 +1,21 @@
-import { SubscriptionManager } from "@dualies/client";
-import { useState, useEffect } from "react";
+import DualiesClient, { SubscriptionManager } from "@dualies/client";
+import { useState, useEffect, createContext, useContext } from "react";
 import { enabledPlugins } from "../plugins";
-import { error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size, FileClient } from "./client";
+import { APIWrapper, error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size, IBackend } from "./client";
+
+const BackendContext = createContext<IBackend>(new DualiesClient({path: "/api"}))
+
+export const BackendProvider = BackendContext.Provider
+
+function useBackend(): IBackend {
+    return useContext(BackendContext)
+}
+
+function useAPIWrapper(): APIWrapper {
+    const backend = useBackend()
+    return new APIWrapper(backend)
+}
+
 
 function useAsyncSubscription(starter: () => Promise<SubscriptionManager>, deps: any[]) {
     const [subscription, setSubscription] = useState<null | SubscriptionManager>(null)
@@ -40,7 +54,8 @@ export interface GlobalInfo {
 }
 
 export function useGlobal(): null | GlobalInfo {
-    const client = new GlobalClient()
+    const api = useAPIWrapper()
+    const client = new GlobalClient(api)
     const [panels, setPanels] = useState<null | PanelIndex[]>(null)
     useStateSubscription({
         fetchValue: () => client.panels(),
@@ -75,7 +90,8 @@ export interface PanelInfo extends PanelInfoActions {
 
 
 export function usePanel(panelId: number): null | PanelInfo {
-    const client = new PanelClient(panelId)
+    const api = useAPIWrapper()
+    const client = new PanelClient(api, panelId)
     const [meta, setMeta] = useState<PanelMeta | null>(null)
     const [size, setSize] = useState<Size | null>(null)
     const [pluginsList, setPluginsList] = useState<number[] | null>(null)
@@ -132,7 +148,8 @@ export interface PluginInfo {
 }
 
 export function usePlugin(panelId: number, pluginId: number): PluginInfo | null {
-    const client = new PluginClient(panelId, pluginId)
+    const api = useAPIWrapper()
+    const client = new PluginClient(api, panelId, pluginId)
     const [meta, setMeta] = useState<null | PluginMeta>(null)
     const [size, setSize] = useState<null | Rect>(null)
     const [config, setConfig] = useState<null | any>(null)

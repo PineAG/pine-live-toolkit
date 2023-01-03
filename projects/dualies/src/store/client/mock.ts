@@ -1,5 +1,5 @@
-import DualiesClient, { FileClient, JsonDataClient, SubscriptionEvent, SubscriptionManager } from "@dualies/client";
-import { ClientOptions, FullClientOptions } from "@dualies/client/src/base";
+import { SubscriptionEvent, SubscriptionManager } from "@dualies/client";
+import { IBackend, IDataClient, IFileClient } from "./base";
 
 const LOCALSTORAGE_DATA_PREFIX = "$dualies.mock/data"
 const LOCALSTORAGE_FILE_PREFIX = "$dualies.mock/file"
@@ -54,11 +54,9 @@ function mockBus(): MockBus {
     return _globalMockBus
 }
 
-class MockJsonDataClient<T> extends JsonDataClient<T> implements JsonDataClient<T> {
+class MockJsonDataClient<T> implements IDataClient<T> {
 
-    constructor(private key: string) {
-        super({})
-    }
+    constructor(private key: string) {}
 
     private get path() {
         return `${LOCALSTORAGE_DATA_PREFIX}${this.key}`
@@ -106,10 +104,7 @@ class MockJsonDataClient<T> extends JsonDataClient<T> implements JsonDataClient<
     }
 }
 
-class MockFileClient extends FileClient implements FileClient {
-    constructor() {
-        super({})
-    }
+class MockFileClient implements IFileClient {
     async create(data: string | Blob): Promise<string> {
         const uuid = crypto.randomUUID()
         await this.saveFile(uuid, data)
@@ -145,30 +140,14 @@ class MockFileClient extends FileClient implements FileClient {
         }
         return Buffer.from(b64, "base64")
     }
-    protected get httpPath(): string {
-        throw new Error("Method not implemented.");
-    }
-    protected get wsPath(): string {
-        throw new Error("Method not implemented.");
-    }
     
 }
 
-export class MockAPIClient extends DualiesClient implements DualiesClient {
-    constructor() {
-        super({})
-    }
-    data<T>(path: string): JsonDataClient<T> {
+export class BrowserStorageBackend implements IBackend {
+    data<T>(path: string): MockJsonDataClient<T> {
         return new MockJsonDataClient(path)
     }
-    files(): FileClient {
+    files(): MockFileClient {
         return new MockFileClient()
     }
-    protected get httpPath(): string {
-        throw new Error("Method not implemented.");
-    }
-    protected get wsPath(): string {
-        throw new Error("Method not implemented.");
-    }
-    
 }
