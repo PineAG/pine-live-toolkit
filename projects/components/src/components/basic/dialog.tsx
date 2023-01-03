@@ -1,4 +1,4 @@
-import { Modal, Popconfirm } from "antd"
+import { Modal, Popconfirm, Tooltip as AntdTooltip } from "antd"
 
 export interface DialogProps {
     title: string
@@ -36,3 +36,15 @@ export function QuickConfirm(props: QuickConfirmProps) {
         {props.children}
     </Popconfirm>
 }
+
+export interface TooltipProps {
+    title: string
+    children: JSX.Element | string
+}
+
+export function Tooltip(props: TooltipProps) {
+    return <AntdTooltip title={props.title}>
+        {props.children}
+    </AntdTooltip>
+}
+

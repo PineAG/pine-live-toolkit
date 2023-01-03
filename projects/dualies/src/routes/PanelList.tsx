@@ -12,7 +12,7 @@ type PageListButtonProps = {
     children: ReactElement
 }
 const ListButton = (props: PageListButtonProps) => {
-    return <Grid span={4}>
+    return <Grid span={2}>
         <Card className="list-button">
             <ButtonBase className="fill" onAnimationEnd={props.onClick}>
                 {props.children}
@@ -45,7 +45,7 @@ export const PanelListPage = () => {
     return <>
     <Grid container>
         <ListButton onClick={() => newPanel.update(defaultNewPanel())}>
-            <Icons.Add/>
+            <Icons.Add size="middle"/>
         </ListButton>
         {store.panels.map(p => (
             <ListButton onClick={() => navigate(`/panel/${p.id}`)}>
@@ -63,7 +63,7 @@ export const PanelListPage = () => {
             newPanel.update(null)
         }} 
         onCancel={() => newPanel.update(null)}>
-            <Grid container>
+            <Grid container alignment="left">
                 <Grid span={12}>
                     <FormItem label="标题">
                         <StringField

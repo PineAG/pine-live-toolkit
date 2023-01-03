@@ -1,29 +1,37 @@
 import * as icons from "@ant-design/icons"
+import { AntdIconProps } from "@ant-design/icons/lib/components/AntdIcon"
 
-export const Add = () => <icons.PlusOutlined/>
+const iconSizeMapping = {
+    small: 32,
+    middle: 48,
+    large: 64
+}
 
-export const Edit = () => <icons.EditOutlined/>
+export interface IconProps {
+    size?: keyof typeof iconSizeMapping
+    color?: string
+}
 
-export const Delete = () => <icons.DeleteOutlined/>
+const warpIcon = (Icon: typeof icons.PlusOutlined) => (props: IconProps) => (
+    <Icon
+        style={{
+            fontSize: props.size && iconSizeMapping[props.size],
+            color: props.color
+        }}
+    />
+)
 
-export const Ok = () => <icons.CheckOutlined/>
-
-export const Close = () => <icons.DeleteOutlined/>
-
-export const Minimize = () => <icons.LineOutlined/>
-
-export const Move = () => <icons.DragOutlined/>
-
-export const Share = () => <icons.ShareAltOutlined/>
-
-export const Show = () => <icons.EyeOutlined/>
-
-export const Hide = () => <icons.EyeInvisibleOutlined/>
-
-export const Pending = () => <icons.ClockCircleOutlined/>
-
-export const Completed = () => <icons.CheckOutlined/>
-
-export const Up = () => <icons.ArrowUpOutlined/>
-
-export const Down = () => <icons.ArrowDownOutlined/>
+export const Add = warpIcon(icons.PlusOutlined)
+export const Edit = warpIcon(icons.EditOutlined)
+export const Delete = warpIcon(icons.DeleteOutlined)
+export const Ok = warpIcon(icons.CheckOutlined)
+export const Close = warpIcon(icons.DeleteOutlined)
+export const Minimize = warpIcon(icons.LineOutlined)
+export const Move = warpIcon(icons.DragOutlined)
+export const Share = warpIcon(icons.ShareAltOutlined)
+export const Show = warpIcon(icons.EyeOutlined)
+export const Hide = warpIcon(icons.EyeInvisibleOutlined)
+export const Pending = warpIcon(icons.ClockCircleOutlined)
+export const Completed = warpIcon(icons.CheckOutlined)
+export const Up = warpIcon(icons.ArrowUpOutlined)
+export const Down = warpIcon(icons.ArrowDownOutlined)
