@@ -1,9 +1,9 @@
 import { createDBinding, createReadonlyDBinding, useLocalDBinding } from "@dualies/components"
-import { enabledPlugins } from "../../plugins"
+
 import { usePlugin } from "../../store"
 import { EditableStateContext, PluginStoreContext } from "../context"
 import Loading from "../Loading"
-import { EditableState } from "./base"
+import { EditableState, useEnabledPlugins } from "./base"
 import { EditableBody } from "./editable"
 import { PreviewFramework } from "./frameworks"
 
@@ -13,6 +13,7 @@ export interface ComponentProps {
 }
 
 export const EditablePlugin = (props: ComponentProps) => {
+    const enabledPlugins = useEnabledPlugins()
     const store = usePlugin(props.panelId, props.pluginId)
     const stateBinding = useLocalDBinding(EditableState.Edit)
     if(store === null){
@@ -36,7 +37,8 @@ export const EditablePlugin = (props: ComponentProps) => {
         </PluginStoreContext.Provider>
 }
 
-export const PreviewPlugin = (props: ComponentProps) => {
+export function PreviewPlugin(props: ComponentProps){
+    const enabledPlugins = useEnabledPlugins()
     const store = usePlugin(props.panelId, props.pluginId)
     if(store === null){
         return <Loading/>

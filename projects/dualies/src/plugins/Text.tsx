@@ -1,5 +1,5 @@
 import { convertTextStyleToCSS, FormItem, Grid, MultiLinesStringField, propertyBinding, TextStyleAndSize, TextStyleAndSizePicker } from "@dualies/components"
-import { Plugin, PropsWithConfig } from "./base"
+import { Plugin, PropsWithConfig } from "../ui"
 
 import "@fontsource/zcool-kuaile"
 

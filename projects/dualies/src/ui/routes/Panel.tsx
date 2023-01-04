@@ -4,8 +4,7 @@ import { TransparentBackground } from "../components/backgrounds"
 import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
 import Loading from "../components/Loading"
 import { KeepRatio } from "../components/panels/KeepRatio"
-import { EditablePlugin } from "../components/plugins"
-import { enabledPlugins, enabledPluginsList } from "../plugins"
+import { EditablePlugin, useEnabledPluginList, useEnabledPlugins } from "../components/plugins"
 import { PanelInfo, Rect, usePanel } from "../store"
 import "./Panel.css"
 import { usePanelId } from "./utils"
@@ -38,6 +37,8 @@ function ShareButton() {
 }
 
 function AddPluginButton(props: {panel: PanelInfo}) {
+    const enabledPluginsList = useEnabledPluginList()
+    const enabledPlugins = useEnabledPlugins()
     const newPluginTypeBinding = useLocalDBinding<string | null>(null)
     return <>
         <ActionButton icon={<Icons.Add/>} onClick={() => newPluginTypeBinding.update(enabledPluginsList[0].type)}>添加组件</ActionButton>

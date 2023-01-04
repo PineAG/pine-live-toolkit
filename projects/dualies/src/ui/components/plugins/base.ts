@@ -1,7 +1,12 @@
+import {createContext, ReactNode, useContext, useMemo} from "react"
 import { DBinding } from "@dualies/components"
-import { ReactNode, useContext } from "react"
-import { PluginStoreContext } from "../components/context"
-import { Rect, Size } from "../store"
+import { Rect, Size } from "../../store"
+import {PluginStoreContext} from "../context"
+
+export enum EditableState {
+    Edit = "edit",
+    Move = "move"
+}
 
 interface Renderer<Config> {
     move: (configStore: DBinding<Config>) => ReactNode
@@ -31,4 +36,23 @@ export function usePluginSize(): Rect {
 
 export interface PropsWithConfig<Config> {
     configStore: DBinding<Config>
+}
+
+const EnabledPluginContext = createContext<Plugin<any>[]>([])
+
+export const EnabledPluginProvider = EnabledPluginContext.Provider
+
+export function useEnabledPluginList(): Plugin<any>[] {
+    return useContext(EnabledPluginContext)
+}
+
+export function useEnabledPlugins(): Record<string, Plugin<any>> {
+    const list = useEnabledPluginList()
+    return useMemo(() => {
+        const result: Record<string, Plugin<any>> = {}
+        for(const p of list){
+            result[p.type] = p
+        }
+        return result
+    }, [list])
 }

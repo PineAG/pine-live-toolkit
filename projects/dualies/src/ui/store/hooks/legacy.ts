@@ -1,9 +1,9 @@
 import { SubscriptionManager } from "@dualies/client";
 import { useEffect, useState } from "react";
-import { enabledPlugins } from "../../plugins";
+import { useEnabledPlugins } from "../../components/plugins";
 import { error, GlobalClient, PanelClient, PluginClient } from "../client";
 import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
-import { useAPIWrapper, useFileClient } from "./base";
+import { useAPIWrapper } from "./base";
 
 
 function useAsyncSubscription(starter: () => Promise<SubscriptionManager>, deps: any[]) {
@@ -79,6 +79,7 @@ export interface PanelInfo extends PanelInfoActions {
 
 
 export function usePanel(panelId: number): null | PanelInfo {
+    const enabledPlugins = useEnabledPlugins()
     const api = useAPIWrapper()
     const client = new PanelClient(api, panelId)
     const [meta, setMeta] = useState<PanelMeta | null>(null)
@@ -137,6 +138,7 @@ export interface PluginInfo {
 }
 
 export function usePlugin(panelId: number, pluginId: number): PluginInfo | null {
+    const enabledPlugins = useEnabledPlugins()
     const api = useAPIWrapper()
     const client = new PluginClient(api, panelId, pluginId)
     const [meta, setMeta] = useState<null | PluginMeta>(null)

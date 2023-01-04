@@ -1,9 +1,8 @@
 import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
 import React, { CSSProperties, ReactNode, useContext } from "react"
-import { enabledPlugins } from "../../plugins"
 import { Rect, Size } from "../../store"
 import { EditableStateContext, PanelSizeContext, PluginStoreContext, PreviewModeContext, useNotNullContext } from "../context"
-import { EditableState } from "./base"
+import { EditableState, useEnabledPluginList, useEnabledPlugins } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"
 
 export interface EditableBodyRenderer {
@@ -27,6 +26,7 @@ function getEditableSwitchStyle(pluginSize: Rect, panelSize: Size): [CSSProperti
 
 
 export const EditableSwitch = () => {
+    const enabledPlugins = useEnabledPlugins()
     const plugin = useNotNullContext(PluginStoreContext)
     const editableStateBinding = useContext(EditableStateContext);
     const panelSize = useContext(PanelSizeContext)

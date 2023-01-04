@@ -1,8 +1,7 @@
-import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, propertyBinding, Switch, UploadButton } from "@dualies/components"
+import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, Loading, propertyBinding, Switch, UploadButton } from "@dualies/components"
 import { useRef } from "react"
-import Loading from "../components/Loading"
-import { IFileClient, readFileToBlob, useFileClient, useFileId } from "../store"
-import { Plugin, PropsWithConfig } from "./base"
+import { IFileClient, readFileToBlob, useFileClient, useFileId } from "../ui"
+import { Plugin, PropsWithConfig } from "../ui"
 
 export interface Config {
     fileId: string | null
