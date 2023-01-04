@@ -1,5 +1,4 @@
 import * as icons from "@ant-design/icons"
-import { AntdIconProps } from "@ant-design/icons/lib/components/AntdIcon"
 
 const iconSizeMapping = {
     small: 32,

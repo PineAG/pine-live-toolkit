@@ -1,4 +1,4 @@
-import {Collapse as AntCollapse} from "antd"
+import { Collapse as AntCollapse } from "antd"
 
 export interface CollapseProps {
     title: string | JSX.Element

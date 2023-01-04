@@ -1,4 +1,3 @@
-import * as rnd from "react-rnd"
 
 export interface PluginProps {
     panelId: number

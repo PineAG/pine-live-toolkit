@@ -1,6 +1,6 @@
-import {createContext} from "react"
-import {ConfigProvider} from "antd"
+import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
+import { createContext } from "react"
 
 const supportedLanguages = {
     zhCN,

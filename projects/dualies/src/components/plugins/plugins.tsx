@@ -1,7 +1,7 @@
 import { createDBinding, createReadonlyDBinding, useLocalDBinding } from "@dualies/components"
 import { enabledPlugins } from "../../plugins"
 import { usePlugin } from "../../store"
-import { EditableStateContext, PluginStoreContext} from "../context"
+import { EditableStateContext, PluginStoreContext } from "../context"
 import Loading from "../Loading"
 import { EditableState } from "./base"
 import { EditableBody } from "./editable"

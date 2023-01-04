@@ -1,4 +1,4 @@
-import {Select as AntdSelect} from "antd"
+import { Select as AntdSelect } from "antd"
 import { DBinding } from "../../store"
 
 export interface SelectProps<T> {

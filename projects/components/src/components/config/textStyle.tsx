@@ -1,5 +1,5 @@
-import { SelectWithFilter, DBinding, NumberField, propertyBinding, Grid, FormItem, defaultValueBinding, Select, InlineForm, mapBinding, ColorPicker } from "../../"
 import { CSSProperties, useMemo } from "react"
+import { ColorPicker, DBinding, defaultValueBinding, FormItem, Grid, mapBinding, NumberField, propertyBinding, Select, SelectWithFilter } from "../../"
 
 export interface TextStyle {
     fontFamily?: string,

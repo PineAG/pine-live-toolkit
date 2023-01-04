@@ -1,4 +1,4 @@
-import {Input, InputNumber, Form as AntdForm} from "antd"
+import { Form as AntdForm, Input, InputNumber } from "antd"
 import TextArea from "antd/es/input/TextArea"
 import { DBinding } from "../../store"
 

@@ -1,7 +1,7 @@
+import { InternationalProvider } from '@dualies/components';
 import React from 'react';
 import { RouterRoot } from './routes';
-import { InternationalProvider } from '@dualies/components';
-import {BackendProvider, BrowserStorageBackend, IBackend} from "./store"
+import { BackendProvider, BrowserStorageBackend, IBackend } from "./store";
 
 import DualiesClient from '@dualies/client';
 

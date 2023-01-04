@@ -1,8 +1,8 @@
-import { Plugin, PropsWithConfig } from "./base"
-import { IFileClient, useFileClient, useFileId } from "../store"
-import Loading from "../components/Loading"
-import { Checkbox, DangerButton, DBinding, FormItem, Grid, Icons, IconSwitch, propertyBinding, Flex, Switch, UploadButton } from "@dualies/components"
+import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, propertyBinding, Switch, UploadButton } from "@dualies/components"
 import { useRef } from "react"
+import Loading from "../components/Loading"
+import { IFileClient, useFileClient, useFileId } from "../store"
+import { Plugin, PropsWithConfig } from "./base"
 
 export interface Config {
     fileId: string | null

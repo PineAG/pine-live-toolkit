@@ -1,4 +1,4 @@
-import {Card as AntdCard} from "antd"
+import { Card as AntdCard } from "antd"
 import { CSSProperties } from "react"
 
 export interface CardGridItem {

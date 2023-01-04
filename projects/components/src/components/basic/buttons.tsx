@@ -1,4 +1,4 @@
-import {Button as AntdButton} from "antd"
+import { Button as AntdButton } from "antd"
 import { ComponentProps, CSSProperties, useRef } from "react"
 
 export interface ButtonProps {

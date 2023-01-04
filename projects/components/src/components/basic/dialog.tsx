@@ -1,7 +1,7 @@
-import { Modal, Popconfirm, Tooltip as AntdTooltip, notification, Popover as AntdPopover, Button as AntdButton } from "antd"
+import { Button as AntdButton, Modal, notification, Popconfirm, Popover as AntdPopover, Tooltip as AntdTooltip } from "antd"
 import { useEffect } from "react"
+import { CompactPicker } from "react-color"
 import { DBinding } from "../../store"
-import {CompactPicker} from "react-color"
 
 export interface DialogProps {
     title: string

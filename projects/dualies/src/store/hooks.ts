@@ -1,7 +1,7 @@
 import DualiesClient, { SubscriptionManager } from "@dualies/client";
-import { useState, useEffect, createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { enabledPlugins } from "../plugins";
-import { APIWrapper, error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size, IBackend, IFileClient } from "./client";
+import { APIWrapper, error, GlobalClient, IBackend, IFileClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size } from "./client";
 
 const BackendContext = createContext<IBackend>(new DualiesClient({path: "/api"}))
 

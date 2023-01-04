@@ -1,1 +1,2 @@
-export {TransparentBackground} from "./TransparentBackground";
+export { TransparentBackground } from "./TransparentBackground";
+

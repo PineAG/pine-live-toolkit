@@ -1,6 +1,5 @@
-import {CSSProperties} from "react"
+import { CSSProperties, useContext, useEffect, useState } from "react"
 import * as rnd from "react-rnd"
-import {useContext, useState, useEffect} from "react"
 import { Rect, Size } from "../../store"
 import { PanelElementSizeContext, PanelSizeContext } from "../context"
 

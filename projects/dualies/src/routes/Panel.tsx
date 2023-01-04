@@ -1,14 +1,14 @@
+import { ActionButton, Dialog, Flex, FormItem, Grid, Icons, Notification, Select, Switch, useLocalDBinding } from "@dualies/components"
+import React, { useEffect, useRef, useState } from "react"
 import { TransparentBackground } from "../components/backgrounds"
+import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
 import Loading from "../components/Loading"
 import { KeepRatio } from "../components/panels/KeepRatio"
 import { EditablePlugin } from "../components/plugins"
-import { PanelInfo, Rect, usePanel } from "../store"
-import { usePanelId } from "./utils"
-import "./Panel.css"
-import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
-import React, { useEffect, useRef, useState } from "react"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
-import {ActionButton, Switch, Dialog, FormItem, Grid, Icons, Notification, Select, useLocalDBinding, Flex} from "@dualies/components"
+import { PanelInfo, Rect, usePanel } from "../store"
+import "./Panel.css"
+import { usePanelId } from "./utils"
 
 
 function convertDomRectToRect(rect: DOMRect | undefined): Rect {

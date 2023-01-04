@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { PanelPage } from "./Panel";
 import { PanelExhibitionPage } from "./PanelExhibition";
 import { PanelListPage } from "./PanelList";

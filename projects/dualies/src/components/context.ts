@@ -1,5 +1,5 @@
 import { DBinding, memoryBinding } from "@dualies/components";
-import { createContext, Context, useContext, useState } from "react";
+import { Context, createContext, useContext } from "react";
 import { PanelInfo, PluginInfo, Rect } from "../store";
 import { EditableState } from "./plugins/base";
 

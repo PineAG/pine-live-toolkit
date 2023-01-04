@@ -1,4 +1,4 @@
-import {Plugin} from "./base"
+import { Plugin } from "./base"
 import ChecklistPlugin from "./Checklist"
 import ClockPlugin from "./Clock"
 import ImageViewerPlugin from "./ImageViewer"

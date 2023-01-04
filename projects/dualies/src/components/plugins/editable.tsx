@@ -1,4 +1,4 @@
-import { Dialog, IconButton, Icons, QuickConfirm, useLocalDBinding, Flex, DBinding } from "@dualies/components"
+import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
 import React, { CSSProperties, ReactNode, useContext } from "react"
 import { enabledPlugins } from "../../plugins"
 import { Rect, Size } from "../../store"

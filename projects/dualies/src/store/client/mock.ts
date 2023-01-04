@@ -1,5 +1,5 @@
-import * as idb from "idb"
 import { SubscriptionEvent, SubscriptionManager } from "@dualies/client";
+import * as idb from "idb";
 import { IBackend, IDataClient, IFileClient } from "./base";
 
 const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
