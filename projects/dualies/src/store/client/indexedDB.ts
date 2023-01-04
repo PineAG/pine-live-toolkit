@@ -63,6 +63,10 @@ module DBWrapper {
     export function file(key: string): DBAccess<Blob> {
         return new DBAccess(IndexedDBName, FileStoreName, key)
     }
+
+    export function destroyDB(): Promise<void> {
+        return idb.deleteDB(IndexedDBName)
+    }
 }
 
 class IndexedDBDataClient<T> implements IDataClient<T> {
@@ -163,4 +167,8 @@ export class BrowserStorageBackend implements IBackend {
     files(): IndexedDBFileClient {
         return new IndexedDBFileClient()
     }
+}
+
+export async function clearIndexedDBBackendData() {
+    await DBWrapper.destroyDB()
 }
