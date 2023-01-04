@@ -9,7 +9,7 @@ function useRatio(internalSize: Size): [number, React.Dispatch<React.SetStateAct
     useEffect(() => {
         if(ref.current === null) {
             return;
-        } 
+        }
         const width = ref.current.clientWidth
         const height = ref.current.clientHeight
         const ratioWidth = width / internalSize.width

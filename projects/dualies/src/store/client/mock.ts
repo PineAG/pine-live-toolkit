@@ -60,7 +60,7 @@ module DBWrapper {
         return new DBAccess(IndexedDBName, DataStoreName, key)
     }
 
-    export function file(key: string): DBAccess<Uint8Array> {
+    export function file(key: string): DBAccess<Blob> {
         return new DBAccess(IndexedDBName, FileStoreName, key)
     }
 }
@@ -138,8 +138,8 @@ class MockFileClient implements IFileClient {
     async update(id: string, data: string | Blob): Promise<void> {
         console.log("FILE WRITE", id)
         const raw = typeof data === "string" ?
-            new TextEncoder().encode(data) :
-            new Uint8Array(await data.arrayBuffer())
+            new Blob([new TextEncoder().encode(data)]) :
+            data
         await this.db(id).set(raw)
 
     }
@@ -149,7 +149,7 @@ class MockFileClient implements IFileClient {
         if(data === null) {
             throw new Error(`Not found: ${data}`)
         }
-        return data
+        return new Uint8Array(await data.arrayBuffer())
     }
     async readAsObjectURL(id: string): Promise<string> {
         const data = await this.readBlob(id)

@@ -1,7 +1,7 @@
 import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, propertyBinding, Switch, UploadButton } from "@dualies/components"
 import { useRef } from "react"
 import Loading from "../components/Loading"
-import { IFileClient, useFileClient, useFileId } from "../store"
+import { IFileClient, readFileToBlob, useFileClient, useFileId } from "../store"
 import { Plugin, PropsWithConfig } from "./base"
 
 export interface Config {
@@ -45,14 +45,10 @@ function ImageViewer({configStore}: PropsWithConfig<Config>) {
     }
 }
 
-async function uploadFile(file: File, client: IFileClient): Promise<string | null> {
-    const res = await file.stream().getReader().read()
-    if(res.value){
-        const fileId = await client.create(new Blob([res.value]))
-        return fileId
-    } else {
-        return null
-    }
+async function uploadFile(file: File, client: IFileClient): Promise<string> {
+    const blob = await readFileToBlob(file)
+    const fileId = await client.create(blob)
+    return fileId
 }
 
 function VisibleSwitch({binding}: {binding: DBinding<boolean>}) {
