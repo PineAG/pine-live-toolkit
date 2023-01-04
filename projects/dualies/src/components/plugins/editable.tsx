@@ -1,4 +1,4 @@
-import { Dialog, IconButton, Icons, QuickConfirm, useLocalDBinding, Stack, DBinding } from "@dualies/components"
+import { Dialog, IconButton, Icons, QuickConfirm, useLocalDBinding, Flex, DBinding } from "@dualies/components"
 import React, { CSSProperties, ReactNode, useContext } from "react"
 import { enabledPlugins } from "../../plugins"
 import { Rect, Size } from "../../store"
@@ -38,7 +38,7 @@ export const EditableSwitch = () => {
 
     if(editableStateBinding.value === EditableState.Edit) {
         return <>
-        <Stack style={style} nowrap reverse={reverse}>
+        <Flex style={style} nowrap reverse={reverse}>
             <QuickConfirm title="删除组件" description="确认要删除组件吗？" onConfirm={() => plugin.delete()}>    
                 <IconButton size="middle" icon={<Icons.Delete/>}/>
             </QuickConfirm>
@@ -48,7 +48,7 @@ export const EditableSwitch = () => {
             <IconButton size="middle" onClick={() => editableStateBinding.update(EditableState.Move)}>
                 <Icons.Move/>
             </IconButton>
-        </Stack>
+        </Flex>
 
         <Dialog 
             title={`设置组件 ${pluginTemplate.title}`}
@@ -64,11 +64,11 @@ export const EditableSwitch = () => {
         </Dialog>
         </>
     } else {
-        return <Stack style={style}>
+        return <Flex style={style}>
             <IconButton size="middle" onClick={() => editableStateBinding.update(EditableState.Edit)}>
                 <Icons.Ok/>
             </IconButton>
-        </Stack>
+        </Flex>
     }
 }
 

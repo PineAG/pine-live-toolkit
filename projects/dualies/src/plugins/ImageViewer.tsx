@@ -1,7 +1,7 @@
 import { Plugin, PropsWithConfig } from "./base"
 import { IFileClient, useFileClient, useFileId } from "../store"
 import Loading from "../components/Loading"
-import { Checkbox, DangerButton, DBinding, FormItem, Grid, Icons, IconSwitch, propertyBinding, Stack, UploadButton } from "@dualies/components"
+import { Checkbox, DangerButton, DBinding, FormItem, Grid, Icons, IconSwitch, propertyBinding, Flex, Switch, UploadButton } from "@dualies/components"
 import { useRef } from "react"
 
 export interface Config {
@@ -32,17 +32,17 @@ function renderImage(url: string, opacity?: number, onClick?: () => void) {
 }
 
 function ImageViewer({configStore}: PropsWithConfig<Config>) {
-    const fileURL = useFileId(configStore.value.fileId)
-    if(configStore.value.fileId === null) {
-        return <EmptyImageIcon/>
-    }
-    if(fileURL === null) {
-        return <Loading/>
-    }
+    const fileResult = useFileId(configStore.value.fileId)
     if(!configStore.value.visible) {
         return <div/>
     }
-    return renderImage(fileURL)
+    if(fileResult.status === "Loaded") {
+        return renderImage(fileResult.url)
+    } else if (fileResult.status === "Pending") {
+        return <Loading/>
+    } else {
+        return <EmptyImageIcon/>
+    }
 }
 
 async function uploadFile(file: File, client: IFileClient): Promise<string | null> {
@@ -67,7 +67,7 @@ function VisibleSwitch({binding}: {binding: DBinding<boolean>}) {
 function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
     const fileClient = useFileClient()
     const ref = useRef<HTMLInputElement>(null)
-    const fileURL = useFileId(configStore.value.fileId)
+    const fileResult = useFileId(configStore.value.fileId)
     const fileIdBinding = propertyBinding(configStore, "fileId")
     async function onChangeInternal(files: FileList | null) {
         if(files === null || files.length === 0) return;
@@ -87,61 +87,69 @@ function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
             {fileHandler}
         </>
     }
-    if(fileURL === null) {
+    if(fileResult.status === "Loaded"){
+        return <>
+            {renderImage(fileResult.url, configStore.value.visible ? 1 : 0.2, onClick)}
+            <VisibleSwitch binding={propertyBinding(configStore, "visible")}/>
+            {fileHandler}
+        </>
+    }else if(fileResult.status === "Pending") {
         return <Loading/>
+    } else {
+        return <EmptyImageIcon/>
     }
-    return <>
-        {renderImage(fileURL, configStore.value.visible ? 1 : 0.2, onClick)}
-        <VisibleSwitch binding={propertyBinding(configStore, "visible")}/>
-        {fileHandler}
-    </>
 }
 
 function ImageViewerMove({configStore}: PropsWithConfig<Config>) {
-    const fileURL = useFileId(configStore.value.fileId)
-    if(configStore.value.fileId === null) {
+    const fileResult = useFileId(configStore.value.fileId) 
+    if (fileResult.status === "Loaded") {
+        return renderImage(fileResult.url, configStore.value.visible ? 1 : 0.2)
+    } else if(fileResult.status === "Pending") {
+        return <Loading/>
+    } else {
         return <EmptyImageIcon/>
     }
-    if(fileURL === null) {
-        return <Loading/>
-    }
-    return renderImage(fileURL, configStore.value.visible ? 1 : 0.2)
 }
 
 function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
     const fileClient = useFileClient()
     const fileIdStore = propertyBinding(configStore, "fileId")
-    const fileURL = useFileId(fileIdStore.value)
-    return <Stack>
+    const fileResult = useFileId(fileIdStore.value)
+    async function onFileChange(files: FileList | null) {
+        if(files === null) return;
+        const file = files[0]
+        if(!file) return;
+        await fileIdStore.update(null)
+        await fileIdStore.update(await uploadFile(file, fileClient))
+    }
+    return <Flex>
             <Grid container style={{width: "100%"}}>
                 <Grid span={5}>
                     <UploadButton
                         acceptFiles="image/*"
                         icon={<Icons.Upload/>}
-                        onChange={async (files) => {
-                            if(files === null) return;
-                            const file = files[0]
-                            if(!file) return;
-                            await fileIdStore.update(null)
-                            await fileIdStore.update(await uploadFile(file, fileClient))
-                        }}
+                        onChange={onFileChange}
                     >
                         上传图片
                     </UploadButton>
                 </Grid>
-                <Grid span={4}>
-                    <FormItem label="显示图片">
-                        <Checkbox binding={propertyBinding(configStore, "visible")}/>
-                    </FormItem>
-                </Grid>
-                <Grid span={3}>
-                    <DangerButton icon={<Icons.Delete/>} onClick={() => fileIdStore.update(null)}>删除图片</DangerButton>
+                <Grid span={7}>
+                    <Flex alignment="end" spacing={20}>
+                        <FormItem label="显示图片">
+                            <Switch binding={propertyBinding(configStore, "visible")}/>
+                        </FormItem>
+                        <DangerButton icon={<Icons.Delete/>} onClick={() => fileIdStore.update(null)}>删除图片</DangerButton>
+                    </Flex>
                 </Grid>
             </Grid>
             <>
-                {fileURL ? <img src={fileURL}></img> : null}
+                {fileResult.status === "Loaded" ? 
+                    <img alt="" src={fileResult.url}></img> :
+                    fileResult.status === "NotFound" ?
+                        <EmptyImageIcon/> :
+                        <Loading/>}
             </>
-        </Stack>
+        </Flex>
 }
 
 export const ImageViewerPlugin: Plugin<Config> = {

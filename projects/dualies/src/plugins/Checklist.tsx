@@ -1,4 +1,4 @@
-import { Icons, arrayBinding, Collapse, propertyBinding, StringField, useLocalDBinding, QuickConfirm, Grid, IconButton, IconSwitch, Checkbox, DBinding, ButtonProps } from "@dualies/components";
+import { Icons, arrayBinding, Collapse, propertyBinding, StringField, useLocalDBinding, QuickConfirm, Grid, IconButton, IconSwitch, Checkbox, DBinding, ButtonProps, Flex } from "@dualies/components";
 import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "./base";
 import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "@dualies/components";
@@ -80,33 +80,26 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
     const config = configStore.value
     const newItemBinding = useLocalDBinding("")
     const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
-    return (<Grid container spacing={0}>
+    return (<Flex direction="vertical" nowrap>
         {itemsBinding.items.filter(it => it.value.show).map((item, i) => (
-            <Grid container key={i} span={12}>
-                <Grid span={10}>
-                    <div style={textStyle(item.value.done, config)}>
-                        {item.value.content}
-                    </div>
-                </Grid>
-                <Grid span={2}>
-                    <ChecklistDoneButton binding={propertyBinding(item, "done")} size="large"/>
-                </Grid>
-            </Grid>
+            <Flex direction="horizontal" alignment="space-between" nowrap>
+                <div style={textStyle(item.value.done, config)}>
+                    {item.value.content}
+                </div>
+                <ChecklistDoneButton binding={propertyBinding(item, "done")} size="large"/>
+            </Flex>
         ))}
-        <Grid container span={12}>
-            <Grid span={10}>
-                <StringField binding={newItemBinding}/>
-            </Grid>
-            <Grid span={2}>
-                <IconButton onClick={async () => {
+        <Flex direction="horizontal" alignment="space-between" nowrap>
+            <StringField binding={newItemBinding}/>
+            <IconButton onClick={async () => {
+                    if(newItemBinding.value === "") return;
                     await itemsBinding.append({done: false, content: newItemBinding.value, show: true})
                     newItemBinding.update("")
-                    }}
-                    icon={<Icons.Add/>}
-                    />
-            </Grid>
-        </Grid>
-    </Grid>)
+                }}
+                icon={<Icons.Add/>}
+                />
+        </Flex>
+    </Flex>)
 }
 
 export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistConfig>) {

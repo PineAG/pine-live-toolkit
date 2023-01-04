@@ -1,7 +1,6 @@
 import {Row, Col} from "antd"
-import { createContext, useContext } from "react"
-
-type GridChildren = JSX.Element | string | null | GridChildren[]
+import { createContext, CSSProperties, useContext } from "react"
+import { NodeChildren } from "./utils"
 
 const gridAlignmentMapping = {
     left: "start",
@@ -14,7 +13,7 @@ type GridAlignment = keyof typeof gridAlignmentMapping
 interface GridPropsBase {
     style?: React.CSSProperties
     className?: string
-    children: GridChildren
+    children: NodeChildren
 }
 
 export interface GridContainerProps extends GridPropsBase {
@@ -71,29 +70,30 @@ export function Grid(props: GridContainerProps | GridItemProps | GridItemContain
     }
 }
 
-const stackDirectionMapping = {
+const flexDirectionMapping = {
     horizontal: "row",
     vertical: "column"
 } as const
 
-const stackAlignmentMapping = {
+const flexAlignmentMapping = {
     start: "flex-start",
     end: "flex-end",
     center: "flex-center",
     evenly: "space-around",
+    "space-between": "space-between"
 } as const
 
-export interface StackProps {
-    direction?: keyof typeof stackDirectionMapping
+export interface FlexProps {
+    direction?: keyof typeof flexDirectionMapping
     reverse?: boolean
-    children: JSX.Element | JSX.Element[]
+    children: NodeChildren
     spacing?: number
-    alignment?: keyof typeof stackAlignmentMapping
+    alignment?: keyof typeof flexAlignmentMapping
     nowrap?: boolean
     style?: React.CSSProperties
 }
 
-export function Stack(props: StackProps) {
+export function Flex(props: FlexProps) {
     const direction = props.direction ?? "horizontal"
     const reverse = props.reverse ?? false
     const wrap = !props.nowrap
@@ -101,13 +101,45 @@ export function Stack(props: StackProps) {
     const children = Array.isArray(props.children) ? props.children : [props.children]
     const style: React.CSSProperties = {
         display: "flex",
-        flexDirection: `${stackDirectionMapping[direction]}${ reverse ? "-reverse" : "" }`,
+        flexDirection: `${flexDirectionMapping[direction]}${ reverse ? "-reverse" : "" }`,
         gap: props.spacing,
         flexWrap: wrap ? "wrap" : "nowrap",
-        justifyContent: stackAlignmentMapping[alignment],
+        justifyContent: flexAlignmentMapping[alignment],
         ...props.style
     }
     return <div style={style}>
         {children}
+    </div>
+}
+
+export type StackLayoutItem = "auto" | `${number}fr`
+
+export interface StackProps {
+    spacing?: number
+    layout: StackLayoutItem[]
+    children: NodeChildren
+}
+
+export function VStack(props: StackProps) {
+    const style: CSSProperties = {
+        gap: props.spacing,
+        display: "grid",
+        gridTemplateRows: props.layout.join(" "),
+        gridTemplateColumns: "1fr"
+    }
+    return <div style={style}>
+        {props.children}
+    </div>
+}
+
+export function HStack(props: StackProps) {
+    const style: CSSProperties = {
+        gap: props.spacing,
+        display: "grid",
+        gridTemplateRows: "1fr",
+        gridTemplateColumns: props.layout.join(" ")
+    }
+    return <div style={style}>
+        {props.children}
     </div>
 }

@@ -2,13 +2,13 @@ import { TransparentBackground } from "../components/backgrounds"
 import Loading from "../components/Loading"
 import { KeepRatio } from "../components/panels/KeepRatio"
 import { EditablePlugin } from "../components/plugins"
-import { Rect, usePanel } from "../store"
+import { PanelInfo, Rect, usePanel } from "../store"
 import { usePanelId } from "./utils"
 import "./Panel.css"
 import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
 import React, { useEffect, useRef, useState } from "react"
 import { enabledPlugins, enabledPluginsList } from "../plugins"
-import {ActionButton, Switch, Dialog, FormItem, Grid, Icons, Notification, Select, useLocalDBinding, Stack} from "@dualies/components"
+import {ActionButton, Switch, Dialog, FormItem, Grid, Icons, Notification, Select, useLocalDBinding, Flex} from "@dualies/components"
 
 
 function convertDomRectToRect(rect: DOMRect | undefined): Rect {
@@ -37,11 +37,39 @@ function ShareButton() {
     </>
 }
 
+function AddPluginButton(props: {panel: PanelInfo}) {
+    const newPluginTypeBinding = useLocalDBinding<string | null>(null)
+    return <>
+        <ActionButton icon={<Icons.Add/>} onClick={() => newPluginTypeBinding.update(enabledPluginsList[0].type)}>添加组件</ActionButton>
+        <Dialog title="添加组件" open={newPluginTypeBinding.value !== null} 
+                onOk={async () => {
+                    if(newPluginTypeBinding.value === null) return;
+                    const plugin = enabledPlugins[newPluginTypeBinding.value]
+                    await props.panel.createPlugin(plugin.type, {x: 0, y: 0, ...plugin.initialize.defaultSize()}, plugin.initialize.defaultConfig())
+                    newPluginTypeBinding.update(null)
+                }} 
+                onCancel={() => newPluginTypeBinding.update(null)}>
+            <Grid container>
+                <Grid span={12}>
+                    <FormItem label="组件类型">
+                        <Select
+                            binding={newPluginTypeBinding}
+                            options={enabledPluginsList.map(plugin => ({
+                                value: plugin.type,
+                                label: plugin.title
+                            }))}
+                        />
+                    </FormItem>
+                </Grid>
+            </Grid>
+        </Dialog>
+    </>
+}
+
 
 export const PanelPage = () => {
     const panelId = usePanelId()
     const panel = usePanel(panelId)
-    const newPluginTypeBinding = useLocalDBinding<string | null>(null)
     const ref = useRef<HTMLDivElement>(null)
     const [panelBody, setPanelBody] = useState<React.ReactElement | null>(null)
     const previewModeBinding = useLocalDBinding(false)
@@ -78,13 +106,13 @@ export const PanelPage = () => {
                     <div style={{fontSize: "2rem"}}>{panel.meta.title}</div>
                 </Grid>
                 <Grid span={6}>
-                    <Stack direction="horizontal" alignment="evenly">
-                        <ActionButton icon={<Icons.Add/>} onClick={() => newPluginTypeBinding.update(enabledPluginsList[0].type)}>添加组件</ActionButton>
+                    <Flex direction="horizontal" alignment="end" spacing={20}>
+                        <AddPluginButton panel={panel}/>
                         <FormItem label="预览模式">
                             <Switch binding={previewModeBinding}/>
                         </FormItem>
                         <ShareButton/>
-                    </Stack>
+                    </Flex>
                 </Grid>
             </Grid>
             <div className="route-panel-body" ref={ref}>
@@ -93,27 +121,5 @@ export const PanelPage = () => {
                 </PanelStoreContext.Provider>
             </div>
         </PreviewModeContext.Provider>
-        <Dialog title="添加组件" open={newPluginTypeBinding.value !== null} 
-                onOk={async () => {
-                    if(newPluginTypeBinding.value === null) return;
-                    const plugin = enabledPlugins[newPluginTypeBinding.value]
-                    await panel.createPlugin(plugin.type, {x: 0, y: 0, ...plugin.initialize.defaultSize()}, plugin.initialize.defaultConfig())
-                    newPluginTypeBinding.update(null)
-                }} 
-                onCancel={() => newPluginTypeBinding.update(null)}>
-            <Grid container>
-                <Grid span={12}>
-                    <FormItem label="组件类型">
-                        <Select
-                            binding={newPluginTypeBinding}
-                            options={enabledPluginsList.map(plugin => ({
-                                value: plugin.type,
-                                label: plugin.title
-                            }))}
-                        />
-                    </FormItem>
-                </Grid>
-            </Grid>
-        </Dialog>
     </div>
 }

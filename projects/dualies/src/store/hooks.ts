@@ -202,15 +202,18 @@ export function usePlugin(panelId: number, pluginId: number): PluginInfo | null 
     }
 }
 
-export function useFileId(fileId: string | null): string | null {
-    const [url, setUrl] = useState<string | null>(null)
+export type UseFileIdResult = {status: "Pending" | "NotFound"} | {status: "Loaded", url: string}
+
+export function useFileId(fileId: string | null): UseFileIdResult {
+    const [result, setResult] = useState<UseFileIdResult>({status: "Pending"})
     const fileClient = useFileClient()
     useEffect(() => {
         if(fileId) {
+            setResult({status: "Pending"})
             const p = fileClient.readAsObjectURL(fileId)
             p.then(url => {
                 if(url) {
-                    setUrl(url)
+                    setResult({status: "Loaded", url})
                 }
             })
             return () => p.then(url => {
@@ -219,11 +222,11 @@ export function useFileId(fileId: string | null): string | null {
                 }
             })
         } else {
-            setUrl(null)
+            setResult({status: "NotFound"})
         }
         return () => {}
     }, [fileId])
-    return url
+    return result
 }
 
 // export function useFileId(fileId: string | null): string | null {

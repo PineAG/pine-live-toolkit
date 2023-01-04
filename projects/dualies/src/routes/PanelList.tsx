@@ -1,4 +1,4 @@
-import { Dialog, Grid, Icons, nullablePropertyBinding, defaultValueBinding, propertyBinding, StringField, useLocalDBinding, FormItem, NumberField, DBinding, Stack, ActionButton, CardGrid } from "@dualies/components"
+import { Dialog, Grid, Icons, nullablePropertyBinding, defaultValueBinding, propertyBinding, StringField, useLocalDBinding, FormItem, NumberField, DBinding, Flex, ActionButton, CardGrid } from "@dualies/components"
 import { ReactElement } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
@@ -81,9 +81,9 @@ export const PanelListPage = () => {
     return <div style={{margin: "50px"}}>
     <Grid container alignment="left">
         <Grid span={12}>
-            <Stack>
+            <Flex>
                 <ActionButton icon={<Icons.Add/>} onClick={() => newPanel.update(defaultNewPanel())}>创建新面板</ActionButton>
-            </Stack>
+            </Flex>
         </Grid>
         <Grid span={12}>
             <RenderPanelListPageBody store={store}/>
