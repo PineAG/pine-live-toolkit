@@ -117,43 +117,31 @@ export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistCon
         itemsBinding.insert(0, newItem)
         newItemContentStore.update("")
     }
-    return <Grid container>
-    <Grid span={12} container>
-        <Grid span={10}>
-            <StringField binding={newItemContentStore}/>
-        </Grid>
-        <Grid span={2}>
-            <IconButton onClick={createItem}>
-                <Icons.Add/>
-            </IconButton>
-        </Grid>
-    </Grid>
+    return <Flex direction="vertical" nowrap spacing={16}>
+    <Flex direction="horizontal" nowrap spacing={8}>
+        <StringField binding={newItemContentStore}/>
+        <IconButton onClick={createItem}>
+            <Icons.Add/>
+        </IconButton>
+    </Flex>
     {itemsBinding.items.map((item, i) => (
-        <Grid container span={12} key={i}>
-            <Grid span={1}>
-                <ChecklistDoneButton binding={propertyBinding(item, "done")}/>
-            </Grid>
-            <Grid span={1}>
-                <ChecklistVisibleButton binding={propertyBinding(item, "show")}/>
-            </Grid>
-            <Grid span={9}>
-                <StringField binding={propertyBinding(item, "content")}/>
-            </Grid>
-            <Grid span={1}>
-                <QuickConfirm title="确认要删除吗" description="之后无法恢复" onConfirm={() => item.remove()}>
-                    <IconButton>
-                        <Icons.Delete/>
-                    </IconButton>
-                </QuickConfirm>
-            </Grid>
-        </Grid>
+        <Flex direction="horizontal" nowrap style={{width: "100%"}} spacing={8}>
+            <ChecklistDoneButton binding={propertyBinding(item, "done")}/>
+            <ChecklistVisibleButton binding={propertyBinding(item, "show")}/>
+            <StringField binding={propertyBinding(item, "content")}/>
+            <IconButton icon={<Icons.Up/>} disabled={i === 0} onClick={() => item.move(i-1)}/>
+            <IconButton icon={<Icons.Down/>} disabled={i === itemsBinding.value.length - 1} onClick={() => item.move(i+1)}/>
+            <QuickConfirm title="确认要删除吗" description="之后无法恢复" onConfirm={() => item.remove()}>
+                <IconButton>
+                    <Icons.Delete/>
+                </IconButton>
+            </QuickConfirm>
+        </Flex>
     ))}
-    <Grid span={12}>    
-        <Collapse title="字体设置">
-            <TextStyleAndSizePicker binding={textStyle}/>
-        </Collapse>
-    </Grid>
-    </Grid>
+    <Collapse title="字体设置">
+        <TextStyleAndSizePicker binding={textStyle}/>
+    </Collapse>
+    </Flex>
 }
 
 export const ChecklistPlugin: Plugin<ChecklistConfig> = {

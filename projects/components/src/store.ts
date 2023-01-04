@@ -123,8 +123,9 @@ class ArrayBinding<Item> implements DBinding<Item[]> {
 
     move(fromIndex: number, toIndex: number): Promise<void> {
         return this.warpInternalUpdate(items => {
+            const item = items[fromIndex]
             items.splice(fromIndex, 1)
-            items.splice(toIndex, toIndex <= fromIndex ? toIndex : toIndex-1)
+            items.splice(toIndex, 0, item)
         })
     }
 }
