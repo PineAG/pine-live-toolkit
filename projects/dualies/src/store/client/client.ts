@@ -1,27 +1,7 @@
 
 import DualiesClient, { SubscriptionManager } from "@dualies/client";
 import { IBackend, IDataClient } from "./base";
-
-export interface PanelMeta {
-    title: string
-}
-
-export interface PluginMeta {
-    pluginType: string
-}
-
-export interface Size {
-    width: number, height: number
-}
-
-export interface Position {
-    x: number, y: number
-}
-
-export interface Rect {
-    x: number, y: number
-    width: number, height: number
-}
+import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
 
 export class APIWrapper {
     constructor(private client: IBackend){}
@@ -42,24 +22,24 @@ export class APIWrapper {
         return this.client.data(`/panel/${panelId}/size`)
     }
 
-    pluginsCounter(panelId: number): IDataClient<number> {
-        return this.client.data(`/panel/${panelId}/plugins/counter`)
+    pluginsCounter(): IDataClient<number> {
+        return this.client.data(`/plugins/counter`)
     }
 
     pluginsList(panelId: number): IDataClient<number[]> {
         return this.client.data(`/panel/${panelId}/plugins/enabled`)
     }
 
-    pluginMeta(panelId: number, pluginId: number): IDataClient<PluginMeta> {
-        return this.client.data(`/panel/${panelId}/plugin/${pluginId}/meta`)
+    pluginMeta(pluginId: number): IDataClient<PluginMeta> {
+        return this.client.data(`/plugin/${pluginId}/meta`)
     }
     
     pluginRect(panelId: number, pluginId: number): IDataClient<Rect> {
         return this.client.data(`/panel/${panelId}/plugin/${pluginId}/rect`)
     }
 
-    pluginConfig<T>(panelId: number, pluginId: number): IDataClient<T> {
-        return this.client.data(`/panel/${panelId}/plugin/${pluginId}/config`)
+    pluginConfig<T>(pluginId: number): IDataClient<T> {
+        return this.client.data(`/plugin/${pluginId}/config`)
     }
 }
 
@@ -67,10 +47,6 @@ type Callback = () => void
 
 export function error(message: string): never {
     throw new Error(message)
-}
-
-export interface PanelIndex extends PanelMeta {
-    id: number
 }
 
 export class GlobalClient {
@@ -131,12 +107,12 @@ export class PanelClient {
 
     async createPlugin<Config>(pluginType: string, size: Rect, config: Config): Promise<number[]> {
         const pluginsList = (await this.api.pluginsList(this.panelId).get()) ?? []
-        const pluginId = (await this.api.pluginsCounter(this.panelId).get()) ?? 0
+        const pluginId = (await this.api.pluginsCounter().get()) ?? 0
         pluginsList.push(pluginId)
-        await this.api.pluginMeta(this.panelId, pluginId).set({ pluginType })
+        await this.api.pluginMeta(pluginId).set({ pluginType })
         await this.api.pluginRect(this.panelId, pluginId).set(size)
-        await this.api.pluginConfig(this.panelId, pluginId).set(config)
-        await this.api.pluginsCounter(this.panelId).set(pluginId+1)
+        await this.api.pluginConfig(pluginId).set(config)
+        await this.api.pluginsCounter().set(pluginId+1)
         await this.api.pluginsList(this.panelId).set(pluginsList)
         return pluginsList
     }
@@ -153,7 +129,7 @@ export class PanelClient {
         for(const pluginId of pluginList){
             await new PluginClient(this.api, this.panelId, pluginId).delete()
         }
-        await this.api.pluginsCounter(this.panelId).delete()
+        await this.api.pluginsCounter().delete()
         await this.api.pluginsList(this.panelId).delete()
         await this.api.panelMeta(this.panelId).delete()
         await this.api.panelSize(this.panelId).delete()
@@ -177,21 +153,21 @@ export class PluginClient {
     constructor(private api: APIWrapper, private panelId: number, private pluginId: number) {}
 
     async meta(): Promise<PluginMeta> {
-        const meta = await this.api.pluginMeta(this.panelId, this.pluginId).get()
+        const meta = await this.api.pluginMeta(this.pluginId).get()
         return meta ?? error("Plugin not exists")
     }
 
     async config(): Promise<any> {
-        const config = await this.api.pluginConfig(this.panelId, this.pluginId).get()
+        const config = await this.api.pluginConfig(this.pluginId).get()
         return config ?? error("Plugin not exists")
     }
 
     async setConfig(config: any): Promise<any> {
-        await this.api.pluginConfig(this.panelId, this.pluginId).set(config)
+        await this.api.pluginConfig(this.pluginId).set(config)
     }
 
     async configOrNull(): Promise<{} | null> {
-        const config = await this.api.pluginConfig<any>(this.panelId, this.pluginId).get()
+        const config = await this.api.pluginConfig<any>(this.pluginId).get()
         return config ?? null
     }
 
@@ -207,13 +183,13 @@ export class PluginClient {
     async delete() {
         const pluginList = (await this.api.pluginsList(this.panelId).get()) ?? []
         await this.api.pluginsList(this.panelId).set(pluginList.filter(id => id !== this.pluginId))
-        await this.api.pluginMeta(this.panelId, this.pluginId).delete()
+        await this.api.pluginMeta(this.pluginId).delete()
         await this.api.pluginRect(this.panelId, this.pluginId).delete()
-        await this.api.pluginConfig(this.panelId, this.pluginId).delete()
+        await this.api.pluginConfig(this.pluginId).delete()
     }
 
     async subscribeMeta(callback: Callback): Promise<SubscriptionManager> {
-        return this.api.pluginMeta(this.panelId, this.pluginId).subscribe(callback)
+        return this.api.pluginMeta(this.pluginId).subscribe(callback)
     }
 
     async subscribeSize(callback: Callback): Promise<SubscriptionManager> {
@@ -221,7 +197,7 @@ export class PluginClient {
     }
 
     async subscribeConfig<T>(callback: Callback): Promise<SubscriptionManager> {
-        return this.api.pluginConfig<T>(this.panelId, this.pluginId).subscribe(callback)
+        return this.api.pluginConfig<T>(this.pluginId).subscribe(callback)
     }
 }
 
@@ -238,7 +214,7 @@ export class FileClient {
         return fileId
     }
 
-    async downloadAsObjectURL(fileId: string): Promise<string> {
-        return await this.client.files().readAsObjectURL(fileId)
+    async download(fileId: string): Promise<Blob> {
+        return await this.client.files().read(fileId)
     }
 }

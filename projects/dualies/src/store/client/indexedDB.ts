@@ -65,7 +65,7 @@ module DBWrapper {
     }
 }
 
-class MockJsonDataClient<T> implements IDataClient<T> {
+class IndexedDBDataClient<T> implements IDataClient<T> {
 
     constructor(private key: string) {}
 
@@ -124,7 +124,7 @@ class MockJsonDataClient<T> implements IDataClient<T> {
     }
 }
 
-class MockFileClient implements IFileClient {
+class IndexedDBFileClient implements IFileClient {
     async create(data: string | Blob): Promise<string> {
         const uuid = crypto.randomUUID()
         await this.update(uuid, data)
@@ -143,19 +143,13 @@ class MockFileClient implements IFileClient {
         await this.db(id).set(raw)
 
     }
-    async readBlob(id: string): Promise<Uint8Array> {
+    async read(id: string): Promise<Blob> {
         console.log("FILE READ", id)
         const data = await this.db(id).get()
         if(data === null) {
             throw new Error(`Not found: ${data}`)
         }
-        return new Uint8Array(await data.arrayBuffer())
-    }
-    async readAsObjectURL(id: string): Promise<string> {
-        const data = await this.readBlob(id)
-        const blob = new Blob([data])
-        const url = URL.createObjectURL(blob)
-        return url
+        return data
     }
     async delete(id: string): Promise<void> {
         await this.db(id).delete()
@@ -163,10 +157,10 @@ class MockFileClient implements IFileClient {
 }
 
 export class BrowserStorageBackend implements IBackend {
-    data<T>(path: string): MockJsonDataClient<T> {
-        return new MockJsonDataClient(path)
+    data<T>(path: string): IndexedDBDataClient<T> {
+        return new IndexedDBDataClient(path)
     }
-    files(): MockFileClient {
-        return new MockFileClient()
+    files(): IndexedDBFileClient {
+        return new IndexedDBFileClient()
     }
 }

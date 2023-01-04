@@ -22,7 +22,7 @@ export class FileClient extends ClientBase {
         }
     }
 
-    async readBlob(id: string): Promise<Uint8Array> {
+    async read(id: string): Promise<Blob> {
         const res = await fetch(`${this.httpPath}/${id}`)
         if(res.status !== 200) {
             throw new Error(`${res.status}: ${res.statusText}`)
@@ -32,12 +32,7 @@ export class FileClient extends ClientBase {
         if(!value){
             throw new Error("Empty body")
         }
-        return value
-    }
-
-    async readAsObjectURL(id: string): Promise<string> {
-        const data = await this.readBlob(id)
-        return URL.createObjectURL(new Blob([data]))
+        return new Blob([value])
     }
 
     async delete(id: string) {

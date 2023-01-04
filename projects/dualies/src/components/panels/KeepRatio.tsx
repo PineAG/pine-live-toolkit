@@ -40,9 +40,9 @@ export const KeepRatio = (props: KeepRatioProps) => {
                 setRatio(ref.offsetWidth / props.internalSize.width)
             }}
             style={{
-                borderStyle: "solid",
-                borderWidth: "1px",
-                borderColor: "black",
+                outlineStyle: "solid",
+                outlineWidth: "1px",
+                outlineColor: "black",
                 overflow: "hidden"
             }}
             >

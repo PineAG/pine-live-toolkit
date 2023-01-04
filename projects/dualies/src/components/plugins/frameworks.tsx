@@ -49,7 +49,7 @@ export const ScaledFramework = (props: FrameworkProps) => {
         width: width * scale,
         height: height * scale,
         position: "absolute",
-        ...props.style
+        ...props.style,
     }
     const wrapperStyle: CSSProperties = {
         position: "absolute",

@@ -140,7 +140,11 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
             </Grid>
             <>
                 {fileResult.status === "Loaded" ? 
-                    <img alt="" src={fileResult.url}></img> :
+                    <img alt="" src={fileResult.url} style={{
+                        maxWidth: "min(500px, 100%)",
+                        minHeight: "min(500px, 100%)",
+                        opacity: configStore.value.visible ? 1 : 0.2
+                    }}></img> :
                     fileResult.status === "NotFound" ?
                         <EmptyImageIcon/> :
                         <Loading/>}

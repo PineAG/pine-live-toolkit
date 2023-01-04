@@ -5,10 +5,11 @@ import { ButtonProps, IconButton } from "./buttons"
 
 export interface SwitchProps {
     binding: DBinding<boolean>
+    disabled?: boolean
 }
 
-export function Switch({binding}: SwitchProps){
-    return <Antd.Switch checked={binding.value} onClick={value => binding.update(value)}/>
+export function Switch({binding, disabled}: SwitchProps){
+    return <Antd.Switch disabled={disabled} checked={binding.value} onClick={value => binding.update(value)}/>
 }
 
 export interface CheckboxProps {

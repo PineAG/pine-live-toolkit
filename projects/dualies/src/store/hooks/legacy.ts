@@ -1,24 +1,9 @@
-import DualiesClient, { SubscriptionManager } from "@dualies/client";
-import { createContext, useContext, useEffect, useState } from "react";
-import { enabledPlugins } from "../plugins";
-import { APIWrapper, error, GlobalClient, IBackend, IFileClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size } from "./client";
-
-const BackendContext = createContext<IBackend>(new DualiesClient({path: "/api"}))
-
-export const BackendProvider = BackendContext.Provider
-
-function useBackend(): IBackend {
-    return useContext(BackendContext)
-}
-
-function useAPIWrapper(): APIWrapper {
-    const backend = useBackend()
-    return new APIWrapper(backend)
-}
-
-export function useFileClient(): IFileClient {
-    return useContext(BackendContext).files()
-}
+import { SubscriptionManager } from "@dualies/client";
+import { useEffect, useState } from "react";
+import { enabledPlugins } from "../../plugins";
+import { error, GlobalClient, PanelClient, PluginClient } from "../client";
+import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
+import { useAPIWrapper, useFileClient } from "./base";
 
 
 function useAsyncSubscription(starter: () => Promise<SubscriptionManager>, deps: any[]) {
@@ -201,49 +186,3 @@ export function usePlugin(panelId: number, pluginId: number): PluginInfo | null 
         }
     }
 }
-
-export type UseFileIdResult = {status: "Pending" | "NotFound"} | {status: "Loaded", url: string}
-
-export function useFileId(fileId: string | null): UseFileIdResult {
-    const [result, setResult] = useState<UseFileIdResult>({status: "Pending"})
-    const fileClient = useFileClient()
-    useEffect(() => {
-        if(fileId) {
-            setResult({status: "Pending"})
-            const p = fileClient.readAsObjectURL(fileId)
-            p.then(url => {
-                if(url) {
-                    setResult({status: "Loaded", url})
-                }
-            })
-            return () => p.then(url => {
-                if(url) {
-                    URL.revokeObjectURL(url)
-                }
-            })
-        } else {
-            setResult({status: "NotFound"})
-        }
-        return () => {}
-    }, [fileId])
-    return result
-}
-
-// export function useFileId(fileId: string | null): string | null {
-//     const [url, setURL] = useState<string | null>(null)
-//     useEffect(() => {
-//         if(fileId === null) {
-//             return
-//         }
-//         const client = new FileClient()
-//         const promise = client.downloadAsObjectURL(fileId)
-//         promise.then(setURL)
-//         return () => {
-//             promise.then(url => URL.revokeObjectURL(url))
-//         }
-//     }, [fileId])
-//     if(fileId === null) {
-//         return null;
-//     }
-//     return url
-// }

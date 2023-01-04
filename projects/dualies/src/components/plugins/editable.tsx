@@ -82,18 +82,18 @@ const frameworkBackgroundStyle: React.CSSProperties = {
 }
 
 const frameworkBorderStyle: React.CSSProperties = {
-    borderWidth: 1, 
-    borderColor: "black",
+    outlineWidth: 1, 
+    outlineColor: "black",
 }
 
 const editableFrameworkStyles: React.CSSProperties = {
-    borderStyle: "solid",
+    outlineStyle: "solid",
     ...frameworkBorderStyle,
     ...frameworkBackgroundStyle,
 }
 
 const scaledFrameworkStyles: React.CSSProperties = {
-    borderStyle: "dashed",
+    outlineStyle: "dashed",
     ...frameworkBorderStyle,
     ...frameworkBackgroundStyle,
 }

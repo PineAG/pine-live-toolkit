@@ -11,8 +11,7 @@ export interface IDataClient<T> {
 export interface IFileClient {
     create(data: string | Blob): Promise<string>
     update(id: string, data: string | Blob): Promise<void>
-    readBlob(id: string): Promise<Uint8Array>
-    readAsObjectURL(id: string): Promise<string>
+    read(id: string): Promise<Blob>
     delete(id: string): Promise<void>
 }
 
