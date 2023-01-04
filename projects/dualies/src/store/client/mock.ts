@@ -1,105 +1,125 @@
+import * as idb from "idb"
 import { SubscriptionEvent, SubscriptionManager } from "@dualies/client";
 import { IBackend, IDataClient, IFileClient } from "./base";
 
-const LOCALSTORAGE_DATA_PREFIX = "$dualies.mock/data"
-const LOCALSTORAGE_FILE_PREFIX = "$dualies.mock/file"
+const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
 
-type Subscriber = () => void
+module DBWrapper {
+    const IndexedDBName = "dualies.mock.db:data_kv"
+    const DataStoreName = "data_kv"
+    const FileStoreName = "file_kv"
 
-class MockBus {
-    private subscribers: Map<string, Set<Subscriber>> = new Map()
-    constructor() {
-        window.addEventListener("storage", evt => {
-            if(evt.key){
-                this.emit(evt.key)
+    async function openInternal(dbName: string) {
+        const db = await idb.openDB(dbName, 1, {
+            upgrade(db) {
+                db.createObjectStore(DataStoreName)
+                db.createObjectStore(FileStoreName)
             }
         })
+        return db
     }
 
-    emit(key: string) {
-        setTimeout(() => {
-            const c = this.subscribers.get(key)
-            if(!c) return;
-            for(const s of c){
-                s()
-            }
-        }, 10)
+    async function getInternal<T>(dbName: string, storeName: string, key: string): Promise<T | null> {
+        const db = await openInternal(dbName)
+        const tx = db.transaction(storeName, "readonly", {})
+        const value = await tx.store.get(key)
+        await tx.done
+        return value ?? null
     }
 
-    subscribe(key: string, subscriber: Subscriber) {
-        let c = this.subscribers.get(key)
-        if(!c) {
-            c = new Set()
-            this.subscribers.set(key, c)
+    async function putInternal<T>(dbName: string, storeName: string, key: string, value: T): Promise<void> {
+        const db = await openInternal(dbName)
+        const tx = db.transaction(storeName, "readwrite", {})
+        await tx.store.put(value, key)
+        await tx.done
+        db.close()
+    }
+
+    async function deleteInternal(dbName: string, storeName: string, key: string): Promise<void> {
+        const db = await openInternal(dbName)
+        const tx = db.transaction(storeName, "readwrite")
+        await tx.store.delete(key)
+        await tx.done
+        db.close()
+    }
+
+    class DBAccess<T> {
+        constructor(private dbName: string, private storeName: string, private key: string) {}
+        async get(): Promise<T | null> {
+            return await getInternal(this.dbName, this.storeName, this.key)
         }
-        c.add(subscriber)
-    }
-
-    dispose(key: string, subscriber: Subscriber) {
-        const c = this.subscribers.get(key)
-        if(!c) return;
-        c.delete(subscriber)
-        if(c.size === 0) {
-            this.subscribers.delete(key)
+        async set(value: T): Promise<void> {
+            await putInternal(this.dbName, this.storeName, this.key, value)
+        }
+        async delete(): Promise<void> {
+            await deleteInternal(this.dbName, this.storeName, this.key)
         }
     }
-}
 
-let _globalMockBus: MockBus | null = null
-
-function mockBus(): MockBus {
-    if(_globalMockBus === null) {
-        _globalMockBus = new MockBus()
+    export function data<T>(key: string): DBAccess<T> {
+        return new DBAccess(IndexedDBName, DataStoreName, key)
     }
-    return _globalMockBus
+
+    export function file(key: string): DBAccess<Uint8Array> {
+        return new DBAccess(IndexedDBName, FileStoreName, key)
+    }
 }
 
 class MockJsonDataClient<T> implements IDataClient<T> {
 
     constructor(private key: string) {}
 
-    private get path() {
-        return `${LOCALSTORAGE_DATA_PREFIX}${this.key}`
+    private broadcastMessage(event: SubscriptionEvent) {
+        const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+        bc.postMessage({event, key: this.key})
+        bc.close()
+    }
+
+    private get db() {
+        return DBWrapper.data<T>(this.key)
     }
 
     async get(): Promise<T | null> {
-        const data = localStorage.getItem(this.path)
-        if(data !== null) {
-            return JSON.parse(data)
-        } else {
-            return null
-        }
+        console.log("GET", this.key)
+        return await this.db.get()
     }
     async set(data: T): Promise<void> {
-        localStorage.setItem(this.path, JSON.stringify(data))
-        mockBus().emit(this.path)
+        console.log("SET", this.key)
+        await this.db.set(data)
+        this.broadcastMessage("SET")
     }
     async delete(): Promise<void> {
-        localStorage.removeItem(this.path)
-        mockBus().emit(this.path)
+        console.log("DEL", this.key)
+        await this.db.delete()
+        this.broadcastMessage("DELETE")
     }
+
     subscribe(callback: (evt: SubscriptionEvent) => void): SubscriptionManager {
-        const subscriber = () => {
-            const newValue = localStorage.getItem(this.path)
-            callback(newValue ? "SET" : "DELETE")
+        const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+        bc.onmessage = (message) => {
+            const event = message.data["event"]
+            const key = message.data["key"]
+            console.log("SUB", key)
+            if(key === this.key && (event === "SET" || event === "DELETE")) {
+                callback(event)
+            }
         }
-        mockBus().subscribe(this.path, subscriber)
         return {
-            close: () => mockBus().dispose(this.path, subscriber)
+            close: () => bc.close()
         }
     }
     onValueChanged(callback: (value: T | null) => void): SubscriptionManager {
-        const subscriber = () => {
-            const newValue = localStorage.getItem(this.path)
-            if(newValue === null) {
-                callback(null)
-            } else {
-                callback(JSON.parse(newValue))
+        const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+        bc.onmessage = async (message) => {
+            const key = message.data["key"]
+            console.log("SUB", key)
+            if(key === this.key) {
+                const value = await this.db.get()
+                callback(value)
             }
         }
-        mockBus().subscribe(this.path, subscriber)
         return {
-            close: () => mockBus().dispose(this.path, subscriber)
+            close: () => bc.close()
         }
     }
 }
@@ -107,40 +127,39 @@ class MockJsonDataClient<T> implements IDataClient<T> {
 class MockFileClient implements IFileClient {
     async create(data: string | Blob): Promise<string> {
         const uuid = crypto.randomUUID()
-        await this.saveFile(uuid, data)
+        await this.update(uuid, data)
         return uuid
     }
+
+    private db(path: string) {
+        return DBWrapper.file(path)
+    }
+
     async update(id: string, data: string | Blob): Promise<void> {
-        await this.saveFile(id, data)
+        console.log("FILE WRITE", id)
+        const raw = typeof data === "string" ?
+            new TextEncoder().encode(data) :
+            new Uint8Array(await data.arrayBuffer())
+        await this.db(id).set(raw)
+
     }
     async readBlob(id: string): Promise<Uint8Array> {
-        const data = await this.readFile(id)
-        return Uint8Array.from(data)
+        console.log("FILE READ", id)
+        const data = await this.db(id).get()
+        if(data === null) {
+            throw new Error(`Not found: ${data}`)
+        }
+        return data
     }
     async readAsObjectURL(id: string): Promise<string> {
-        return URL.createObjectURL(new Blob([await this.readFile(id)]))
+        const data = await this.readBlob(id)
+        const blob = new Blob([data])
+        const url = URL.createObjectURL(blob)
+        return url
     }
     async delete(id: string): Promise<void> {
-        localStorage.removeItem(this.path(id))
-    }
-    path(id: string): string {
-        return `${LOCALSTORAGE_FILE_PREFIX}/${id}`
-    }
-    private async saveFile(id: string, data: string | Blob) {
-        if(typeof data === "string") {
-            data = new Blob([new TextEncoder().encode(data)])
-        }
-        const b64 = Buffer.from(await data.arrayBuffer()).toString("base64")
-        localStorage.setItem(id, b64)
-    }
-    private async readFile(id: string): Promise<Buffer> {
-        const b64 = localStorage.getItem(this.path(id))
-        if(b64 === null) {
-            throw new Error(`Missing key: ${id}`)
-        }
-        return Buffer.from(b64, "base64")
-    }
-    
+        await this.db(id).delete()
+    }    
 }
 
 export class BrowserStorageBackend implements IBackend {

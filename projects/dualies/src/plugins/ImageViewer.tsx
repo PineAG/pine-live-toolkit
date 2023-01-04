@@ -1,7 +1,7 @@
 import { Plugin, PropsWithConfig } from "./base"
-import { FileClient, useFileId } from "../store"
+import { IFileClient, useFileClient, useFileId } from "../store"
 import Loading from "../components/Loading"
-import { Checkbox, DangerButton, FormItem, Grid, Icons, propertyBinding, Stack, UploadButton } from "@dualies/components"
+import { Checkbox, DangerButton, DBinding, FormItem, Grid, Icons, IconSwitch, propertyBinding, Stack, UploadButton } from "@dualies/components"
 import { useRef } from "react"
 
 export interface Config {
@@ -45,24 +45,34 @@ function ImageViewer({configStore}: PropsWithConfig<Config>) {
     return renderImage(fileURL)
 }
 
-async function uploadFile(file: File): Promise<string | null> {
+async function uploadFile(file: File, client: IFileClient): Promise<string | null> {
     const res = await file.stream().getReader().read()
     if(res.value){
-        const fileId = await new FileClient().upload(res.value)
+        const fileId = await client.create(new Blob([res.value]))
         return fileId
     } else {
         return null
     }
 }
 
+function VisibleSwitch({binding}: {binding: DBinding<boolean>}) {
+    return <IconSwitch
+        binding={binding}
+        enabledIcon={<Icons.Show/>}
+        disabledIcon={<Icons.Hide/>}
+        style={{position: "absolute", right: 0, bottom: 0}}
+    />
+}
+
 function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
+    const fileClient = useFileClient()
     const ref = useRef<HTMLInputElement>(null)
     const fileURL = useFileId(configStore.value.fileId)
     const fileIdBinding = propertyBinding(configStore, "fileId")
     async function onChangeInternal(files: FileList | null) {
         if(files === null || files.length === 0) return;
         const file = files[0]
-        const newId = await uploadFile(file)
+        const newId = await uploadFile(file, fileClient)
         await fileIdBinding.update(newId)
     }
     function onClick() {
@@ -82,6 +92,7 @@ function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
     }
     return <>
         {renderImage(fileURL, configStore.value.visible ? 1 : 0.2, onClick)}
+        <VisibleSwitch binding={propertyBinding(configStore, "visible")}/>
         {fileHandler}
     </>
 }
@@ -98,6 +109,7 @@ function ImageViewerMove({configStore}: PropsWithConfig<Config>) {
 }
 
 function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
+    const fileClient = useFileClient()
     const fileIdStore = propertyBinding(configStore, "fileId")
     const fileURL = useFileId(fileIdStore.value)
     return <Stack>
@@ -111,7 +123,7 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
                             const file = files[0]
                             if(!file) return;
                             await fileIdStore.update(null)
-                            await fileIdStore.update(await uploadFile(file))
+                            await fileIdStore.update(await uploadFile(file, fileClient))
                         }}
                     >
                         上传图片

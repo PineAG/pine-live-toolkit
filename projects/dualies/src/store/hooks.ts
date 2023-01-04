@@ -1,7 +1,7 @@
 import DualiesClient, { SubscriptionManager } from "@dualies/client";
 import { useState, useEffect, createContext, useContext } from "react";
 import { enabledPlugins } from "../plugins";
-import { APIWrapper, error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size, IBackend } from "./client";
+import { APIWrapper, error, GlobalClient, PanelClient, PanelIndex, PanelMeta, PluginClient, PluginMeta, Rect, Size, IBackend, IFileClient } from "./client";
 
 const BackendContext = createContext<IBackend>(new DualiesClient({path: "/api"}))
 
@@ -14,6 +14,10 @@ function useBackend(): IBackend {
 function useAPIWrapper(): APIWrapper {
     const backend = useBackend()
     return new APIWrapper(backend)
+}
+
+export function useFileClient(): IFileClient {
+    return useContext(BackendContext).files()
 }
 
 
@@ -199,7 +203,27 @@ export function usePlugin(panelId: number, pluginId: number): PluginInfo | null 
 }
 
 export function useFileId(fileId: string | null): string | null {
-    return fileId === null ? null : `/api/files/${fileId}`
+    const [url, setUrl] = useState<string | null>(null)
+    const fileClient = useFileClient()
+    useEffect(() => {
+        if(fileId) {
+            const p = fileClient.readAsObjectURL(fileId)
+            p.then(url => {
+                if(url) {
+                    setUrl(url)
+                }
+            })
+            return () => p.then(url => {
+                if(url) {
+                    URL.revokeObjectURL(url)
+                }
+            })
+        } else {
+            setUrl(null)
+        }
+        return () => {}
+    }, [fileId])
+    return url
 }
 
 // export function useFileId(fileId: string | null): string | null {

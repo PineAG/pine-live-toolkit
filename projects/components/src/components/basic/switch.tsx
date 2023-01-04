@@ -1,4 +1,5 @@
 import * as Antd from "antd"
+import { CSSProperties } from "react"
 import { DBinding } from "../../store"
 import { ButtonProps, IconButton } from "./buttons"
 
@@ -23,6 +24,7 @@ export interface IconSwitchProps {
     disabledIcon: JSX.Element
     binding: DBinding<boolean>
     size?: ButtonProps["size"]
+    style?: CSSProperties
 }
 
 export function IconSwitch(props: IconSwitchProps) {
@@ -31,5 +33,6 @@ export function IconSwitch(props: IconSwitchProps) {
         size={props.size}
         icon={icon}
         onClick={() => props.binding.update(!props.binding.value)}
+        style={props.style}
     />
 }
