@@ -1,4 +1,4 @@
-import { ActionButton, Dialog, Flex, FormItem, Grid, Icons, Notification, Select, Switch, useLocalDBinding } from "@dualies/components"
+import { ActionButton, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@dualies/components"
 import React, { useEffect, useRef, useState } from "react"
 import { TransparentBackground } from "../components/backgrounds"
 import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
@@ -101,20 +101,20 @@ export const PanelPage = () => {
     }
     return <div className="route-panel-root">
         <PreviewModeContext.Provider value={previewModeBinding.value}>
-            <Grid container className="route-panel-header" alignment="left">
-                <Grid span={6}>
+            <HStack layout={["1fr", "auto"]} className="route-panel-header">
+                <Flex direction="vertical" alignment="space-between" nowrap>
                     <div style={{fontSize: "2rem"}}>{panel.meta.title}</div>
-                </Grid>
-                <Grid span={6}>
-                    <Flex direction="horizontal" alignment="end" spacing={20}>
+                </Flex>
+                <Flex>
+                    <Flex direction="horizontal" alignment="end" spacing={20} nowrap>
                         <AddPluginButton panel={panel}/>
                         <FormItem label="预览模式">
                             <Switch binding={previewModeBinding}/>
                         </FormItem>
                         <ShareButton/>
                     </Flex>
-                </Grid>
-            </Grid>
+                </Flex>
+            </HStack>
             <div className="route-panel-body" ref={ref}>
                 <PanelStoreContext.Provider value={panel}>
                 {panelBody}

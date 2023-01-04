@@ -91,6 +91,7 @@ export interface FlexProps {
     alignment?: keyof typeof flexAlignmentMapping
     nowrap?: boolean
     style?: React.CSSProperties
+    className?: string
 }
 
 export function Flex(props: FlexProps) {
@@ -107,7 +108,7 @@ export function Flex(props: FlexProps) {
         justifyContent: flexAlignmentMapping[alignment],
         ...props.style
     }
-    return <div style={style}>
+    return <div style={style} className={props.className}>
         {children}
     </div>
 }
@@ -118,6 +119,8 @@ export interface StackProps {
     spacing?: number
     layout: StackLayoutItem[]
     children: NodeChildren
+    className?: string
+    style?: CSSProperties
 }
 
 export function VStack(props: StackProps) {
@@ -125,9 +128,10 @@ export function VStack(props: StackProps) {
         gap: props.spacing,
         display: "grid",
         gridTemplateRows: props.layout.join(" "),
-        gridTemplateColumns: "1fr"
+        gridTemplateColumns: "1fr",
+        ...props.style
     }
-    return <div style={style}>
+    return <div style={style} className={props.className}>
         {props.children}
     </div>
 }
@@ -137,9 +141,10 @@ export function HStack(props: StackProps) {
         gap: props.spacing,
         display: "grid",
         gridTemplateRows: "1fr",
-        gridTemplateColumns: props.layout.join(" ")
+        gridTemplateColumns: props.layout.join(" "),
+        ...props.style
     }
-    return <div style={style}>
+    return <div style={style} className={props.className}>
         {props.children}
     </div>
 }

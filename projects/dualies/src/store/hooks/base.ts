@@ -20,51 +20,46 @@ export function useFileClient(): IFileClient {
     return useContext(BackendContext).files()
 }
 
-export type APIBindingState<T> = {
+export type AsyncBindingState<T> = {
     status: "Pending"
 } | {
     status: "Success",
-    binding: DBinding<T | null>
+    binding: DBinding<T>
 } | {
     status: "Failed",
     message?: any
 }
 
-type UseAPIBindingState<T> = {
+type UseAsyncBindingState<T> = {
     status: "Pending"
 } | {
     status: "Success",
-    value: T | null
+    value: T
 } | {
     status: "Failed",
     message?: any
 }
 
-export function useAPIBinding<T>(client: IDataClient<T>): APIBindingState<T> {
-    const [state, setState] = useState<UseAPIBindingState<T>>({status: "Pending"})
+export function useAsyncBinding<T>(get: () => Promise<T>, update: (value: T) => Promise<void>): AsyncBindingState<T> {
+    const [state, setState] = useState<UseAsyncBindingState<T>>({status: "Pending"})
     useEffect(() => {
         setState({status: "Pending"})
-        const disposer = client.onValueChanged(value => {
+        get().then(value => {
             setState({status: "Success", value})
+        }).catch(err => {
+            setState({status: "Failed", message: err})
         })
-        client.get().then(value => setState({status: "Success", value}))
-        return () => disposer.close()
-    }, [client])
+    }, [get, update])
     if(state.status === "Success") {
         return {
             status: "Success",
             binding: {
                 value: state.value,
-                update: async (newValue) => {
-                    if(newValue === null) {
-                        client.delete()
-                    } else {
-                        client.set(newValue)
-                    }
-                }
+                update
             }
         }
     } else {
         return state
     }
 }
+
