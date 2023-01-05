@@ -1,9 +1,8 @@
-export interface IBackendItemWrapper<Key, T> {
-
-}
-
-export interface IBackendCollectionWrapper<Key, FullObject, IndexObject, IndexQuery> {
+export interface IBackendCollectionWrapper<Key, T, Query> {
     count(): Promise<number>
-    queryIndex(query: IndexQuery): Promise<IndexObject[]>
-    item(key: Key): IBackendItemWrapper<Key, FullObject>
+    query(query: Query): Promise<T[]>
+    get(key: Key): Promise<T>
+    create(data: T): Promise<Key>
+    update(key: Key, data: Partial<T>): Promise<void>
+    delete(key: Key): Promise<void>
 }
