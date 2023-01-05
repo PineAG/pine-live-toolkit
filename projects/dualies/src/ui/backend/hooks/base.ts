@@ -1,5 +1,5 @@
-import DualiesClient from "@dualies/client"
-import { DBinding } from "@dualies/components"
+import DualiesClient from "@pltk/client"
+import { DBinding } from "@pltk/components"
 import { createContext, useContext, useEffect, useState } from "react"
 import { APIWrapper, IBackend, IDataClient, IFileClient } from "../client"
 

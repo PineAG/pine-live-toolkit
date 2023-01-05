@@ -1,5 +1,5 @@
 
-import DualiesClient, { SubscriptionManager } from "@dualies/client";
+import DualiesClient, { SubscriptionManager } from "@pltk/client";
 import { IBackend, IDataClient } from "./base";
 import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
 

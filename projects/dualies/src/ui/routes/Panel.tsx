@@ -1,4 +1,4 @@
-import { ActionButton, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@dualies/components"
+import { ActionButton, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@pltk/components"
 import React, { useEffect, useRef, useState } from "react"
 import { TransparentBackground } from "../components/backgrounds"
 import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"

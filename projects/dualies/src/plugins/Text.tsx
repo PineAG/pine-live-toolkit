@@ -1,4 +1,4 @@
-import { convertTextStyleToCSS, FormItem, Grid, MultiLinesStringField, propertyBinding, TextStyleAndSize, TextStyleAndSizePicker } from "@dualies/components"
+import { convertTextStyleToCSS, FormItem, Grid, MultiLinesStringField, propertyBinding, TextStyleAndSize, TextStyleAndSizePicker } from "@pltk/components"
 import { Plugin, PropsWithConfig } from "../ui"
 
 import "@fontsource/zcool-kuaile"

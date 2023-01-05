@@ -1,4 +1,4 @@
-import { InternationalProvider, SupportedLanguages } from '@dualies/components';
+import { InternationalProvider, SupportedLanguages } from '@pltk/components';
 import { EnabledPluginProvider, Plugin } from './components/plugins';
 import { RouterRoot } from './routes';
 import { BackendProvider, IBackend } from "./backend";

@@ -1,4 +1,4 @@
-import { createDBinding, createReadonlyDBinding, useLocalDBinding } from "@dualies/components"
+import { createDBinding, createReadonlyDBinding, useLocalDBinding } from "@pltk/components"
 
 import { usePlugin } from "../../backend"
 import { EditableStateContext, PluginStoreContext } from "../context"

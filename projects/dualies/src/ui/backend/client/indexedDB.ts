@@ -1,4 +1,4 @@
-import { SubscriptionEvent, SubscriptionManager } from "@dualies/client";
+import { SubscriptionEvent, SubscriptionManager } from "@pltk/client";
 import * as idb from "idb";
 import { IBackend, IDataClient, IFileClient } from "./base";
 

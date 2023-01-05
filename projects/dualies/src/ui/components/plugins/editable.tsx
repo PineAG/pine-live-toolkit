@@ -1,4 +1,4 @@
-import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
+import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@pltk/components"
 import React, { CSSProperties, ReactNode, useContext } from "react"
 import { Rect, Size } from "../../backend"
 import { EditableStateContext, PanelSizeContext, PluginStoreContext, PreviewModeContext, useNotNullContext } from "../context"

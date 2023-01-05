@@ -1,5 +1,5 @@
 {
-  "name": "@dualies/mock-backend",
+  "name": "@pltk/mock-backend",
   "version": "1.0.0",
   "main": "lib/index.js",
   "typings": "src/index.ts",

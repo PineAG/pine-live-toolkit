@@ -1,5 +1,5 @@
 {
-  "name": "@dualies/client",
+  "name": "@pltk/client",
   "version": "1.0.0",
   "typings": "src/index.ts",
   "main": "lib/index.js",

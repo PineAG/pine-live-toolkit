@@ -1,4 +1,4 @@
-import { Loading } from "@dualies/components"
+import { Loading } from "@pltk/components"
 
 export default () => {
     return <Loading/>

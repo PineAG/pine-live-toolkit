@@ -1,5 +1,5 @@
 {
-  "name": "@dualies/components",
+  "name": "@pltk/components",
   "version": "1.0.0",
   "typings": "src/index.ts",
   "main": "lib/index.js",

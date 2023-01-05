@@ -1,4 +1,4 @@
-import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, Loading, propertyBinding, Switch, UploadButton } from "@dualies/components"
+import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, Loading, propertyBinding, Switch, UploadButton } from "@pltk/components"
 import { useRef } from "react"
 import { IFileClient, readFileToBlob, useFileClient, useFileId } from "../ui"
 import { Plugin, PropsWithConfig } from "../ui"

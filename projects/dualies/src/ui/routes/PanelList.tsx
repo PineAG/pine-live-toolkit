@@ -1,4 +1,4 @@
-import { ActionButton, CardGrid, DBinding, defaultValueBinding, Dialog, Flex, FormItem, Grid, Icons, nullablePropertyBinding, NumberField, StringField, useLocalDBinding } from "@dualies/components"
+import { ActionButton, CardGrid, DBinding, defaultValueBinding, Dialog, Flex, FormItem, Grid, Icons, nullablePropertyBinding, NumberField, StringField, useLocalDBinding } from "@pltk/components"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
 import { GlobalInfo, useGlobal } from "../backend"

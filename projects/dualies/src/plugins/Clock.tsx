@@ -1,9 +1,9 @@
-import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "@dualies/components"
+import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "@pltk/components"
 import moment from "moment"
 import { useEffect, useRef, useState } from "react"
 import { Plugin, PropsWithConfig } from "../ui"
 
-import { FormItem, Grid, propertyBinding, StringField } from "@dualies/components"
+import { FormItem, Grid, propertyBinding, StringField } from "@pltk/components"
 import "@fontsource/baumans"
 
 const DEFAULT_FONT = '"Baumans"'

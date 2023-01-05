@@ -1,4 +1,4 @@
-import { SubscriptionEvent, SubscriptionManager } from "@dualies/client"
+import { SubscriptionEvent, SubscriptionManager } from "@pltk/client"
 
 export interface IDataClient<T> {
     get(): Promise<T | null>

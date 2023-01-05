@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import DualiesClient from '@dualies/client';
+import DualiesClient from '@pltk/client';
 
 import features from './features.json';
 import { BrowserStorageBackend, clearIndexedDBBackendData, DualiesApp, IBackend } from './ui';
 import builtinPlugins from './plugins';
-import { DangerLink, Dialog, Icons, QuickConfirm } from '@dualies/components';
+import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
 
 function createBackend(): IBackend {
   if(features.Use_LocalStorage_Backend) {

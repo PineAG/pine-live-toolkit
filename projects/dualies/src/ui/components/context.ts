@@ -1,4 +1,4 @@
-import { DBinding, memoryBinding } from "@dualies/components";
+import { DBinding, memoryBinding } from "@pltk/components";
 import { Context, createContext, useContext } from "react";
 import { PanelInfo, PluginInfo, Rect } from "../backend";
 import { EditableState } from "./plugins/base";

@@ -1,10 +1,10 @@
 {
-  "name": "@dualies/dualies",
+  "name": "@pltk/dualies",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@dualies/client": "*",
-    "@dualies/components": "*",
+    "@pltk/client": "*",
+    "@pltk/components": "*",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fontsource/baumans": "^4.5.9",

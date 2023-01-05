@@ -1,5 +1,5 @@
 import {createContext, ReactNode, useContext, useMemo} from "react"
-import { DBinding } from "@dualies/components"
+import { DBinding } from "@pltk/components"
 import { Rect, Size } from "../../backend"
 import {PluginStoreContext} from "../context"
 

@@ -1,4 +1,4 @@
-import { arrayBinding, ButtonProps, Collapse, convertTextStyleToCSS, DBinding, Flex, Grid, IconButton, Icons, IconSwitch, propertyBinding, QuickConfirm, StringField, TextStyleAndSize, TextStyleAndSizePicker, useLocalDBinding } from "@dualies/components";
+import { arrayBinding, ButtonProps, Collapse, convertTextStyleToCSS, DBinding, Flex, Grid, IconButton, Icons, IconSwitch, propertyBinding, QuickConfirm, StringField, TextStyleAndSize, TextStyleAndSizePicker, useLocalDBinding } from "@pltk/components";
 import { CSSProperties } from "react";
 import { Plugin, PropsWithConfig } from "../ui";
 
