@@ -1,4 +1,4 @@
-import { SubscriptionEvent, SubscriptionManager } from "@pltk/client";
+import { SubscriptionEvent, SubscriptionManager } from "@pltk/clients";
 import * as idb from "idb";
 import { IBackend, IDataClient, IFileClient } from "./base";
 

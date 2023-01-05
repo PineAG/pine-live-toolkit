@@ -1,4 +1,4 @@
-import { SubscriptionManager } from "@pltk/client";
+import { SubscriptionManager } from "@pltk/clients";
 import { useEffect, useState } from "react";
 import { useEnabledPlugins } from "../../components/plugins";
 import { error, GlobalClient, PanelClient, PluginClient } from "../client";

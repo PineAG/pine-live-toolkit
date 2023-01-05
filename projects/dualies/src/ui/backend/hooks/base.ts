@@ -1,4 +1,4 @@
-import DualiesClient from "@pltk/client"
+import DualiesClient from "@pltk/clients"
 import { DBinding } from "@pltk/components"
 import { createContext, useContext, useEffect, useState } from "react"
 import { APIWrapper, IBackend, IDataClient, IFileClient } from "../client"
