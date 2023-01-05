@@ -1,7 +1,6 @@
-
-import DualiesClient, { SubscriptionManager } from "@pltk/clients";
-import { IBackend, IDataClient } from "./base";
+import { IBackend, IDataClient, SubscriptionManager } from "./base";
 import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
+import { RestClient } from "@pltk/clients";
 
 export class APIWrapper {
     constructor(private client: IBackend){}
@@ -202,7 +201,7 @@ export class PluginClient {
 }
 
 export class FileClient {
-    private client = new DualiesClient({
+    private client = new RestClient({
         path: "/api"
     })
 

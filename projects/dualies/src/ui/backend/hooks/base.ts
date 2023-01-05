@@ -1,9 +1,9 @@
-import DualiesClient from "@pltk/clients"
+import {RestClient} from "@pltk/clients"
 import { DBinding } from "@pltk/components"
 import { createContext, useContext, useEffect, useState } from "react"
-import { APIWrapper, IBackend, IDataClient, IFileClient } from "../client"
+import { APIWrapper, IBackend, IFileClient } from "../client"
 
-const BackendContext = createContext<IBackend>(new DualiesClient({path: "/api"}))
+const BackendContext = createContext<IBackend>(new RestClient({path: "/api"}))
 
 export const BackendProvider = BackendContext.Provider
 

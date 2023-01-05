@@ -1,3 +1,5 @@
+import { IDataClient, SubscriptionManager } from "./client"
+
 export interface PanelMeta {
     title: string
 }

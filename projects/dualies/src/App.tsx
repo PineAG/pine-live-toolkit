@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import DualiesClient from '@pltk/client';
+import {RestClient} from '@pltk/clients';
 
 import features from './features.json';
 import { BrowserStorageBackend, clearIndexedDBBackendData, DualiesApp, IBackend } from './ui';
@@ -10,7 +10,7 @@ function createBackend(): IBackend {
   if(features.Use_LocalStorage_Backend) {
     return new BrowserStorageBackend()
   } else {
-    return new DualiesClient({path: "/api"})
+    return new RestClient({path: "/api"})
   }
 }
 

@@ -1,4 +1,7 @@
-import { SubscriptionEvent, SubscriptionManager } from "@pltk/clients"
+export type SubscriptionEvent = "SET" | "DELETE"
+export interface SubscriptionManager {
+    close(): void
+} 
 
 export interface IDataClient<T> {
     get(): Promise<T | null>

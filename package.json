@@ -6,7 +6,6 @@
   "private": true,
   "workspaces": [
     "projects/*",
-    "plugins/*",
     "maintenance"
   ]
 }

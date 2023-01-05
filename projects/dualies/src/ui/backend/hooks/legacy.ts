@@ -1,7 +1,6 @@
-import { SubscriptionManager } from "@pltk/clients";
 import { useEffect, useState } from "react";
 import { useEnabledPlugins } from "../../components/plugins";
-import { error, GlobalClient, PanelClient, PluginClient } from "../client";
+import { error, GlobalClient, PanelClient, PluginClient, SubscriptionManager } from "../client";
 import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
 import { useAPIWrapper } from "./base";
 

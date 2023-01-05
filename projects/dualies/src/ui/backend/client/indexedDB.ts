@@ -1,6 +1,5 @@
-import { SubscriptionEvent, SubscriptionManager } from "@pltk/clients";
 import * as idb from "idb";
-import { IBackend, IDataClient, IFileClient } from "./base";
+import { IBackend, IDataClient, IFileClient, SubscriptionEvent, SubscriptionManager } from "./base";
 
 const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
 
