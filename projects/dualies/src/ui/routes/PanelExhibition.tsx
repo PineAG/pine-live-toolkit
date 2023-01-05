@@ -1,6 +1,6 @@
 import Loading from "../components/Loading"
 import { PreviewPlugin } from "../components/plugins"
-import { usePanel } from "../store"
+import { usePanel } from "../backend"
 import { usePanelId } from "./utils"
 
 export const PanelExhibitionPage = () => {

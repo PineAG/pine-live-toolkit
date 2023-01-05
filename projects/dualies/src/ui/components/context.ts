@@ -1,6 +1,6 @@
 import { DBinding, memoryBinding } from "@dualies/components";
 import { Context, createContext, useContext } from "react";
-import { PanelInfo, PluginInfo, Rect } from "../store";
+import { PanelInfo, PluginInfo, Rect } from "../backend";
 import { EditableState } from "./plugins/base";
 
 export interface PanelSize {

@@ -1,6 +1,6 @@
 import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@dualies/components"
 import React, { CSSProperties, ReactNode, useContext } from "react"
-import { Rect, Size } from "../../store"
+import { Rect, Size } from "../../backend"
 import { EditableStateContext, PanelSizeContext, PluginStoreContext, PreviewModeContext, useNotNullContext } from "../context"
 import { EditableState, useEnabledPluginList, useEnabledPlugins } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"

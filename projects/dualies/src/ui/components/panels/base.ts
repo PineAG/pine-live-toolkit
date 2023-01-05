@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-import { Rect, Size } from "../../store";
+import { Rect, Size } from "../../backend";
 
 export interface PanelProps {
     panelId: number

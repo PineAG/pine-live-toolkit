@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Rnd } from "react-rnd"
-import { Size } from "../../store"
+import { Size } from "../../backend"
 import { PanelSizeContext } from "../context"
 
 function useRatio(internalSize: Size): [number, React.Dispatch<React.SetStateAction<number>>, React.RefObject<HTMLDivElement>] {

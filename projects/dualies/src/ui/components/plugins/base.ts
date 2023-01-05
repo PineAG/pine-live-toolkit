@@ -1,6 +1,6 @@
 import {createContext, ReactNode, useContext, useMemo} from "react"
 import { DBinding } from "@dualies/components"
-import { Rect, Size } from "../../store"
+import { Rect, Size } from "../../backend"
 import {PluginStoreContext} from "../context"
 
 export enum EditableState {

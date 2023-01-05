@@ -5,7 +5,7 @@ import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "
 import Loading from "../components/Loading"
 import { KeepRatio } from "../components/panels/KeepRatio"
 import { EditablePlugin, useEnabledPluginList, useEnabledPlugins } from "../components/plugins"
-import { PanelInfo, Rect, usePanel } from "../store"
+import { PanelInfo, Rect, usePanel } from "../backend"
 import "./Panel.css"
 import { usePanelId } from "./utils"
 

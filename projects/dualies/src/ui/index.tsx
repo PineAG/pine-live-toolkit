@@ -1,7 +1,7 @@
 import { InternationalProvider, SupportedLanguages } from '@dualies/components';
 import { EnabledPluginProvider, Plugin } from './components/plugins';
 import { RouterRoot } from './routes';
-import { BackendProvider, IBackend } from "./store";
+import { BackendProvider, IBackend } from "./backend";
 
 export interface DualiesAppProps {
     backend: IBackend
@@ -19,7 +19,5 @@ export function DualiesApp(props: DualiesAppProps) {
     </BackendProvider>
 }
 
-export type {IBackend, Rect, Size, PluginInfo, PanelInfo, PluginMeta, PanelMeta} from "./store"
-export {BrowserStorageBackend} from "./store"
 export type { Plugin, PropsWithConfig } from './components/plugins'
-export * from "./store"
+export * from "./backend"
