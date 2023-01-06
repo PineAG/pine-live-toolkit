@@ -29,8 +29,18 @@ async function installProjectDependencies(projName) {
     await execCommand("yarn", ["install"], projDir)
 }
 
+function watchProject(projName) {
+    const projDir = path.resolve(rootDir, "projects", projName)
+    const files = ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.json", "./src/**/*.css"]
+    return gulp.watch(files, {
+        cwd: projDir,
+        ignoreInitial: false
+        
+    }, () => buildProject(projDir))
+}
+
 exports.installAllDependencies = async () => {
-    await installProjectDependencies("client")
+    await installProjectDependencies("clients")
     await installProjectDependencies("components")
     await installProjectDependencies("dualies")
 }
@@ -46,7 +56,12 @@ exports.enableDemoFeatures = async () => {
 }
 
 exports.buildAllProjects = async () => {
-    await buildProject("client")
+    await buildProject("clients")
     await buildProject("components")
     await buildProject("dualies")
 }
+
+exports.watchDependencies = gulp.task("watchDependencies", () => {
+    watchProject("clients")
+    watchProject("components")
+})
