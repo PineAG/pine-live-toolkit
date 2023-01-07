@@ -2,7 +2,7 @@ import { ClientBase, ClientOptions } from "./base";
 
 export class FileClient extends ClientBase {
     async create(data: string | Blob): Promise<string> {
-        const res = await fetch(this.httpPath, {
+        const res = await fetch(`${this.httpPath}/`, {
             method: "POST",
             body: data
         })
