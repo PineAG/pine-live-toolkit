@@ -67,7 +67,7 @@ export const RenderPanelListPageBody = ({store}: {store: GlobalInfo | null}) => 
             onClick: () => navigate(`/panel/${p.id}`),
             content: (
                 <span style={{fontSize: "1.8rem"}}>
-                    {p.title}
+                    {p.meta.title}
                 </span>
             ),
         }))}

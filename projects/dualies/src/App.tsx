@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import {RestClient} from '@pltk/clients';
 
 import features from './features.json';
-import { BrowserStorageBackend, clearIndexedDBBackendData, DualiesApp, IBackend } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
+import { BackendConfig, DualiesApp } from './ui';
+import { clearIndexedDBBackendData, createIndexedDBAPIWrapper } from './adaptors/kv/indexedDB';
 
-function createBackend(): IBackend {
+function createBackend(): BackendConfig {
   if(features.Use_LocalStorage_Backend) {
-    return new BrowserStorageBackend()
+    return createIndexedDBAPIWrapper()
   } else {
-    return new RestClient({path: "/api"})
+    throw new Error("Fuck")
   }
 }
 
@@ -18,8 +19,8 @@ function App() {
   const backend = React.useMemo(createBackend, [])
   return <>
     <DualiesApp
+      api={backend}
       language='zhCN'
-      backend={backend}
       plugins={builtinPlugins}
     />
     <DemoMessage/>

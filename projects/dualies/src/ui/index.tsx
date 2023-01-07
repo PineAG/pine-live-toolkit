@@ -1,16 +1,16 @@
 import { InternationalProvider, SupportedLanguages } from '@pltk/components';
 import { EnabledPluginProvider, Plugin } from './components/plugins';
 import { RouterRoot } from './routes';
-import { BackendProvider, IBackend } from "./backend";
+import { BackendProvider, BackendConfig} from "./backend";
 
 export interface DualiesAppProps {
-    backend: IBackend
+    api: BackendConfig
     language: SupportedLanguages
     plugins: Plugin<any>[]
 }
 
 export function DualiesApp(props: DualiesAppProps) {
-    return <BackendProvider value={props.backend}>
+    return <BackendProvider {...props.api}>
       <InternationalProvider language={props.language}>
         <EnabledPluginProvider value={props.plugins}>
           <RouterRoot/>

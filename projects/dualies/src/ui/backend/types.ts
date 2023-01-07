@@ -1,4 +1,6 @@
-import { IDataClient, SubscriptionManager } from "./client"
+export interface APIKey {
+    id: number
+}
 
 export interface PanelMeta {
     title: string
@@ -21,6 +23,28 @@ export interface Rect {
     width: number, height: number
 }
 
-export interface PanelIndex extends PanelMeta {
-    id: number
+export interface PanelIndex extends APIKey {
+    meta: PanelMeta
 }
+
+export interface PanelBase {
+    meta: PanelMeta
+    size: Size
+}
+
+export interface PanelItem extends PanelBase, APIKey {}
+
+export interface PanelWithPlugins {
+    id: number
+    meta: PanelMeta
+    size: Size
+    plugins: number[]
+}
+
+export interface PluginBase<Config> {
+    meta: PluginMeta
+    rect: Rect
+    config: Config
+}
+
+export interface PluginItem<Config> extends PluginBase<Config>, APIKey {}

@@ -1,14 +1,19 @@
-export type SubscriptionEvent = "SET" | "DELETE"
-export interface SubscriptionManager {
-    close(): void
-} 
+type QueryPartitionsBase = Record<string, any>
 
-export interface IDataClient<T> {
-    get(): Promise<T | null>
-    set(data: T): Promise<void>
-    delete(): Promise<void>
-    subscribe(callback: (evt: SubscriptionEvent) => void): SubscriptionManager
-    onValueChanged(callback: (value: T|null) => void): SubscriptionManager
+export interface IBackendCollectionWrapper<Key extends Record<string, any>, T extends Record<string, any>, Query, QueryPartitions extends QueryPartitionsBase = {}> {
+    get(id: Key): Promise<T & Key>
+    query(query: Query): Promise<(T & Key)[]>
+    queryPartition<P extends keyof QueryPartitions>(query: Query, partition: P): Promise<QueryPartitions[P][]>
+    create(data: T): Promise<Key>
+    update(key: Key, data: Partial<T>): Promise<void>
+    delete(key: Key): Promise<void>
+}
+
+export type SubscriptionDisposer = {close: () => void}
+
+export interface IBackendSubscriptionWrapper<Key> {
+    onCountChanged(listener: () => void): SubscriptionDisposer
+    onItemChanged(key: Key, listener: () => void): SubscriptionDisposer
 }
 
 export interface IFileClient {
@@ -16,23 +21,4 @@ export interface IFileClient {
     update(id: string, data: string | Blob): Promise<void>
     read(id: string): Promise<Blob>
     delete(id: string): Promise<void>
-}
-
-export interface IBackend {
-    data<T>(path: string): IDataClient<T>
-    files(): IFileClient
-}
-
-export async function readFileToBlob(file: File): Promise<Blob> {
-    const reader = file.stream().getReader()
-    const blobParts: Uint8Array[] = []
-    let res = await reader.read()
-    while(!res.done) {
-        blobParts.push(res.value)
-        res = await reader.read()
-    }
-    if(res.value !== undefined) {
-        blobParts.push(res.value)
-    }
-    return new Blob(blobParts)
 }

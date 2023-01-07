@@ -1,23 +1,34 @@
-import {RestClient} from "@pltk/clients"
 import { DBinding } from "@pltk/components"
 import { createContext, useContext, useEffect, useState } from "react"
-import { APIWrapper, IBackend, IFileClient } from "../client"
+import { defaultFileClient, defaultGlobalBackend, IGlobalBackend } from "../base"
+import { IFileClient } from "../client"
 
-const BackendContext = createContext<IBackend>(new RestClient({path: "/api"}))
+const BackendAPIContext = createContext<IGlobalBackend>(defaultGlobalBackend)
+const FileClientContext = createContext<IFileClient>(defaultFileClient)
 
-export const BackendProvider = BackendContext.Provider
-
-export function useBackend(): IBackend {
-    return useContext(BackendContext)
+export interface BackendConfig {
+    backend: IGlobalBackend
+    fileClient: IFileClient
 }
 
-export function useAPIWrapper(): APIWrapper {
-    const backend = useBackend()
-    return new APIWrapper(backend)
+interface BackendProviderProps extends BackendConfig {
+    children: any
+}
+
+export function BackendProvider(props: BackendProviderProps) {
+    return <BackendAPIContext.Provider value={props.backend}>
+        <FileClientContext.Provider value={props.fileClient}>
+            {props.children}
+        </FileClientContext.Provider>
+    </BackendAPIContext.Provider>
+} 
+
+export function useBackend(): IGlobalBackend {
+    return useContext(BackendAPIContext)
 }
 
 export function useFileClient(): IFileClient {
-    return useContext(BackendContext).files()
+    return useContext(FileClientContext)
 }
 
 export type AsyncBindingState<T> = {

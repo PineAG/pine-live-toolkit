@@ -1,5 +1,7 @@
 import * as idb from "idb";
-import { IBackend, IDataClient, IFileClient, SubscriptionEvent, SubscriptionManager } from "./base";
+import { BackendConfig, IFileClient, SubscriptionDisposer } from "../../ui";
+import { createKVBackend } from "../../ui/backend/client/kv";
+import { IKVDataClient } from "../../ui/backend/client/kv/base";
 
 const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
 
@@ -68,13 +70,13 @@ module DBWrapper {
     }
 }
 
-class IndexedDBDataClient<T> implements IDataClient<T> {
+class IndexedDBDataClient<T> implements IKVDataClient<T> {
 
     constructor(private key: string) {}
 
-    private broadcastMessage(event: SubscriptionEvent) {
+    private broadcastMessage() {
         const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-        bc.postMessage({event, key: this.key})
+        bc.postMessage(this.key)
         bc.close()
     }
 
@@ -89,36 +91,21 @@ class IndexedDBDataClient<T> implements IDataClient<T> {
     async set(data: T): Promise<void> {
         console.log("SET", this.key)
         await this.db.set(data)
-        this.broadcastMessage("SET")
+        this.broadcastMessage()
     }
     async delete(): Promise<void> {
         console.log("DEL", this.key)
         await this.db.delete()
-        this.broadcastMessage("DELETE")
+        this.broadcastMessage()
     }
 
-    subscribe(callback: (evt: SubscriptionEvent) => void): SubscriptionManager {
+    subscribe(callback: () => void): SubscriptionDisposer {
         const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-        bc.onmessage = (message) => {
-            const event = message.data["event"]
-            const key = message.data["key"]
-            console.log("SUB", key)
-            if(key === this.key && (event === "SET" || event === "DELETE")) {
-                callback(event)
-            }
-        }
-        return {
-            close: () => bc.close()
-        }
-    }
-    onValueChanged(callback: (value: T | null) => void): SubscriptionManager {
-        const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-        bc.onmessage = async (message) => {
-            const key = message.data["key"]
+        bc.onmessage = (evt) => {
+            const key = evt.data
             console.log("SUB", key)
             if(key === this.key) {
-                const value = await this.db.get()
-                callback(value)
+                callback()
             }
         }
         return {
@@ -159,15 +146,13 @@ class IndexedDBFileClient implements IFileClient {
     }    
 }
 
-export class BrowserStorageBackend implements IBackend {
-    data<T>(path: string): IndexedDBDataClient<T> {
-        return new IndexedDBDataClient(path)
-    }
-    files(): IndexedDBFileClient {
-        return new IndexedDBFileClient()
-    }
-}
-
 export async function clearIndexedDBBackendData() {
     await DBWrapper.destroyDB()
+}
+
+export function createIndexedDBAPIWrapper(): BackendConfig {
+    return {
+        backend: createKVBackend(key => new IndexedDBDataClient(key)),
+        fileClient: new IndexedDBFileClient()
+    }
 }

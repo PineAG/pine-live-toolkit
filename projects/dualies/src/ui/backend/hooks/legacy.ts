@@ -1,40 +1,8 @@
 import { useEffect, useState } from "react";
 import { useEnabledPlugins } from "../../components/plugins";
-import { error, GlobalClient, PanelClient, PluginClient, SubscriptionManager } from "../client";
-import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
-import { useAPIWrapper } from "./base";
-
-
-function useAsyncSubscription(starter: () => Promise<SubscriptionManager>, deps: any[]) {
-    const [subscription, setSubscription] = useState<null | SubscriptionManager>(null)
-    useEffect(() => {
-        starter().then(m => setSubscription(m))
-        return () => {
-            if(subscription !== null) {
-                subscription.close()
-            }
-        }
-    }, deps)
-}
-
-interface UseStateSubscriptionProps<T> {
-    subscribe: (cb: () => void) => Promise<SubscriptionManager>
-    fetchValue: () => Promise<T>
-    setValue: (v: T | null) => void
-    deps: any[]
-}
-
-function useStateSubscription<T>(props: UseStateSubscriptionProps<T>) {
-    const updateValue = async () => {
-        props.setValue(null)
-        const value = await props.fetchValue()
-        props.setValue(value)
-    }
-    useAsyncSubscription(() => props.subscribe(updateValue), props.deps)
-    useEffect(() => {
-        props.fetchValue().then(props.setValue)
-    }, props.deps)
-}
+import { PanelIndex, PanelItem, PanelMeta, PluginBase, PluginMeta, Rect, Size } from "../types";
+import { error } from "../utils";
+import { useBackend } from "./base";
 
 export interface GlobalInfo {
     panels: PanelIndex[]
@@ -42,22 +10,27 @@ export interface GlobalInfo {
 }
 
 export function useGlobal(): null | GlobalInfo {
-    const api = useAPIWrapper()
-    const client = new GlobalClient(api)
+    const backend = useBackend()
     const [panels, setPanels] = useState<null | PanelIndex[]>(null)
-    useStateSubscription({
-        fetchValue: () => client.panels(),
-        setValue: setPanels,
-        subscribe: cb => client.subscribePanels(cb),
-        deps: []
-    })
-    if(panels===null){
+    async function updatePanels() {
+        const panels = await backend.panels.collection.queryPartition(undefined, "index")
+        setPanels(panels)
+    }
+    useEffect(() => {
+        updatePanels()
+        const disposer = backend.panels.subscriber.onCountChanged(updatePanels)
+        return () => disposer.close()
+    }, [])
+    if(panels === null) {
         return null
     }
     return {
         panels,
         createPanel: async (title, size) => {
-            await client.createPanel({title}, size) 
+            await backend.panels.collection.create({
+                meta: {title},
+                size
+            })
         }
     }
 }
@@ -79,50 +52,58 @@ export interface PanelInfo extends PanelInfoActions {
 
 export function usePanel(panelId: number): null | PanelInfo {
     const enabledPlugins = useEnabledPlugins()
-    const api = useAPIWrapper()
-    const client = new PanelClient(api, panelId)
-    const [meta, setMeta] = useState<PanelMeta | null>(null)
-    const [size, setSize] = useState<Size | null>(null)
-    const [pluginsList, setPluginsList] = useState<number[] | null>(null)
-    useStateSubscription({
-        fetchValue: () => client.meta(),
-        setValue: setMeta,
-        subscribe: cb => client.subscribeMeta(cb),
-        deps: [panelId]
-    })
-    useStateSubscription({
-        fetchValue: () => client.size(),
-        setValue: setSize,
-        subscribe: cb => client.subscribeSize(cb),
-        deps: [panelId]
-    })
-    useStateSubscription({
-        fetchValue: () => client.pluginsList(),
-        setValue: setPluginsList,
-        subscribe: cb => client.subscribePlugins(cb),
-        deps: [panelId]
-    })
-    if (meta === null || size === null || pluginsList === null) {
+    const backend = useBackend()
+
+    const [panel, setPanel] = useState<null | PanelItem>(null)
+    const [pluginsList, setPluginsList] = useState<null | number[]>(null)
+
+    async function updatePanel(){
+        const panel = await backend.panels.collection.get({id: panelId})
+        setPanel(panel)
+    }
+    useEffect(() => {
+        updatePanel()
+        const disposer = backend.panels.subscriber.onItemChanged({id: panelId}, updatePanel)
+        return () => disposer.close()
+    }, [panelId])
+
+    async function updatePluginsList() {
+        const list = await backend.plugins.collectionFactory(panelId).queryPartition({panelId}, "id")
+        setPluginsList(list.map(it => it.id))
+    }
+    useEffect(() => {
+        updatePluginsList()
+        const disposer = backend.plugins.subscriberFactory(panelId).onCountChanged(updatePluginsList)
+        return () => disposer.close()
+    }, [panelId])
+
+    if(panel === null || pluginsList === null) {
         return null
     }
+    
     return {
-        meta, size, pluginsList,
+        meta: panel.meta,
+        size: panel.size, 
+        pluginsList,
         resize: async (size) => {
-            setSize(null)
-            await client.resize(size)
-            setSize(size)
+            await backend.panels.collection.update({id: panelId}, {size})
         }, 
         createPlugin: async (pluginType) => {
-            setPluginsList(null)
             const size = enabledPlugins[pluginType]?.initialize.defaultSize() ?? error(`Invalid plugin type: ${pluginType}`)
             const config = enabledPlugins[pluginType]?.initialize.defaultConfig() ?? error(`Invalid plugin type: ${pluginType}`)
-            const plugins = await client.createPlugin(pluginType, {x: 0, y: 0, ...size}, config)
-            setPluginsList(plugins)
+            await backend.plugins.collectionFactory(panelId).create({
+                meta: {pluginType},
+                rect: {x: 0, y: 0, ...size},
+                config
+            })
         },
-        delete: () => client.delete(),
+        delete: async () => {
+            await backend.panels.collection.delete({id: panelId})
+        },
         setTitle: async (title) => {
-            const meta = await client.setTitle(title)
-            setMeta(meta)
+            await backend.panels.collection.update({id: panelId}, {
+                meta: {title}
+            })
         }
     }
 }
@@ -138,52 +119,39 @@ export interface PluginInfo {
 
 export function usePlugin(panelId: number, pluginId: number): PluginInfo | null {
     const enabledPlugins = useEnabledPlugins()
-    const api = useAPIWrapper()
-    const client = new PluginClient(api, panelId, pluginId)
-    const [meta, setMeta] = useState<null | PluginMeta>(null)
-    const [size, setSize] = useState<null | Rect>(null)
-    const [config, setConfig] = useState<null | any>(null)
+    const backend = useBackend()
+    
+    const collection = backend.plugins.collectionFactory(panelId)
 
-    useStateSubscription({
-        fetchValue: () => client.meta(),
-        setValue: setMeta,
-        subscribe: cb => client.subscribeMeta(cb),
-        deps: [panelId, pluginId]
-    })
-    useStateSubscription({
-        fetchValue: () => client.size(),
-        setValue: setSize,
-        subscribe: cb => client.subscribeSize(cb),
-        deps: [panelId, pluginId]
-    })
-    useStateSubscription({
-        fetchValue: async () => {
-            const config = await client.configOrNull()
-            if(config === null) {
-                const meta = await client.meta()
-                return enabledPlugins[meta.pluginType].initialize.defaultConfig()
-            }
-            return config
-        },
-        setValue: setConfig,
-        subscribe: cb => client.subscribeConfig(cb),
-        deps: [panelId, pluginId]
-    })
+    const [plugin, setPlugin] = useState<null | PluginBase<any>>(null)
+    async function updatePlugin() {
+        const plugin = await collection.get({id: pluginId})
+        setPlugin(plugin)
+    }
+    useEffect(() => {
+        updatePlugin()
+        const disposer = backend.plugins.subscriberFactory(panelId).onItemChanged({id: pluginId}, updatePlugin)
+        return () => disposer.close()
+    }, [panelId, pluginId])
 
-    if(meta === null || size === null || config === null){
+    if(plugin === null) {
         return null
     }
-    const pluginTemplate = enabledPlugins[meta.pluginType]
+
+    const pluginTemplate = enabledPlugins[plugin.meta.pluginType]
+
     return {
-        meta, size, 
-        config: config ?? pluginTemplate.initialize.defaultConfig(),
-        resize: (size) => client.resize(size),
-        setConfig: (c) => client.setConfig(c),
+        meta: plugin.meta, 
+        size: plugin.rect, 
+        config: plugin.config ?? pluginTemplate.initialize.defaultConfig(),
+        resize: async (rect) => {
+            await collection.update({id: pluginId}, {rect})
+        },
+        setConfig: async (config) => {
+            await collection.update({id: pluginId}, {config})
+        },
         delete: async () => {
-            await client.delete()
-            if(pluginTemplate.onDestroy) {
-                await pluginTemplate.onDestroy(config)
-            } 
+            await collection.delete({id: pluginId}) 
         }
     }
 }
