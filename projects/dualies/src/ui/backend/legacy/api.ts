@@ -1,72 +1,67 @@
-import { IBackend, IDataClient, SubscriptionManager } from "./base";
-import { PanelIndex, PanelMeta, PluginMeta, Rect, Size } from "../types";
-import { RestClient } from "@pltk/clients";
+import { RestClient } from "@pltk/clients"
+import { IPanelMeta, Size, Rect, IWidgetMeta, SubscriptionCallback, IDisposable, IPanelReference } from "@pltk/protocol"
+import { IKVBackend, IKVDataClient } from "./kv"
+import { error } from "./utils"
 
 export class APIWrapper {
-    constructor(private client: IBackend){}
+    constructor(private client: IKVBackend){}
 
-    panelsCounter(): IDataClient<number> {
+    panelsCounter(): IKVDataClient<number> {
         return this.client.data("/panels/counter")
     }
 
-    panelsList(): IDataClient<number[]> {
+    panelsList(): IKVDataClient<number[]> {
         return this.client.data("/panels/enabled")
     }
 
-    panelMeta(panelId: number): IDataClient<PanelMeta> {
+    panelMeta(panelId: number): IKVDataClient<IPanelMeta> {
         return this.client.data(`/panel/${panelId}/meta`)
     }
 
-    panelSize(panelId: number): IDataClient<Size> {
+    panelSize(panelId: number): IKVDataClient<Size> {
         return this.client.data(`/panel/${panelId}/size`)
     }
 
-    pluginsCounter(): IDataClient<number> {
+    pluginsCounter(): IKVDataClient<number> {
         return this.client.data(`/plugins/counter`)
     }
 
-    pluginsList(panelId: number): IDataClient<number[]> {
+    pluginsList(panelId: number): IKVDataClient<number[]> {
         return this.client.data(`/panel/${panelId}/plugins/enabled`)
     }
 
-    pluginMeta(pluginId: number): IDataClient<PluginMeta> {
+    pluginMeta(pluginId: number): IKVDataClient<IWidgetMeta> {
         return this.client.data(`/plugin/${pluginId}/meta`)
     }
     
-    pluginRect(panelId: number, pluginId: number): IDataClient<Rect> {
+    pluginRect(panelId: number, pluginId: number): IKVDataClient<Rect> {
         return this.client.data(`/panel/${panelId}/plugin/${pluginId}/rect`)
     }
 
-    pluginConfig<T>(pluginId: number): IDataClient<T> {
+    pluginConfig<T>(pluginId: number): IKVDataClient<T> {
         return this.client.data(`/plugin/${pluginId}/config`)
     }
-}
-
-type Callback = () => void
-
-export function error(message: string): never {
-    throw new Error(message)
 }
 
 export class GlobalClient {
     constructor(private api: APIWrapper){}
 
-    async panels(): Promise<PanelIndex[]> {
+    async panels(): Promise<IPanelReference[]> {
         let idList = await this.api.panelsList().get()
         if(idList === null) {
             idList = []
         }
         return Promise.all(idList.map(async id => {
             const meta = await this.api.panelMeta(id).get() ?? error(`Panel not exists: ${id}`)
-            return {...meta, id}
+            return {meta, id}
         }))
     }
 
-    async subscribePanels(callback: Callback): Promise<SubscriptionManager> {
+    subscribePanels(callback: SubscriptionCallback): IDisposable {
         return this.api.panelsList().subscribe(callback)
     }
 
-    async createPanel(meta: PanelMeta, size: Size): Promise<number> {
+    async createPanel(meta: IPanelMeta, size: Size): Promise<number> {
         const panelId = await this.api.panelsCounter().get() ?? 0
         const panelList = (await this.api.panelsList().get()) ?? []
         await Promise.all([
@@ -83,16 +78,13 @@ export class GlobalClient {
 export class PanelClient {
     constructor(private api: APIWrapper, private panelId: number) {}
 
-    async meta(): Promise<PanelMeta> {
+    async meta(): Promise<IPanelMeta> {
         const meta = await this.api.panelMeta(this.panelId).get()
         return meta ?? error("Panel not exists")
     }
 
-    async setTitle(title: string): Promise<PanelMeta> {
-        const meta = await this.meta()
-        const newMeta: PanelMeta = {...meta, title}
-        await this.api.panelMeta(this.panelId).set(newMeta)
-        return newMeta
+    async setMeta(meta: IPanelMeta): Promise<void> {
+        await this.api.panelMeta(this.panelId).set(meta)
     }
 
     async size(): Promise<Size> {
@@ -104,16 +96,16 @@ export class PanelClient {
         return await this.api.panelSize(this.panelId).set(newSize)
     }
 
-    async createPlugin<Config>(pluginType: string, size: Rect, config: Config): Promise<number[]> {
+    async createPlugin<Config>(pluginType: string, size: Rect, config: Config): Promise<number> {
         const pluginsList = (await this.api.pluginsList(this.panelId).get()) ?? []
         const pluginId = (await this.api.pluginsCounter().get()) ?? 0
         pluginsList.push(pluginId)
-        await this.api.pluginMeta(pluginId).set({ pluginType })
+        await this.api.pluginMeta(pluginId).set({ type: pluginType })
         await this.api.pluginRect(this.panelId, pluginId).set(size)
         await this.api.pluginConfig(pluginId).set(config)
         await this.api.pluginsCounter().set(pluginId+1)
         await this.api.pluginsList(this.panelId).set(pluginsList)
-        return pluginsList
+        return pluginId
     }
 
     async pluginsList(): Promise<number[]> {
@@ -134,15 +126,15 @@ export class PanelClient {
         await this.api.panelSize(this.panelId).delete()
     }
 
-    async subscribeMeta(callback: Callback): Promise<SubscriptionManager> {
+    subscribeMeta(callback: SubscriptionCallback): IDisposable {
         return this.api.panelMeta(this.panelId).subscribe(callback)
     }
 
-    async subscribePlugins(callback: Callback): Promise<SubscriptionManager> {
+    subscribePlugins(callback: SubscriptionCallback): IDisposable {
         return this.api.pluginsList(this.panelId).subscribe(callback)
     }
 
-    async subscribeSize(callback: Callback): Promise<SubscriptionManager> {
+    subscribeSize(callback: SubscriptionCallback): IDisposable {
         return this.api.panelSize(this.panelId).subscribe(callback)
     }
     
@@ -151,7 +143,7 @@ export class PanelClient {
 export class PluginClient {
     constructor(private api: APIWrapper, private panelId: number, private pluginId: number) {}
 
-    async meta(): Promise<PluginMeta> {
+    async meta(): Promise<IWidgetMeta> {
         const meta = await this.api.pluginMeta(this.pluginId).get()
         return meta ?? error("Plugin not exists")
     }
@@ -159,6 +151,10 @@ export class PluginClient {
     async config(): Promise<any> {
         const config = await this.api.pluginConfig(this.pluginId).get()
         return config ?? error("Plugin not exists")
+    }
+
+    async setMeta(meta: IWidgetMeta): Promise<void> {
+        await this.api.pluginMeta(this.pluginId).set(meta)
     }
 
     async setConfig(config: any): Promise<any> {
@@ -187,15 +183,15 @@ export class PluginClient {
         await this.api.pluginConfig(this.pluginId).delete()
     }
 
-    async subscribeMeta(callback: Callback): Promise<SubscriptionManager> {
+    subscribeMeta(callback: SubscriptionCallback): IDisposable {
         return this.api.pluginMeta(this.pluginId).subscribe(callback)
     }
 
-    async subscribeSize(callback: Callback): Promise<SubscriptionManager> {
+    subscribeSize(callback: SubscriptionCallback): IDisposable {
         return this.api.pluginRect(this.panelId, this.pluginId).subscribe(callback)
     }
 
-    async subscribeConfig<T>(callback: Callback): Promise<SubscriptionManager> {
+    subscribeConfig<T>(callback: SubscriptionCallback): IDisposable {
         return this.api.pluginConfig<T>(this.pluginId).subscribe(callback)
     }
 }

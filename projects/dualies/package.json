@@ -5,6 +5,7 @@
   "dependencies": {
     "@pltk/clients": "*",
     "@pltk/components": "*",
+    "@pltk/protocol": "*",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fontsource/baumans": "^4.5.9",

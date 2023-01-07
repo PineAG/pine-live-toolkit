@@ -1,5 +1,6 @@
+import { IDisposable, SubscriptionCallback } from "@pltk/protocol";
 import * as idb from "idb";
-import { IBackend, IDataClient, IFileClient, SubscriptionEvent, SubscriptionManager } from "./base";
+import { IKVBackend, IKVDataClient, IKVFileClient } from "./kv";
 
 const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
 
@@ -68,13 +69,13 @@ module DBWrapper {
     }
 }
 
-class IndexedDBDataClient<T> implements IDataClient<T> {
+class IndexedDBDataClient<T> implements IKVDataClient<T> {
 
     constructor(private key: string) {}
 
-    private broadcastMessage(event: SubscriptionEvent) {
+    private broadcastMessage() {
         const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-        bc.postMessage({event, key: this.key})
+        bc.postMessage(this.key)
         bc.close()
     }
 
@@ -89,36 +90,21 @@ class IndexedDBDataClient<T> implements IDataClient<T> {
     async set(data: T): Promise<void> {
         console.log("SET", this.key)
         await this.db.set(data)
-        this.broadcastMessage("SET")
+        this.broadcastMessage()
     }
     async delete(): Promise<void> {
         console.log("DEL", this.key)
         await this.db.delete()
-        this.broadcastMessage("DELETE")
+        this.broadcastMessage()
     }
 
-    subscribe(callback: (evt: SubscriptionEvent) => void): SubscriptionManager {
+    subscribe(callback: SubscriptionCallback): IDisposable {
         const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
         bc.onmessage = (message) => {
-            const event = message.data["event"]
-            const key = message.data["key"]
-            console.log("SUB", key)
-            if(key === this.key && (event === "SET" || event === "DELETE")) {
-                callback(event)
-            }
-        }
-        return {
-            close: () => bc.close()
-        }
-    }
-    onValueChanged(callback: (value: T | null) => void): SubscriptionManager {
-        const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-        bc.onmessage = async (message) => {
-            const key = message.data["key"]
+            const key = message.data
             console.log("SUB", key)
             if(key === this.key) {
-                const value = await this.db.get()
-                callback(value)
+                callback()
             }
         }
         return {
@@ -127,7 +113,7 @@ class IndexedDBDataClient<T> implements IDataClient<T> {
     }
 }
 
-class IndexedDBFileClient implements IFileClient {
+export class IndexedDBFileClient implements IKVFileClient {
     async create(data: string | Blob): Promise<string> {
         const uuid = crypto.randomUUID()
         await this.update(uuid, data)
@@ -159,7 +145,7 @@ class IndexedDBFileClient implements IFileClient {
     }    
 }
 
-export class BrowserStorageBackend implements IBackend {
+export class BrowserStorageBackend implements IKVBackend {
     data<T>(path: string): IndexedDBDataClient<T> {
         return new IndexedDBDataClient(path)
     }
