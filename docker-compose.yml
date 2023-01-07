@@ -13,5 +13,9 @@ services:
     command: [sh, /docker/start.sh]
   data:
     image: pineag/boltbase:master
+    volumes:
+      - "./tmp/data:/data"
   file:
     image: pineag/blitzfile:master
+    volumes:
+      - "./tmp/files:/files"

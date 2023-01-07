@@ -27,12 +27,7 @@ export class FileClient extends ClientBase {
         if(res.status !== 200) {
             throw new Error(`${res.status}: ${res.statusText}`)
         }
-        const r = await res.body?.getReader().read()
-        const value = r?.value
-        if(!value){
-            throw new Error("Empty body")
-        }
-        return new Blob([value])
+        return await res.blob()
     }
 
     async delete(id: string) {
