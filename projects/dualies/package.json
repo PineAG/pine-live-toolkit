@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@pltk/clients": "*",
     "@pltk/components": "*",
     "@pltk/protocol": "*",
     "@emotion/react": "^11.10.5",

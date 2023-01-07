@@ -13,7 +13,7 @@ export class BrowserClient implements ILiveToolkitClient {
         const globalClient = new GlobalClient(this.api)
         return globalClient.panels()
     }
-    async getPanel(id: number): Promise<IPanel | null> {
+    async getPanel(id: number): Promise<IPanel> {
         const panelClient = new PanelClient(this.api, id)
         const [meta, size] = await Promise.all([
             panelClient.meta(),
@@ -61,14 +61,17 @@ export class BrowserClient implements ILiveToolkitClient {
             return {id, meta}
         }))
     }
-    async getWidget<Config>(panelId: number, widgetId: number): Promise<IWidget<Config> | null> {
+    async getWidgetMeta(panelId: number, widgetId: number): Promise<IWidgetMeta> {
         const client = new PluginClient(this.api, panelId, widgetId)
-        const [meta, rect, config] = await Promise.all([
-            client.meta(),
-            client.size(),
-            client.config()
-        ])
-        return {meta, rect, config}
+        return await client.meta()
+    }
+    async getWidgetRect(panelId: number, widgetId: number): Promise<Rect> {
+        const client = new PluginClient(this.api, panelId, widgetId)
+        return await client.size()
+    }
+    async getWidgetConfig<C>(panelId: number, widgetId: number): Promise<C> {
+        const client = new PluginClient(this.api, panelId, widgetId)
+        return await client.config()
     }
     async createWidget<Config>(panelId: number, widget: IWidget<Config>): Promise<number> {
         const client = new PanelClient(this.api, panelId)

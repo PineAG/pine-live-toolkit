@@ -1,3 +1,3 @@
 export * from "./base"
-export * from "./legacy"
+export * from "./api"
 export * from "./file"

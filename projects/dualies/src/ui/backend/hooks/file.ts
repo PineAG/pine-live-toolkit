@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { useFileClient } from "./base"
+import { useLiveToolkitFileStorage } from "./base"
 
 export class FileObjectURLCache {
     private refCounter: Record<string, number> = {}
@@ -36,12 +36,12 @@ export type UseFileIdResult = {status: "Pending" | "NotFound"} | {status: "Loade
 export function useFileId(fileId: string | null): UseFileIdResult {
     const store = useContext(FileObjectURLCacheContext)
     const [result, setResult] = useState<UseFileIdResult>({status: "Pending"})
-    const fileClient = useFileClient()
+    const fileClient = useLiveToolkitFileStorage()
     useEffect(() => {
         if(fileId) {
             setResult({status: "Pending"})
             store.getURL(fileId, (id) => {
-                return fileClient.read(id)
+                return fileClient.fetch(id)
             }).then(url => {
                 if(url) {
                     setResult({status: "Loaded", url})

@@ -8,7 +8,7 @@ export interface IDisposable {
 
 export interface ILiveToolkitClient {
     getPanels(): Promise<IPanelReference[]>
-    getPanel(id: number): Promise<IPanel | null>
+    getPanel(id: number): Promise<IPanel>
     createPanel(panel: IPanel): Promise<number>
     deletePanel(id: number): Promise<void>
     setPanelMeta(id: number, meta: IPanelMeta): Promise<void>
@@ -18,7 +18,9 @@ export interface ILiveToolkitClient {
     subscribePanel(id: number, callback: SubscriptionCallback): IDisposable
     
     getWidgetsOfPanel(panelId: number): Promise<IWidgetReference[]>
-    getWidget<Config>(panelId: number, widgetId: number): Promise<IWidget<Config> | null>
+    getWidgetMeta(panelId: number, widgetId: number): Promise<IWidgetMeta>
+    getWidgetRect(panelId: number, widgetId: number): Promise<Rect>
+    getWidgetConfig<C>(panelId: number, widgetId: number): Promise<C>
     createWidget<Config>(panelId: number, widget: IWidget<Config>): Promise<number>
     deleteWidget(panelId: number, widgetId: number): Promise<void>
     setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void>
