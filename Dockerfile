@@ -1,11 +1,12 @@
 FROM node:lts as FrontendBuild
 COPY . /app
-RUN cd /app/projects/client &&\
-    yarn install && yarn build &&\
-    cd /app/projects/components &&\
-    yarn install && yarn build &&\
-    cd ../dualies &&\
-    yarn install && yarn build
+WORKDIR /app
+RUN yarn config set registry https://registry.npm.taobao.org/
+RUN yarn install &&\
+    cd maintenance &&\
+    npx gulp installAllDependencies &&\
+    npx gulp enableProductionFeatures &&\
+    npx gulp buildAllProjects
 RUN mv /app/projects/dualies/build /web
 
 FROM nginx:latest

@@ -45,14 +45,25 @@ exports.installAllDependencies = async () => {
     await installProjectDependencies("dualies")
 }
 
-exports.enableDemoFeatures = async () => {
+async function updateFeatures(newfeatures) {
     const featureFile = path.resolve(rootDir, "projects", "dualies", "src", "features.json")
     const features = JSON.parse(await fs.readFile(featureFile))
-    Object.assign(features, {
+    Object.assign(features, newfeatures)
+    await fs.writeFile(featureFile, JSON.stringify(features))
+}
+
+exports.enableDemoFeatures = async () => {
+    await updateFeatures({
         Use_LocalStorage_Backend: true,
         Show_Demo_Message: true
     })
-    await fs.writeFile(featureFile, JSON.stringify(features))
+}
+
+exports.enableProductionFeatures = async () => {
+    await updateFeatures({
+        Use_LocalStorage_Backend: false,
+        Show_Demo_Message: false
+    })
 }
 
 exports.buildAllProjects = async () => {
