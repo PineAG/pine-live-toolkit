@@ -1,7 +1,7 @@
 import { ActionButton, CardGrid, DBinding, defaultValueBinding, Dialog, Flex, FormItem, Grid, Icons, nullablePropertyBinding, NumberField, StringField, useLocalDBinding } from "@pltk/components"
 import { useNavigate } from "react-router-dom"
-import Loading from "../components/Loading"
-import { GlobalInfo, useGlobal } from "../backend"
+import { useLiveToolkitClient, usePanels } from "../backend"
+import { unwrapAsyncSubs } from "../components/subs"
 import "./PanelList.css"
 
 
@@ -19,13 +19,16 @@ function defaultNewPanel(): NewPanelInfo {
     }
 }
 
-function NewPanelDialog({binding, store}: {binding: DBinding<NewPanelInfo | null>, store: GlobalInfo | null}) {
-    if(store === null) return <></>;
+function NewPanelDialog({binding}: {binding: DBinding<NewPanelInfo | null>}) {
+    const client = useLiveToolkitClient()
     return <Dialog title="新建界面" open={binding.value !== null} 
         onOk={async () => {
             if(binding.value === null) return;
             const {title, width, height} = binding.value
-            await store.createPanel(title, {width, height})
+            await client.createPanel({
+                meta: { title },
+                size: {width, height}
+            })
             binding.update(null)
         }} 
         onCancel={() => binding.update(null)}>
@@ -55,27 +58,26 @@ function NewPanelDialog({binding, store}: {binding: DBinding<NewPanelInfo | null
     </Dialog>
 }
 
-export const RenderPanelListPageBody = ({store}: {store: GlobalInfo | null}) => {
+export const RenderPanelListPageBody = () => {
     const navigate = useNavigate()
-    if(store === null){
-        return <Loading/>
-    }
-    return <CardGrid
+    const panelsReq = usePanels()
+    return unwrapAsyncSubs(panelsReq, panels => (
+    <CardGrid
         columns={4}
-        items={store.panels.map(p => ({
+        items={panels.map(p => ({
             key: p.id,
             onClick: () => navigate(`/panel/${p.id}`),
             content: (
                 <span style={{fontSize: "1.8rem"}}>
-                    {p.title}
+                    {p.meta.title}
                 </span>
             ),
         }))}
     />
+    ))
 }
 
 export const PanelListPage = () => {
-    const store = useGlobal()
     const newPanel = useLocalDBinding<NewPanelInfo | null>(null)
     return <div style={{margin: "50px"}}>
     <Grid container alignment="left">
@@ -85,9 +87,9 @@ export const PanelListPage = () => {
             </Flex>
         </Grid>
         <Grid span={12}>
-            <RenderPanelListPageBody store={store}/>
+            <RenderPanelListPageBody/>
         </Grid>
     </Grid>
-    <NewPanelDialog binding={newPanel} store={store}/>
+    <NewPanelDialog binding={newPanel}/>
     </div>
 }

@@ -1,4 +1,4 @@
-import { ILiveToolkitClient, ILiveToolkitFileStorage } from "@pltk/protocol"
+import { ILiveToolkitClient, ILiveToolkitFileStorage, IWidgetMeta, IWidgetReference } from "@pltk/protocol"
 import { createNullableContext, useNullableContext } from "./utils"
 
 const ClientContext = createNullableContext<ILiveToolkitClient>("Backend not initialized")
@@ -35,9 +35,11 @@ export function usePanelId(): number {
     return useNullableContext(PanelIdContext)
 }
 
-const WidgetIdContext = createNullableContext<number>("Widget ID not provided")
-export const WidgetProvider = WidgetIdContext.Provider
+const WidgetReferenceContext = createNullableContext<IWidgetReference>("Widget ID not provided")
+export const WidgetProvider = WidgetReferenceContext.Provider
 export function useWidgetId(): number {
-    return useNullableContext(WidgetIdContext)
+    return useNullableContext(WidgetReferenceContext).id
 }
-
+export function useWidgetMeta(): IWidgetMeta {
+    return useNullableContext(WidgetReferenceContext).meta
+}

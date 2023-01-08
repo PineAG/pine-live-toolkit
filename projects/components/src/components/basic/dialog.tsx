@@ -2,13 +2,14 @@ import { Button as AntdButton, Modal, notification, Popconfirm, Popover as AntdP
 import { useEffect } from "react"
 import { CompactPicker } from "react-color"
 import { DBinding } from "../../store"
+import { NodeChildren } from "./utils"
 
 export interface DialogProps {
     title: string
     open: boolean
     onOk: () => void
     onCancel: () => void
-    children: JSX.Element | JSX.Element[]
+    children: NodeChildren
 }
 
 export function Dialog(props: DialogProps) {
@@ -27,7 +28,7 @@ export interface QuickConfirmProps {
     title: string
     description: string
     onConfirm: () => void
-    children: JSX.Element | JSX.Element[]
+    children: NodeChildren
 }
 
 export function QuickConfirm(props: QuickConfirmProps) {

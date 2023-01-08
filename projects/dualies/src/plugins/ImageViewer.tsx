@@ -1,7 +1,7 @@
 import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, Loading, propertyBinding, Switch, UploadButton } from "@pltk/components"
+import { ILiveToolkitFileStorage } from "@pltk/protocol"
 import { useRef } from "react"
-import { IFileClient, readFileToBlob, useFileClient, useFileId } from "../ui"
-import { Plugin, PropsWithConfig } from "../ui"
+import { Plugin, PropsWithConfig, readFileToBlob, useFileId, useLiveToolkitFileStorage } from "../ui"
 
 export interface Config {
     fileId: string | null
@@ -44,7 +44,7 @@ function ImageViewer({configStore}: PropsWithConfig<Config>) {
     }
 }
 
-async function uploadFile(file: File, client: IFileClient): Promise<string> {
+async function uploadFile(file: File, client: ILiveToolkitFileStorage): Promise<string> {
     const blob = await readFileToBlob(file)
     const fileId = await client.create(blob)
     return fileId
@@ -60,7 +60,7 @@ function VisibleSwitch({binding}: {binding: DBinding<boolean>}) {
 }
 
 function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
-    const fileClient = useFileClient()
+    const fileClient = useLiveToolkitFileStorage()
     const ref = useRef<HTMLInputElement>(null)
     const fileResult = useFileId(configStore.value.fileId)
     const fileIdBinding = propertyBinding(configStore, "fileId")
@@ -107,7 +107,7 @@ function ImageViewerMove({configStore}: PropsWithConfig<Config>) {
 }
 
 function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
-    const fileClient = useFileClient()
+    const fileClient = useLiveToolkitFileStorage()
     const fileIdStore = propertyBinding(configStore, "fileId")
     const fileResult = useFileId(fileIdStore.value)
     async function onFileChange(files: FileList | null) {

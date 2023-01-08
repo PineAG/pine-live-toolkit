@@ -1,7 +1,8 @@
-import { CSSProperties, useContext, useEffect, useState } from "react"
+import { CSSProperties, useEffect, useState } from "react"
 import * as rnd from "react-rnd"
 import { Rect, Size } from "../../backend"
-import { PanelElementSizeContext, PanelSizeContext } from "../context"
+import { useNullableContext } from "../../backend/hooks/utils"
+import { PanelSizeContext } from "../context"
 
 
 export interface FrameworkProps {
@@ -12,7 +13,7 @@ export interface FrameworkProps {
 }
 
 export const PreviewFramework = (props: FrameworkProps) => {
-    const {scale} = useContext(PanelSizeContext)
+    const {scale} = useNullableContext(PanelSizeContext)
     const {x, y, width, height} = props.rect
     const style: CSSProperties = {
         left: x * scale,
@@ -41,7 +42,7 @@ export const PreviewFramework = (props: FrameworkProps) => {
 
 
 export const ScaledFramework = (props: FrameworkProps) => {
-    const {scale} = useContext(PanelSizeContext)
+    const {scale} = useNullableContext(PanelSizeContext)
     const {x, y, width, height} = props.rect
     const style: CSSProperties = {
         left: x * scale,
@@ -99,9 +100,8 @@ function isValidRect({x, y, width, height}: Rect, parentSize: Size, scale: numbe
 }
 
 export const ResizableFramework = (props: ResizableFrameworkProps) => {
-    const {scale, ...parentSize} = useContext(PanelSizeContext)
+    const {scale, ...parentSize} = useNullableContext(PanelSizeContext)
     const [rect, setRect] = useState<Rect>({x: 0, y: 0, width: 1, height: 1})
-    const containerSize = useContext(PanelElementSizeContext)
     useEffect(() => {
         setRect(rescaleRect(props.rect, scale))
     }, [props.rect, scale])

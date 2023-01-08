@@ -1,23 +1,23 @@
 import { InternationalProvider, SupportedLanguages } from '@pltk/components';
-import { EnabledPluginProvider, Plugin } from './components/plugins';
+import { EnabledWidgetProvider, WidgetDefinition } from './components/widgets';
 import { RouterRoot } from './routes';
-import { BackendProvider, IBackend } from "./backend";
+import { BackendProvider, BackendOptions } from "./backend";
 
 export interface DualiesAppProps {
-    backend: IBackend
+    backend: BackendOptions
     language: SupportedLanguages
-    plugins: Plugin<any>[]
+    plugins: WidgetDefinition<any>[]
 }
 
 export function DualiesApp(props: DualiesAppProps) {
-    return <BackendProvider value={props.backend}>
+    return <BackendProvider fileStorage={props.backend.fileStorage} client={props.backend.client}>
       <InternationalProvider language={props.language}>
-        <EnabledPluginProvider value={props.plugins}>
+        <EnabledWidgetProvider widgets={props.plugins}>
           <RouterRoot/>
-        </EnabledPluginProvider>
+        </EnabledWidgetProvider>
       </InternationalProvider>
     </BackendProvider>
 }
 
-export type { Plugin, PropsWithConfig } from './components/plugins'
+export type { WidgetDefinition as Plugin, PropsWithConfig } from './components/widgets'
 export * from "./backend"

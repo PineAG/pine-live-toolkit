@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-export function usePanelId() {
+export function usePanelIdFromParams() {
     const {panelId} = useParams()
     if(!panelId) {
         throw new Error(`Invalid panel id: ${panelId}`)

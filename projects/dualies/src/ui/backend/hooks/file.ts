@@ -55,3 +55,17 @@ export function useFileId(fileId: string | null): UseFileIdResult {
     }, [fileId])
     return result
 }
+
+export async function readFileToBlob(file: File): Promise<Blob> {
+    const reader = file.stream().getReader()
+    let res = await reader.read()
+    const parts: Uint8Array[] = []
+    while(!res.done) {
+        parts.push(res.value)
+        res = await reader.read()
+    }
+    if(res.value !== undefined) {
+        parts.push(res.value)
+    }
+    return new Blob(parts)
+}

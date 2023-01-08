@@ -1,21 +1,28 @@
-import Loading from "../components/Loading"
-import { PreviewPlugin } from "../components/plugins"
-import { usePanel } from "../backend"
-import { usePanelId } from "./utils"
+import { PreviewWidget } from "../components/widgets"
+import { PanelIdProvider, usePanel, useWidgetListOfPanel } from "../backend"
+import { unwrapAsyncSubs } from "../components/subs"
+import { usePanelIdFromParams } from "./utils"
 
-export const PanelExhibitionPage = () => {
-    const panelId = usePanelId()
-    const panel = usePanel(panelId)
-    if(panel === null){
-        return <Loading/>
-    }
-    return <div style={panel.size}>
-        {panel.pluginsList.map(pluginId => (
-            <PreviewPlugin
-                key={pluginId}
-                panelId={panelId}
-                pluginId={pluginId}
-            />
-        ))}
-    </div>
+function PanelExhibitionBody() {
+    const panelReq = usePanel()
+    const widgetsReq = useWidgetListOfPanel()
+    return unwrapAsyncSubs(panelReq, panel => (
+        unwrapAsyncSubs(widgetsReq, widgets => (
+        <div style={panel.size}>
+            {widgets.map(widget => (
+                <PreviewWidget
+                    key={widget.id}
+                    widget={widget}
+                />
+            ))}
+        </div>
+        ))
+    ))
+}
+
+export function PanelExhibitionPage(){
+    const panelId = usePanelIdFromParams()
+    return <PanelIdProvider value={panelId}>
+        <PanelExhibitionBody/>
+    </PanelIdProvider>
 }

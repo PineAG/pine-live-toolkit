@@ -1,13 +1,13 @@
-import { ActionButton, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@pltk/components"
-import React, { useEffect, useRef, useState } from "react"
+import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@pltk/components"
+import { Rect } from "@pltk/protocol"
+import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel } from "../backend"
 import { TransparentBackground } from "../components/backgrounds"
-import { PanelElementSizeContext, PanelStoreContext, PreviewModeContext } from "../components/context"
-import Loading from "../components/Loading"
+import { PreviewModeContext } from "../components/context"
 import { KeepRatio } from "../components/panels/KeepRatio"
-import { EditablePlugin, useEnabledPluginList, useEnabledPlugins } from "../components/plugins"
-import { PanelInfo, Rect, usePanel } from "../backend"
+import { EditableWidget, useEnabledWidgetList, useEnabledWidgets } from "../components/widgets"
+import { unwrapAsyncSubs } from "../components/subs"
 import "./Panel.css"
-import { usePanelId } from "./utils"
+import { usePanelIdFromParams } from "./utils"
 
 
 function convertDomRectToRect(rect: DOMRect | undefined): Rect {
@@ -36,9 +36,11 @@ function ShareButton() {
     </>
 }
 
-function AddPluginButton(props: {panel: PanelInfo}) {
-    const enabledPluginsList = useEnabledPluginList()
-    const enabledPlugins = useEnabledPlugins()
+function AddPluginButton() {
+    const panelId = usePanelId()
+    const client = useLiveToolkitClient()
+    const enabledPluginsList = useEnabledWidgetList()
+    const enabledPlugins = useEnabledWidgets()
     const newPluginTypeBinding = useLocalDBinding<string | null>(null)
     return <>
         <ActionButton icon={<Icons.Add/>} onClick={() => newPluginTypeBinding.update(enabledPluginsList[0].type)}>添加组件</ActionButton>
@@ -46,7 +48,14 @@ function AddPluginButton(props: {panel: PanelInfo}) {
                 onOk={async () => {
                     if(newPluginTypeBinding.value === null) return;
                     const plugin = enabledPlugins[newPluginTypeBinding.value]
-                    await props.panel.createPlugin(plugin.type, {x: 0, y: 0, ...plugin.initialize.defaultSize()}, plugin.initialize.defaultConfig())
+                    await client.createWidget<any>(panelId, {
+                        meta: {type: plugin.type},
+                        rect: {
+                            x: 0, y: 0,
+                            ...plugin.initialize.defaultSize()
+                        },
+                        config: plugin.initialize.defaultConfig()
+                    })
                     newPluginTypeBinding.update(null)
                 }} 
                 onCancel={() => newPluginTypeBinding.update(null)}>
@@ -67,60 +76,58 @@ function AddPluginButton(props: {panel: PanelInfo}) {
     </>
 }
 
+function PanelHeader({previewModeBinding}: {previewModeBinding: DBinding<boolean>}) {
+    const panelReq = usePanel()
+    return unwrapAsyncSubs(panelReq, panel => (
+        <HStack layout={["1fr", "auto"]} className="route-panel-header">
+            <Flex direction="vertical" alignment="space-between" nowrap>
+                <div style={{fontSize: "2rem"}}>{panel.meta.title}</div>
+            </Flex>
+            <Flex>
+                <Flex direction="horizontal" alignment="end" spacing={20} nowrap>
+                    <AddPluginButton/>
+                    <FormItem label="预览模式">
+                        <Switch binding={previewModeBinding}/>
+                    </FormItem>
+                    <ShareButton/>
+                </Flex>
+            </Flex>
+        </HStack>
+    ))
+}
+
+function WidgetContainer() {
+    const panelReq = usePanel()
+    const widgetsReq = useWidgetListOfPanel()
+    return unwrapAsyncSubs(panelReq, panel => {
+        return unwrapAsyncSubs(widgetsReq, widgets => {
+            return <div className="route-panel-body">
+                <KeepRatio internalSize={panel.size}>
+                    <TransparentBackground/>
+                    <>
+                    {widgets.map(widget => (
+                        <EditableWidget
+                            key={widget.id}
+                            widget={widget}
+                        />
+                    ))}
+                    </>
+                </KeepRatio>
+            </div>
+        })
+    })
+}
+
 
 export const PanelPage = () => {
-    const panelId = usePanelId()
-    const panel = usePanel(panelId)
-    const ref = useRef<HTMLDivElement>(null)
-    const [panelBody, setPanelBody] = useState<React.ReactElement | null>(null)
+    const panelId = usePanelIdFromParams()
     const previewModeBinding = useLocalDBinding(false)
-    useEffect(() => {
-        if(panel && ref.current) {
-            setPanelBody(createPanelBody(ref.current))
-        }
-    }, [panelId, !!panel, !!ref.current])
-    const createPanelBody = (element: HTMLDivElement) => {
-        if(!panel) return null;
-        return <PanelElementSizeContext.Provider value={convertDomRectToRect(element.getBoundingClientRect())}>
-            <KeepRatio internalSize={panel.size}>
-                <TransparentBackground/>
-                <>
-                {panel.pluginsList.map(pluginId => (
-                    <EditablePlugin
-                        key={pluginId}
-                        panelId={panelId}
-                        pluginId={pluginId}
-                    />
-                ))}
-                </>
-            </KeepRatio>
-        </PanelElementSizeContext.Provider>
-    }
-    
-    if(!panel){
-        return <Loading/>
-    }
     return <div className="route-panel-root">
-        <PreviewModeContext.Provider value={previewModeBinding.value}>
-            <HStack layout={["1fr", "auto"]} className="route-panel-header">
-                <Flex direction="vertical" alignment="space-between" nowrap>
-                    <div style={{fontSize: "2rem"}}>{panel.meta.title}</div>
-                </Flex>
-                <Flex>
-                    <Flex direction="horizontal" alignment="end" spacing={20} nowrap>
-                        <AddPluginButton panel={panel}/>
-                        <FormItem label="预览模式">
-                            <Switch binding={previewModeBinding}/>
-                        </FormItem>
-                        <ShareButton/>
-                    </Flex>
-                </Flex>
-            </HStack>
-            <div className="route-panel-body" ref={ref}>
-                <PanelStoreContext.Provider value={panel}>
-                {panelBody}
-                </PanelStoreContext.Provider>
-            </div>
-        </PreviewModeContext.Provider>
+        <PanelIdProvider value={panelId}>
+            <PreviewModeContext.Provider value={previewModeBinding.value}>
+                <PanelHeader previewModeBinding={previewModeBinding}/>
+                <WidgetContainer/>
+            </PreviewModeContext.Provider>
+        </PanelIdProvider>
     </div>
 }
