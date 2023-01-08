@@ -5,7 +5,9 @@ import panelSchemaConfig from "./PanelType.json"
 import rectSchemaConfig from "./RectType.json"
 import widgetSchemaConfig from "./WidgetType.json"
 import widgetMetaSchemaConfig from "./WidgetMetaType.json"
-import { IDType, PanelType, RectType, WidgetMetaType, WidgetType } from "./types"
+import sizeSchema from "./SizeType.json"
+import panelMetaSchema from "./PanelMetaType.json"
+import { IDType, PanelType, RectType, WidgetMetaType, WidgetType, SizeType, PanelMetaType } from "./types"
 
 const ajv = new Ajv()
 
@@ -33,4 +35,14 @@ export function isWidget(obj: any): obj is WidgetType {
 const validateWidgetMeta = ajv.compile(widgetMetaSchemaConfig)
 export function isWidgetMeta(obj: any): obj is WidgetMetaType {
     return validateWidgetMeta(obj)
+}
+
+const validateSize = ajv.compile(sizeSchema)
+export function isSize(obj: any): obj is SizeType {
+    return validateSize(obj)
+}
+
+const validatePanelMeta = ajv.compile(panelMetaSchema)
+export function isPanelMeta(obj: any): obj is PanelMetaType {
+    return validatePanelMeta(obj)
 }

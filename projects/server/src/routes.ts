@@ -1,12 +1,10 @@
-import { SubscriptionEvent } from "@pltk/protocol"
 import Koa from "koa"
 import Router from "koa-router"
 import {koaBody} from "koa-body"
 
-import { emitMessage } from "./subscription"
 import { error } from "./utils"
 import { ServerSideDataWrapper } from "./facade"
-import { isId, isPanel, isRect, isWidget, isWidgetMeta } from "./schema"
+import { isPanel, isPanelMeta, isRect, isSize, isWidget, isWidgetMeta } from "./schema"
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
 
@@ -63,18 +61,25 @@ export function initializeRouter(app: Koa, api: ServerSideDataWrapper) {
     router.put("/panel/:panelId/meta", koaBody(), async (ctx, next) => {
         const panelId = parsePanelId(ctx)
         const item = ctx.request.body
-        // TODO
-        const result = await api.setPanelMeta(panelId, item)
-        ctx.body = JSON.stringify(result)
+        if(isPanelMeta(item)) {
+            const result = await api.setPanelMeta(panelId, item)
+            ctx.body = JSON.stringify(result)
+        } else {
+            invalidBody(ctx)
+        }
+        
     })
 
     // setPanelSize
     router.put("/panel/:panelId/size", koaBody(), async (ctx, next) => {
         const panelId = parsePanelId(ctx)
         const item = ctx.request.body
-        // TODO
-        const result = await api.setPanelSize(panelId, item)
-        ctx.body = JSON.stringify(result)
+        if(isSize(item)) {
+            const result = await api.setPanelSize(panelId, item)
+            ctx.body = JSON.stringify(result)
+        } else {
+            invalidBody(ctx)
+        }
     })
 
     // deletePanel
