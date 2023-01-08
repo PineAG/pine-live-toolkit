@@ -1,4 +1,4 @@
-export type SubscriptionEvents = {
+export type SubscriptionEventsDefinition = {
     PanelList: {}
     Panel: {panelId: number}
     WidgetListOfPanel: {panelId: number}
@@ -6,7 +6,20 @@ export type SubscriptionEvents = {
     WidgetConfig: {panelId: number, widgetId: number}
 }
 
-export type SubscriptionActions = {
-    Subscribe: SubscriptionEvents
-    Dispose: SubscriptionEvents
+export type SubscriptionEvent = {
+    [K in keyof SubscriptionEventsDefinition]: {
+        type: K
+        parameters: SubscriptionEventsDefinition[K]
+    }
+}[keyof SubscriptionEventsDefinition]
+
+export enum SubscriptionActionType {
+    Subscribe = "subscribe",
+    Dispose = "dispose",
+    Update = "update"
+}
+
+export type SubscriptionAction = {
+    action: SubscriptionActionType
+    event: SubscriptionEvent
 }

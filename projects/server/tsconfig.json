@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "target": "ES5",
+        "outDir": "lib",
+        "composite": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "rootDir": "src",
+        "resolveJsonModule": true
+    },
+    "include": [
+        "./src/**/*",
+        "./src/schema/*.json"
+    ]
+}

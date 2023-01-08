@@ -76,3 +76,11 @@ exports.watchDependencies = gulp.task("watchDependencies", () => {
     watchProject("clients")
     watchProject("components")
 })
+
+exports.generateServerSchema = async () => {
+    const projDir = path.resolve(rootDir, "projects", "server")
+    const types = ["IDType", "PanelType", "WidgetType", "RectType", "WidgetMetaType"]
+    for(const t of types) {
+        await execCommand("npx", ["typescript-json-schema", "./src/schema/types.ts", t, "-o", `./src/schema/${t}.json`], projDir)
+    }
+}

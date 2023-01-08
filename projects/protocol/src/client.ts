@@ -14,8 +14,6 @@ export interface ILiveToolkitClient {
     setPanelMeta(id: number, meta: IPanelMeta): Promise<void>
     setPanelSize(id: number, size: Size): Promise<void>
 
-    subscribePanels(callback: SubscriptionCallback): IDisposable
-    subscribePanel(id: number, callback: SubscriptionCallback): IDisposable
     
     getWidgetsOfPanel(panelId: number): Promise<IWidgetReference[]>
     getWidgetMeta(panelId: number, widgetId: number): Promise<IWidgetMeta>
@@ -26,7 +24,11 @@ export interface ILiveToolkitClient {
     setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void>
     setWidgetRect(panelId: number, widgetId: number, rect: Rect): Promise<void>
     setWidgetConfig<Config>(panelId: number, widgetId: number, config: Config): Promise<void>
+}
 
+export interface ILiveToolkitSubscription {
+    subscribePanels(callback: SubscriptionCallback): IDisposable
+    subscribePanel(id: number, callback: SubscriptionCallback): IDisposable
     subscribeWidgetsOfPanel(panelId: number, callback: SubscriptionCallback): IDisposable
     subscribeWidgetRect(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable
     subscribeWidgetConfig(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable

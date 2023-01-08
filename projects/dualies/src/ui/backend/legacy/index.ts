@@ -1,10 +1,10 @@
-import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
+import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
 import { APIWrapper, GlobalClient, PanelClient, PluginClient } from "./api";
 import { BrowserStorageBackend, IndexedDBFileClient } from "./indexedDB";
 
 export {clearIndexedDBBackendData} from "./indexedDB"
 
-export class BrowserClient implements ILiveToolkitClient {
+export class BrowserClient implements ILiveToolkitClient, ILiveToolkitSubscription {
     private api: APIWrapper
     constructor() {
         const backend = new BrowserStorageBackend()

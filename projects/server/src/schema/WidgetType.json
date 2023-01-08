@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "IWidgetMeta": {
+            "properties": {
+                "type": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Rect": {
+            "properties": {
+                "height": {
+                    "type": "number"
+                },
+                "width": {
+                    "type": "number"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "config": {},
+        "meta": {
+            "$ref": "#/definitions/IWidgetMeta"
+        },
+        "rect": {
+            "$ref": "#/definitions/Rect"
+        }
+    },
+    "type": "object"
+}
+
