@@ -1,6 +1,6 @@
 import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@pltk/components"
 import { Rect } from "@pltk/protocol"
-import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel } from "../backend"
+import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
 import { TransparentBackground } from "../components/backgrounds"
 import { PreviewModeContext } from "../components/context"
 import { KeepRatio } from "../components/panels/KeepRatio"
@@ -8,15 +8,6 @@ import { EditableWidget, useEnabledWidgetList, useEnabledWidgets } from "../comp
 import { unwrapAsyncSubs } from "../components/subs"
 import "./Panel.css"
 import { usePanelIdFromParams } from "./utils"
-
-
-function convertDomRectToRect(rect: DOMRect | undefined): Rect {
-    if(rect === undefined) {
-        return {x: 0, y: 0, width: 1, height: 1}
-    }
-    const {width, height, x, y} = rect
-    return {width, height, x, y}
-}
 
 function ShareButton() {
     const displayNotification = useLocalDBinding(false)
@@ -106,10 +97,11 @@ function WidgetContainer() {
                     <TransparentBackground/>
                     <>
                     {widgets.map(widget => (
-                        <EditableWidget
-                            key={widget.id}
-                            widget={widget}
-                        />
+                        <WidgetProvider value={widget} key={widget.id}>
+                            <EditableWidget
+                                widget={widget}
+                            />
+                        </WidgetProvider>
                     ))}
                     </>
                 </KeepRatio>

@@ -2,6 +2,8 @@ import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, IPanel, IPanel
 import { APIWrapper, GlobalClient, PanelClient, PluginClient } from "./api";
 import { BrowserStorageBackend, IndexedDBFileClient } from "./indexedDB";
 
+export {clearIndexedDBBackendData} from "./indexedDB"
+
 export class BrowserClient implements ILiveToolkitClient {
     private api: APIWrapper
     constructor() {

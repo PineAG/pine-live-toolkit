@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect, useState } from "react"
 import * as rnd from "react-rnd"
-import { Rect, Size } from "../../backend"
+import { Rect, Size, useLiveToolkitClient } from "../../backend"
 import { useNullableContext } from "../../backend/hooks/utils"
 import { PanelSizeContext } from "../context"
 
@@ -73,81 +73,59 @@ export interface ResizableFrameworkProps extends FrameworkProps {
     onSizeChanged: (size: Rect) => void
 }
 
-function rescaleRect({x, y, width, height}: Rect, scale: number): Rect {
-    return {
-        x: x * scale,
-        y: y * scale,
-        width: width * scale,
-        height: height * scale
-    }
-}
-
-function retrieveRectFromDom({x, y, width, height}: Rect, scale: number): Rect {
-    return {
-        x: x / scale,
-        y: y / scale,
-        width: width / scale,
-        height: height / scale
-    }
-}
-
-function isValidRect({x, y, width, height}: Rect, parentSize: Size, scale: number): boolean {
+function isValidRect({x, y, width, height}: Rect, parentSize: Size): boolean {
     const safeGap = 5
-    const parentWidth = parentSize.width * scale
-    const parentHeight = parentSize.height * scale
+    const parentWidth = parentSize.width
+    const parentHeight = parentSize.height
     const left = x, right = x + width, top = y, bottom = y + height
     return left < parentWidth - safeGap && right > safeGap && top < parentHeight - safeGap && bottom > safeGap
 }
 
-export const ResizableFramework = (props: ResizableFrameworkProps) => {
-    const {scale, ...parentSize} = useNullableContext(PanelSizeContext)
-    const [rect, setRect] = useState<Rect>({x: 0, y: 0, width: 1, height: 1})
-    useEffect(() => {
-        setRect(rescaleRect(props.rect, scale))
-    }, [props.rect, scale])
-    function setRectValidated(rect: Rect) {
-        rect.x -= containerSize.x
-        rect.y -= containerSize.y
-        if(isValidRect(rect, parentSize, scale)) {
-            setRect({
-                width: rect.width,
-                height: rect.height,
-                x: rect.x,
-                y: rect.y,
-            })
+export function ResizableFramework(props: ResizableFrameworkProps) {
+    const {scale, configSize, actualRect} = useNullableContext(PanelSizeContext)
+    const [rect, setRect] = useState<Rect>(applyRect(props.rect))
+    function recoverRect({x, y, width, height}: Rect) {
+        return {
+            x: x / scale,
+            y: y / scale,
+            width: width / scale,
+            height: height / scale,
         }
     }
-    function updateRectValidated(rect: DOMRect) {
-        rect.x -= containerSize.x
-        rect.y -= containerSize.y
-        if(isValidRect(rect, parentSize, scale)) {
-            props.onSizeChanged(retrieveRectFromDom(rect, scale))
+    function applyRect({x, y, width, height}: Rect): Rect {
+        return {
+            x: x * scale,
+            y: y * scale,
+            width: width * scale,
+            height: height * scale
         }
     }
-    const {x, y, width, height} = rect
+    function onUpdateHTMLElement(ref: HTMLElement) {
+        let {x, y, width, height} = ref.getBoundingClientRect()
+        x -= actualRect.x
+        y -= actualRect.y
+        const rect = {x, y, width, height}
+        if(isValidRect(rect, actualRect)) {
+            setRect(rect)
+        }
+    }
+    function onUpdateHTMLElementSaved(ref: HTMLElement) {
+        let {x, y, width, height} = ref.getBoundingClientRect()
+        x -= actualRect.x
+        y -= actualRect.y
+        const rect = {x, y, width, height}
+        if(isValidRect(rect, configSize)) {
+            props.onSizeChanged(recoverRect(rect))
+        }
+    }
     return <rnd.Rnd 
         style={props.style} 
-        size={{width, height}}
-        position={{x, y}}
-        onResize={(e, direction, ref, delta, position) => {
-            const {x, y, width, height} = ref.getBoundingClientRect()
-            setRectValidated({x, y, width, height})
-        }}
-        onDrag={
-            (e, data) => {
-                const {x, y, width, height} = data.node.getBoundingClientRect()
-                setRectValidated({x, y, width, height})
-        }}
-        onResizeStop={
-            (e, direction, ref, delta, position) => {
-                const rect = ref.getBoundingClientRect()
-                updateRectValidated(rect)
-        }}
-        onDragStop={
-            (e, data) => {
-                const rect = data.node.getBoundingClientRect()
-                updateRectValidated(rect)
-        }}
+        size={rect}
+        position={rect}
+        onResize={(e, direction, ref, delta, position) => onUpdateHTMLElement(ref)}
+        onDrag={(e, data) => onUpdateHTMLElement(data.node)}
+        onResizeStop={(e, direction, ref, delta, position) => onUpdateHTMLElementSaved(ref)}
+        onDragStop={(e, data) => onUpdateHTMLElementSaved(data.node)}
         >
         <div style={{
             position: "absolute",

@@ -1,6 +1,6 @@
 import { useLocalDBinding } from "@pltk/components"
 import { IWidgetReference } from "@pltk/protocol"
-import { useWidgetConfigBinding, useWidgetRectBinding, WidgetProvider } from "../../backend"
+import { useWidgetConfigBinding, useWidgetRectBinding } from "../../backend"
 
 import { EditableStateContext } from "../context"
 import { unwrapAsyncBinding } from "../subs"
@@ -24,15 +24,13 @@ export function EditableWidget(props: ComponentProps){
     }
     
     return unwrapAsyncBinding(configBindingReq, configBinding => (
-        <WidgetProvider value={props.widget}>
-            <EditableStateContext.Provider value={stateBinding}>
+        <EditableStateContext.Provider value={stateBinding}>
             <EditableBody render={{
                 preview: () => plugin.render.preview(configBinding),
                 edit: () => plugin.render.edit(configBinding),
                 move: () => plugin.render.move(configBinding)
             }}/>
-            </EditableStateContext.Provider>
-        </WidgetProvider>
+        </EditableStateContext.Provider>
     ))
 }
 
@@ -48,10 +46,8 @@ export function PreviewWidget(props: ComponentProps){
     }
     const content = unwrapAsyncBinding(configBindingReq, plugin.render.preview)
     return unwrapAsyncBinding(widgetRectReq, rectBinding => (
-        <WidgetProvider value={props.widget}>
-            <PreviewFramework rect={rectBinding.value}>
-                {content}
-            </PreviewFramework>
-        </WidgetProvider>
+        <PreviewFramework rect={rectBinding.value}>
+            {content}
+        </PreviewFramework>
     ))
 }

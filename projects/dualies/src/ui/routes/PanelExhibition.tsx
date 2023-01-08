@@ -1,5 +1,5 @@
 import { PreviewWidget } from "../components/widgets"
-import { PanelIdProvider, usePanel, useWidgetListOfPanel } from "../backend"
+import { PanelIdProvider, usePanel, useWidgetListOfPanel, WidgetProvider } from "../backend"
 import { unwrapAsyncSubs } from "../components/subs"
 import { usePanelIdFromParams } from "./utils"
 
@@ -10,10 +10,11 @@ function PanelExhibitionBody() {
         unwrapAsyncSubs(widgetsReq, widgets => (
         <div style={panel.size}>
             {widgets.map(widget => (
-                <PreviewWidget
-                    key={widget.id}
-                    widget={widget}
-                />
+                <WidgetProvider value={widget} key={widget.id}>
+                    <PreviewWidget
+                        widget={widget}
+                    />
+                </WidgetProvider>
             ))}
         </div>
         ))

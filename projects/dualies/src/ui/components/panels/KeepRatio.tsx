@@ -1,24 +1,9 @@
-import { useEffect, useRef, useState } from "react"
+import {useRef, useState, useEffect} from "react"
+import { Rect } from "@pltk/protocol"
 import { Rnd } from "react-rnd"
 import { Size } from "../../backend"
-import { PanelSizeContext } from "../context"
-
-function useRatio(internalSize: Size): [number, React.Dispatch<React.SetStateAction<number>>, React.RefObject<HTMLDivElement>] {
-    const ref = useRef<HTMLDivElement>(null)
-    const [ratio, setRatio] = useState(1)
-    useEffect(() => {
-        if(ref.current === null) {
-            return;
-        }
-        const width = ref.current.clientWidth
-        const height = ref.current.clientHeight
-        const ratioWidth = width / internalSize.width
-        const ratioHeight = height / internalSize.height
-        const newRatio = Math.min(ratioWidth, ratioHeight);
-        setRatio(newRatio)
-    }, [internalSize, ref.current, ref.current?.clientWidth, ref.current?.clientHeight])
-    return [ratio, setRatio, ref]
-}
+import { PanelSize, PanelSizeContext } from "../context"
+import { Loading } from "@pltk/components"
 
 interface KeepRatioProps {
     internalSize: Size
@@ -26,29 +11,64 @@ interface KeepRatioProps {
 }
 
 export const KeepRatio = (props: KeepRatioProps) => {
-    const [ratio, setRatio, ref] = useRatio(props.internalSize)
+    const outRef = useRef<HTMLDivElement>(null)
+    const [scale, setScale] = useState(1)
+    const [outRect, setOutRect] = useState<Rect>({x: 0, y: 0, width: 1, height: 1})
+
+    const isOutRefAvailable = outRef.current !== null
+    useEffect(() => {
+        if(outRef.current) {
+            const {width, height, x, y} = outRef.current.getBoundingClientRect()
+            setOutRect({width, height, x, y})
+            const widthScale = width / props.internalSize.width
+            const heightScale = height / props.internalSize.height
+            setScale(Math.min(widthScale, heightScale))
+        }
+    }, [outRef.current])
+
     const fixedRatio = props.internalSize.width / props.internalSize.height
-    return <div ref={ref} style={{position: "absolute", width: "100%", height: "100%"}}>
+
+    const panelSize: PanelSize = {
+        scale,
+        configSize: props.internalSize,
+        actualRect: {
+            x: outRect.x, y: outRect.y,
+            width: props.internalSize.width * scale,
+            height: props.internalSize.height * scale
+        }
+    }
+
+    function onResize(newRect: Rect) {
+        const width = newRect.width
+        const scale = width / props.internalSize.width
+        setScale(scale)
+    }
+
+    const internal = outRef.current === null ? <Loading/> : (
         <Rnd size={{
-                width: props.internalSize.width * ratio,
-                height: props.internalSize.height * ratio
-            }} 
-            disableDragging={true}
-            enableResizing={{right: true, bottom: true, bottomRight: true}}
-            lockAspectRatio={fixedRatio} 
-            onResize={(e, direction, ref, delta, position) => {
-                setRatio(ref.offsetWidth / props.internalSize.width)
-            }}
-            style={{
-                outlineStyle: "solid",
-                outlineWidth: "1px",
-                outlineColor: "black",
-                overflow: "hidden"
-            }}
-            >
-                <PanelSizeContext.Provider value={{scale: ratio, width: props.internalSize.width, height: props.internalSize.height}}>
-                    {props.children}
-                </PanelSizeContext.Provider>
+            width: props.internalSize.width * scale,
+            height: props.internalSize.height * scale
+        }}
+        disableDragging={true}
+        enableResizing={{right: true, bottom: true, bottomRight: true}}
+        lockAspectRatio={fixedRatio} 
+        onResize={(e, direction, ref, delta, position) => onResize(ref.getBoundingClientRect())}
+        style={{
+            outlineStyle: "solid",
+            outlineWidth: "1px",
+            outlineColor: "black",
+            overflow: "hidden"
+        }}
+        >
+            <PanelSizeContext.Provider value={panelSize}>
+                {props.children}
+            </PanelSizeContext.Provider>
         </Rnd>
+    )
+
+    return <>
+    <div style={{position: "absolute", width: "100%", height: "100%"}} ref={outRef}>
+        {internal}
     </div>
+    </>
 }

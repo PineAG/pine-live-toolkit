@@ -35,7 +35,7 @@ export function usePanelId(): number {
     return useNullableContext(PanelIdContext)
 }
 
-const WidgetReferenceContext = createNullableContext<IWidgetReference>("Widget ID not provided")
+const WidgetReferenceContext = createNullableContext<IWidgetReference>("Widget Meta not provided")
 export const WidgetProvider = WidgetReferenceContext.Provider
 export function useWidgetId(): number {
     return useNullableContext(WidgetReferenceContext).id

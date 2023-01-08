@@ -1,22 +1,22 @@
 import {IDisposable, ILiveToolkitClient, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
 
 export class RestClient implements ILiveToolkitClient {
-    async getPanels(): Promise<IPanelReference[]> {
+    getPanels(): Promise<IPanelReference[]> {
         throw new Error("Method not implemented.");
     }
-    async getPanel(id: number): Promise<IPanel | null> {
+    getPanel(id: number): Promise<IPanel> {
         throw new Error("Method not implemented.");
     }
-    async createPanel(panel: IPanel): Promise<number> {
+    createPanel(panel: IPanel): Promise<number> {
         throw new Error("Method not implemented.");
     }
-    async deletePanel(id: number): Promise<void> {
+    deletePanel(id: number): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    async setPanelMeta(id: number, meta: IPanelMeta): Promise<void> {
+    setPanelMeta(id: number, meta: IPanelMeta): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    async setPanelSize(id: number, size: Size): Promise<void> {
+    setPanelSize(id: number, size: Size): Promise<void> {
         throw new Error("Method not implemented.");
     }
     subscribePanels(callback: SubscriptionCallback): IDisposable {
@@ -25,22 +25,28 @@ export class RestClient implements ILiveToolkitClient {
     subscribePanel(id: number, callback: SubscriptionCallback): IDisposable {
         throw new Error("Method not implemented.");
     }
-    async getWidgetsOfPanel(panelId: number): Promise<IWidgetReference[]> {
+    getWidgetsOfPanel(panelId: number): Promise<IWidgetReference[]> {
         throw new Error("Method not implemented.");
     }
-    getWidget<Config>(panelId: number, widgetId: number): Promise<IWidget<Config> | null> {
+    getWidgetMeta(panelId: number, widgetId: number): Promise<IWidgetMeta> {
+        throw new Error("Method not implemented.");
+    }
+    getWidgetRect(panelId: number, widgetId: number): Promise<Rect> {
+        throw new Error("Method not implemented.");
+    }
+    getWidgetConfig<C>(panelId: number, widgetId: number): Promise<C> {
         throw new Error("Method not implemented.");
     }
     createWidget<Config>(panelId: number, widget: IWidget<Config>): Promise<number> {
         throw new Error("Method not implemented.");
     }
-    async deleteWidget(panelId: number, widgetId: number): Promise<void> {
+    deleteWidget(panelId: number, widgetId: number): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    async setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void> {
+    setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    async setWidgetRect(panelId: number, widgetId: number, rect: Rect): Promise<void> {
+    setWidgetRect(panelId: number, widgetId: number, rect: Rect): Promise<void> {
         throw new Error("Method not implemented.");
     }
     setWidgetConfig<Config>(panelId: number, widgetId: number, config: Config): Promise<void> {
@@ -55,4 +61,5 @@ export class RestClient implements ILiveToolkitClient {
     subscribeWidgetConfig(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable {
         throw new Error("Method not implemented.");
     }
+    
 }

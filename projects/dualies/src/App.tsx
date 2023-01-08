@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import {RestClient} from '@pltk/clients';
 
 import features from './features.json';
-import { BrowserStorageBackend, clearIndexedDBBackendData, DualiesApp, IBackend } from './ui';
+import { BackendOptions, BrowserClient, BrowserFileStorage, clearIndexedDBBackendData, DualiesApp } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
 
-function createBackend(): IBackend {
+function createBackend(): BackendOptions {
   if(features.Use_LocalStorage_Backend) {
-    return new BrowserStorageBackend()
+    return {
+      client: new BrowserClient(),
+      fileStorage: new BrowserFileStorage()
+    }
   } else {
-    return new RestClient({path: "/api"})
+    throw new Error()
   }
 }
 

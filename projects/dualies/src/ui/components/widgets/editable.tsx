@@ -72,14 +72,14 @@ export function EditButton(props: ButtonProps) {
 export const EditableSwitch = () => {
     const editableStateBinding = useContext(EditableStateContext);
     const rectBindingReq = useWidgetRectBinding()
-    const panelSize = useNullableContext(PanelSizeContext)
+    const {configSize} = useNullableContext(PanelSizeContext)
     const enabledWidgets = useEnabledWidgets()
     const meta = useWidgetMeta()
 
     const widgetDef = enabledWidgets[meta.type]
     
     return unwrapAsyncBinding(rectBindingReq, rectBinding => {
-        const [style, reverse] = getEditableSwitchStyle(rectBinding.value, panelSize)
+        const [style, reverse] = getEditableSwitchStyle(rectBinding.value, configSize)
         if(editableStateBinding.value === EditableState.Edit) {
             return <>
             <Flex style={style} nowrap reverse={reverse}>
