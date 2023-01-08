@@ -51,7 +51,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start-frontend": "react-scripts start",
-    "start-api": "cd .. && cd mock-backend && yarn start"
+    "start-api": "cd .. && cd server && yarn start-test"
   },
   "eslintConfig": {
     "extends": [

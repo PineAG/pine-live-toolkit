@@ -25,7 +25,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "ts-node src/index.ts --port 8000 --dbRoot ./tmp/db --filesRoot ./tmp/files"
+    "start": "ts-node src/index.ts --port 8000 --dbRoot ./tmp/db --filesRoot ./tmp/files",
+    "start-test": "ts-node src/index.ts --port 3001 --dbRoot ./tmp/db --filesRoot ./tmp/files"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",
