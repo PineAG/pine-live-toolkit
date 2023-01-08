@@ -3,10 +3,12 @@ import {createServer} from "http"
 import Koa from "koa"
 
 import { initializeSubscription } from "./subscription"
-import { initializeRouter } from "./routes"
+import { initializeAPIRouter } from "./apiRoutes"
 import { parseArguments } from "./args"
 import { connectDB } from "./models"
 import { ServerSideDataWrapper } from "./facade"
+import { ServerSideFilesStorage } from "./files"
+import { initializeFilesRoutes } from "./filesRoutes"
 
 const args = parseArguments()
 const dataSource = connectDB(args)
@@ -16,5 +18,9 @@ const httpServer = createServer(app.callback())
 
 const io = initializeSubscription(httpServer)
 const api = new ServerSideDataWrapper(io, dataSource)
-initializeRouter(app, api)
+initializeAPIRouter(app, api)
+
+const fileClient = new ServerSideFilesStorage(args.filesRoot)
+initializeFilesRoutes(app, fileClient)
+
 httpServer.listen(args.port, "0.0.0.0")

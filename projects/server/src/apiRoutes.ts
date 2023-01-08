@@ -8,7 +8,7 @@ import { isPanel, isPanelMeta, isRect, isSize, isWidget, isWidgetMeta } from "./
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
 
-export function initializeRouter(app: Koa, api: ServerSideDataWrapper) {
+export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
     const router = new Router({
         prefix: "/data"
     })
