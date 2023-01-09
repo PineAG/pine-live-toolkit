@@ -12,9 +12,11 @@ RUN yarn install &&\
 RUN mv /app/projects/dualies/build /web && \
     mv /app/projects/server/lib /server
 
-FROM node:lts
+FROM node:lts-slim
 COPY --chown=1000:1000 --from=FrontendBuild /web /web
 COPY --chown=1000:1000 --from=FrontendBuild /server /server
+COPY --chown=1000:1000 --from=FrontendBuild /server/package.json /server/
+RUN cd /server && yarn install --prod
 VOLUME [ "/data", "/files" ]
 ENV PORT=8000
 WORKDIR /server
