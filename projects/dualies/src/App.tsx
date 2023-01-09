@@ -4,15 +4,22 @@ import features from './features.json';
 import { BackendOptions, BrowserClient, BrowserFileStorage, clearIndexedDBBackendData, DualiesApp } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
+import { RestClient, RestFileStorage, RestSubscription } from './ui/backend/rest';
 
 function createBackend(): BackendOptions {
   if(features.Use_LocalStorage_Backend) {
+    const client = new BrowserClient()
     return {
-      client: new BrowserClient(),
-      fileStorage: new BrowserFileStorage()
+      client,
+      fileStorage: new BrowserFileStorage(),
+      subscription: client
     }
   } else {
-    throw new Error()
+    return {
+      client: new RestClient(),
+      subscription: new RestSubscription(),
+      fileStorage: new RestFileStorage()
+    }
   }
 }
 

@@ -1,3 +1,4 @@
+import { SubscriptionEvent } from "@pltk/protocol";
 import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
 import { APIWrapper, GlobalClient, PanelClient, PluginClient } from "./api";
 import { BrowserStorageBackend, IndexedDBFileClient } from "./indexedDB";
@@ -106,7 +107,23 @@ export class BrowserClient implements ILiveToolkitClient, ILiveToolkitSubscripti
     subscribeWidgetConfig(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable {
         const client = new PluginClient(this.api, panelId, widgetId)
         return client.subscribeConfig(callback)
-    }   
+    }
+
+    subscribe(evt: SubscriptionEvent, cb: SubscriptionCallback): IDisposable {
+        if(evt.type === "PanelList") {
+            return this.subscribePanels(cb)
+        } else if(evt.type === "Panel") {
+            return this.subscribePanel(evt.parameters.panelId, cb)
+        } else if(evt.type === "WidgetListOfPanel") {
+            return this.subscribeWidgetsOfPanel(evt.parameters.panelId, cb)
+        } else if(evt.type === "WidgetRect") {
+            return this.subscribeWidgetRect(evt.parameters.panelId, evt.parameters.widgetId, cb)
+        } else if(evt.type === "WidgetConfig") {
+            return this.subscribeWidgetConfig(evt.parameters.panelId, evt.parameters.widgetId, cb)
+        } else {
+            throw new Error("Unknown event: "+JSON.stringify(evt))
+        }
+    }
 }
 
 export class BrowserFileStorage implements ILiveToolkitFileStorage {

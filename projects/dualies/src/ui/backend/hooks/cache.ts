@@ -18,13 +18,15 @@ export class CacheStore {
         }
         const id = this.idCounter++
         c.set(id, cb)
+        const triggerUpdate = async () => {
+            const v = await fetcher()
+            this.emitToCallback(evt, v)
+        }
         if(subscribe) {
-            const d = this.subs.subscribe(evt, async () => {
-                const v = await fetcher()
-                this.emitToCallback(evt, v)
-            })
+            const d = this.subs.subscribe(evt, triggerUpdate)
             this.disposers.set(key, d)
         }
+        triggerUpdate()
         return {
             close: () => {
                 let c = this.store.get(key)
@@ -45,7 +47,7 @@ export class CacheStore {
         const c = this.store.get(key)
         if(!c) return;
         for(const cb of c.values()){
-            setImmediate(() => cb(value))
+            setTimeout(() => cb(value), 0)
         }
     }
 
