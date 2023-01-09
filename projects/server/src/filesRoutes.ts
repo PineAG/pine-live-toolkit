@@ -8,7 +8,7 @@ import rawBody from "raw-body";
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
 export function initializeFilesRoutes(app: Koa, fileClient: ServerSideFilesStorage) {
     const router = new Router({
-        prefix: "/files"
+        prefix: "/api/files"
     })
 
     function getFileId(ctx: Ctx): string {

@@ -24,7 +24,7 @@ type HttpServer = ReturnType<typeof createServer>
 
 export function initializeSubscription(httpServer: HttpServer): SocketIO.Server {
     const io = new SocketIO.Server(httpServer, {
-        "path": "/subscription"
+        "path": "/api/subscription"
     })
     io.on("connection", socket => {
         console.log("CONNECT!")

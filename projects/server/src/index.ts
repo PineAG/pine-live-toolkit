@@ -2,6 +2,7 @@ import "reflect-metadata"
 import {createServer} from "http"
 import Koa from "koa"
 import KoaLogger from "koa-logger"
+import KoaStatic from "koa-static"
 
 import { initializeSubscription } from "./subscription"
 import { initializeAPIRouter } from "./apiRoutes"
@@ -26,5 +27,11 @@ initializeAPIRouter(app, api)
 
 const fileClient = new ServerSideFilesStorage(args.filesRoot)
 initializeFilesRoutes(app, fileClient)
+
+if(args.staticRoot) {
+    app.use(KoaStatic(args.staticRoot, {
+        index: "index.html"
+    }))
+}
 
 httpServer.listen(args.port, "0.0.0.0")

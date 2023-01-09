@@ -10,7 +10,7 @@ type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, a
 
 export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
     const router = new Router({
-        prefix: "/data"
+        prefix: "/api/data"
     })
 
     function parsePanelId(ctx: Ctx): number {

@@ -7,9 +7,9 @@ module.exports = function (app) {
         target: 'http://127.0.0.1:3001',
         ws: true,
         changeOrigin: true,
-        pathRewrite: {
-          "^/api/":"/"
-        }
+        // pathRewrite: {
+        //   "^/api/":"/"
+        // }
       }),
     );
   };
