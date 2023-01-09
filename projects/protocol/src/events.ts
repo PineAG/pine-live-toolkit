@@ -1,17 +1,49 @@
-export type SubscriptionEventsDefinition = {
-    PanelList: {}
-    Panel: {panelId: number}
-    WidgetListOfPanel: {panelId: number}
-    WidgetRect: {panelId: number, widgetId: number}
-    WidgetConfig: {panelId: number, widgetId: number}
+import { IPanel, IPanelReference, IWidgetReference, Rect } from "./base"
+
+type SubscriptionEventsDefinition = {
+    PanelList: {
+        args: {}
+        returns: IPanelReference[]
+    }
+    Panel: {
+        args: {panelId: number}
+        returns: IPanel
+    }
+    WidgetListOfPanel: {
+        args: {panelId: number},
+        returns: IWidgetReference[]
+    }
+    WidgetRect: {
+        args: {panelId: number, widgetId: number}
+        returns: Rect
+    }
+    WidgetConfig: {
+        args: {panelId: number, widgetId: number}
+        returns: any
+    }
 }
 
+export type SubscriptionTypes = keyof SubscriptionEventsDefinition
+
 export type SubscriptionEvent = {
-    [K in keyof SubscriptionEventsDefinition]: {
+    [K in SubscriptionTypes]: {
         type: K
-        parameters: SubscriptionEventsDefinition[K]
+        parameters: SubscriptionEventsDefinition[K]["args"]
     }
-}[keyof SubscriptionEventsDefinition]
+}[SubscriptionTypes]
+
+export type SubscriptionEventMapping<K extends SubscriptionTypes> = {
+    type: K
+    parameters: SubscriptionEventsDefinition[K]["args"]
+}
+
+export type SubscriptionParameters = {
+    [K in SubscriptionTypes]: SubscriptionEventsDefinition[K]["args"]
+}
+
+export type SubscriptionReturns = {
+    [K in SubscriptionTypes]: SubscriptionEventsDefinition[K]["returns"]
+}
 
 export enum SubscriptionActionType {
     Subscribe = "subscribe",

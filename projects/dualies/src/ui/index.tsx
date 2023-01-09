@@ -10,7 +10,7 @@ export interface DualiesAppProps {
 }
 
 export function DualiesApp(props: DualiesAppProps) {
-    return <BackendProvider fileStorage={props.backend.fileStorage} client={props.backend.client}>
+    return <BackendProvider fileStorage={props.backend.fileStorage} client={props.backend.client} subscription={props.backend.subscription}>
       <InternationalProvider language={props.language}>
         <EnabledWidgetProvider widgets={props.plugins}>
           <RouterRoot/>

@@ -1,5 +1,4 @@
 import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@pltk/components"
-import { Rect } from "@pltk/protocol"
 import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
 import { TransparentBackground } from "../components/backgrounds"
 import { PreviewModeContext } from "../components/context"

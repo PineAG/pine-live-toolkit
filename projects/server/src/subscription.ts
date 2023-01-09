@@ -1,5 +1,5 @@
-import { IDisposable, ILiveToolkitSubscription, SubscriptionActionType, SubscriptionCallback, SubscriptionEvent } from "@pltk/protocol"
-import {createServer} from "http"
+import { SubscriptionActionType, SubscriptionEvent } from "@pltk/protocol"
+import { createServer } from "http"
 import * as SocketIO from "socket.io"
 
 function eventToRoomName(evt: SubscriptionEvent): string {

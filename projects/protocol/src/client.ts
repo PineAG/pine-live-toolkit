@@ -1,4 +1,5 @@
 import { IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size } from "./base";
+import { SubscriptionEvent } from "./events";
 
 export type SubscriptionCallback = () => void
 
@@ -27,11 +28,7 @@ export interface ILiveToolkitClient {
 }
 
 export interface ILiveToolkitSubscription {
-    subscribePanels(callback: SubscriptionCallback): IDisposable
-    subscribePanel(id: number, callback: SubscriptionCallback): IDisposable
-    subscribeWidgetsOfPanel(panelId: number, callback: SubscriptionCallback): IDisposable
-    subscribeWidgetRect(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable
-    subscribeWidgetConfig(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable
+    subscribe(evt: SubscriptionEvent, callback: SubscriptionCallback): IDisposable
 }
 
 export interface ILiveToolkitFileStorage {

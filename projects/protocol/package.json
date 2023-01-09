@@ -2,7 +2,7 @@
   "name": "@pltk/protocol",
   "version": "1.0.0",
   "typing": "src/index.ts",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc"
