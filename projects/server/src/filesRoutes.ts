@@ -43,7 +43,7 @@ export function initializeFilesRoutes(app: Koa, fileClient: ServerSideFilesStora
     router.get("/:fileId", async (ctx, next) => {
         const fileId = getFileId(ctx)
         const blob = await fileClient.fetch(fileId)
-        ctx.body = new Buffer(await blob.arrayBuffer())
+        ctx.body = Buffer.from(await blob.arrayBuffer())
     })
 
     router.put("/:fileId", async (ctx, next) => {

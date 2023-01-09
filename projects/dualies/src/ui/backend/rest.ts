@@ -10,7 +10,7 @@ export class RestClient implements ILiveToolkitClient {
             }
             const m = p.match(/^\/?(.*?)\/?$/)
             return m === null ? "" : m[1]
-        }).filter(s => s.length > 0)
+        }).filter(s => s.length > 0).join("/")
         return "/api/data/" + cleanParts
     }
 
@@ -159,13 +159,13 @@ export class RestSubscription implements ILiveToolkitSubscription {
         const eventKey = this.stringifyEvent(evt)
         const subscribe = this.registerCallback(eventKey, id, callback)
         if(subscribe) {
-            this.socket.emit(SubscriptionActionType.Subscribe)
+            this.socket.emit(SubscriptionActionType.Subscribe, evt)
         }
         return {
             close: () => {
                 const dispose = this.disposeCallback(eventKey, id)
                 if(dispose) {
-                    this.socket.emit(SubscriptionActionType.Dispose)
+                    this.socket.emit(SubscriptionActionType.Dispose, evt)
                 }
             }
         }
@@ -176,7 +176,7 @@ export class RestSubscription implements ILiveToolkitSubscription {
         const callbacks = this.listeners.get(key)?.values()
         if(!callbacks) return;
         for(const cb of callbacks) {
-            setImmediate(cb)
+            setTimeout(cb, 0)
         }
     }
 }

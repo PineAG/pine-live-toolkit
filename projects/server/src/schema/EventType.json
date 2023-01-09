@@ -1,0 +1,103 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "anyOf": [
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {},
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "PanelList"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "panelId": {
+                            "type": "number"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "Panel"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "panelId": {
+                            "type": "number"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "WidgetListOfPanel"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "panelId": {
+                            "type": "number"
+                        },
+                        "widgetId": {
+                            "type": "number"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "WidgetRect"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "panelId": {
+                            "type": "number"
+                        },
+                        "widgetId": {
+                            "type": "number"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "WidgetConfig"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    ]
+}
+

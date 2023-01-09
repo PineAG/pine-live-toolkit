@@ -1,6 +1,7 @@
 import "reflect-metadata"
 import {createServer} from "http"
 import Koa from "koa"
+import KoaLogger from "koa-logger"
 
 import { initializeSubscription } from "./subscription"
 import { initializeAPIRouter } from "./apiRoutes"
@@ -14,6 +15,9 @@ const args = parseArguments()
 const dataSource = connectDB(args)
 
 const app = new Koa()
+
+app.use(KoaLogger())
+
 const httpServer = createServer(app.callback())
 
 const io = initializeSubscription(httpServer)

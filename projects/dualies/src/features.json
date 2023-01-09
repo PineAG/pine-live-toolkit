@@ -1,4 +1,4 @@
 {
-    "Use_LocalStorage_Backend": true,
+    "Use_LocalStorage_Backend": false,
     "Show_Demo_Message": false
 }

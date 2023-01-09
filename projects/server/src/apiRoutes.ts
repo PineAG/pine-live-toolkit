@@ -62,8 +62,8 @@ export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
         const panelId = parsePanelId(ctx)
         const item = ctx.request.body
         if(isPanelMeta(item)) {
-            const result = await api.setPanelMeta(panelId, item)
-            ctx.body = JSON.stringify(result)
+            await api.setPanelMeta(panelId, item)
+            ctx.body = "true"
         } else {
             invalidBody(ctx)
         }
@@ -75,8 +75,8 @@ export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
         const panelId = parsePanelId(ctx)
         const item = ctx.request.body
         if(isSize(item)) {
-            const result = await api.setPanelSize(panelId, item)
-            ctx.body = JSON.stringify(result)
+            await api.setPanelSize(panelId, item)
+            ctx.body = "true"
         } else {
             invalidBody(ctx)
         }
@@ -86,8 +86,7 @@ export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
     router.delete("/panel/:panelId", async (ctx, next) => {
         const panelId = parsePanelId(ctx)
         await api.deletePanel(panelId)
-        const result = true
-        ctx.body = JSON.stringify(result)
+        ctx.body = "true"
     })
 
     // getWidgetsOfPanel
@@ -124,8 +123,8 @@ export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
         const widgetId = parseWidgetId(ctx)
         const item = ctx.request.body
         if(isWidgetMeta(item)) {    
-            const result = await api.setWidgetMeta(panelId, widgetId, item)
-            ctx.body = JSON.stringify(result)
+            api.setWidgetMeta(panelId, widgetId, item)
+            ctx.body = "true"
         } else {
             invalidBody(ctx)
         }
@@ -145,8 +144,8 @@ export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
         const widgetId = parseWidgetId(ctx)
         const item = ctx.request.body
         if(isRect(item)) {    
-            const result = await api.setWidgetRect(panelId, widgetId, item)
-            ctx.body = JSON.stringify(result)
+            await api.setWidgetRect(panelId, widgetId, item)
+            ctx.body = "true"
         } else {
             invalidBody(ctx)
         }
@@ -161,12 +160,20 @@ export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
     })
 
     // setWidgetConfig
-    router.get("/panel/:panelId/widget/:widgetId/config", async (ctx, next) => {
+    router.put("/panel/:panelId/widget/:widgetId/config", koaBody(), async (ctx, next) => {
         const panelId = parsePanelId(ctx)
         const widgetId = parseWidgetId(ctx)
         const item = ctx.request.body
-        const result = await api.setWidgetConfig(panelId, widgetId, item)
-        ctx.body = JSON.stringify(result)
+        await api.setWidgetConfig(panelId, widgetId, item)
+        ctx.body = "true"
+    })
+
+    //deleteWidget
+    router.del("/panel/:panelId/widget/:widgetId", async (ctx, next) => {
+        const panelId = parsePanelId(ctx)
+        const widgetId = parseWidgetId(ctx)
+        await api.deleteWidget(panelId, widgetId)
+        ctx.body = "true"
     })
 
     app.use(router.routes()).use(router.allowedMethods())

@@ -48,14 +48,18 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
         })
     }
     async setPanelMeta(panelId: number, meta: IPanelMeta): Promise<void> {
-        await this.panels.update({id: panelId}, {meta})
+        const item = await this.panels.findOne({where: {id: panelId}})
+        item.meta = meta
+        await this.panels.save(item)
         this.notify({
             type: "Panel",
             parameters: {panelId}
         })
     }
     async setPanelSize(panelId: number, size: Size): Promise<void> {
-        await this.panels.update({id: panelId}, {size})
+        const item = await this.panels.findOne({where: {id: panelId}})
+        item.size = size
+        await this.panels.save(item)
         this.notify({
             type: "Panel",
             parameters: {panelId}
@@ -117,21 +121,27 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
         })
     }
     async setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void> {
-        await this.widgets.update({id: widgetId}, {meta})
+        const item = await this.widgets.findOne({where: {id: widgetId}})
+        item.meta = meta
+        await this.widgets.save(item)
         this.notify({
             type: "WidgetListOfPanel",
             parameters: {panelId}
         })
     }
     async setWidgetRect(panelId: number, widgetId: number, rect: Rect): Promise<void> {
-        await this.widgets.update({id: widgetId}, {rect})
+        const item = await this.widgets.findOne({where: {id: widgetId}})
+        item.rect = rect
+        await this.widgets.save(item)
         this.notify({
             type: "WidgetRect",
             parameters: {panelId, widgetId}
         })
     }
     async setWidgetConfig<Config>(panelId: number, widgetId: number, config: Config): Promise<void> {
-        await this.widgets.update({id: widgetId}, {config: config as any})
+        const item = await this.widgets.findOne({where: {id: widgetId}})
+        item.config = config
+        await this.widgets.save(item)
         this.notify({
             type: "WidgetConfig",
             parameters: {panelId, widgetId}
