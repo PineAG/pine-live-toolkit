@@ -25,4 +25,4 @@ RUN cd /server && yarn install && cd /server/projects/server && yarn install --p
 VOLUME [ "/data", "/files" ]
 ENV PORT=8000
 WORKDIR /server/projects/server
-CMD ["node", "./index.js", "--staticRoot", "/web", "--dbRoot", "/data", "--filesRoot", "/files", "--port", "$PORT"]
+CMD ["node", "./index.js", "--staticRoot", "/web", "--dbRoot", "/data", "--filesRoot", "/files", "--port", "${PORT}"]
