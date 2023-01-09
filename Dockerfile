@@ -5,11 +5,16 @@ WORKDIR /app
 RUN yarn install &&\
     cd maintenance &&\
     npx gulp installAllDependencies &&\
+    npx gulp generateServerSchema &&\
     npx gulp enableProductionFeatures &&\
     npx gulp buildAllProjects
-RUN mv /app/projects/dualies/build /web
+RUN mv /app/projects/dualies/build /web && \
+    mv /app/projects/server/lib /server
 
-FROM nginx:latest
+FROM node:lts
 COPY --chown=1000:1000 --from=FrontendBuild /web /web
-COPY ./.docker /docker
-CMD sh /docker/start.sh
+COPY --chown=1000:1000 --from=FrontendBuild /server /server
+VOLUME [ "/data", "/files" ]
+ENV PORT=8000
+WORKDIR /server
+CMD ["node", "./index.js", "--staticRoot", "/web", "--dbRoot", "/data", "--filesRoot", "/files", "--port", "$PORT"]

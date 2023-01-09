@@ -40,9 +40,10 @@ function watchProject(projName) {
 }
 
 exports.installAllDependencies = async () => {
-    await installProjectDependencies("clients")
     await installProjectDependencies("components")
+    await installProjectDependencies("protocol")
     await installProjectDependencies("dualies")
+    await installProjectDependencies("server")
 }
 
 async function updateFeatures(newfeatures) {
@@ -67,13 +68,14 @@ exports.enableProductionFeatures = async () => {
 }
 
 exports.buildAllProjects = async () => {
-    await buildProject("clients")
     await buildProject("components")
+    await buildProject("protocol")
+    await buildProject("server")
     await buildProject("dualies")
 }
 
 exports.watchDependencies = gulp.task("watchDependencies", () => {
-    watchProject("clients")
+    watchProject("protocol")
     watchProject("components")
 })
 
