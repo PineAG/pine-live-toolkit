@@ -16,7 +16,7 @@ RUN mv /app/projects/dualies/build /web && \
     mkdir /server/projects/protocol &&\
     mv /app/projects/protocol/lib /server/projects/protocol/lib &&\
     mv /app/projects/protocol/package.json /server/projects/protocol
-COPY ./docker/package.json /server/package.json
+COPY ./.docker/package.json /server/package.json
 
 FROM node:lts-slim
 COPY --chown=1000:1000 --from=FrontendBuild /web /web
