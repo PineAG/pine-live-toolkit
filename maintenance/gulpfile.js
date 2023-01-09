@@ -67,6 +67,17 @@ exports.enableProductionFeatures = async () => {
     })
 }
 
+
+exports.buildLibs = async () => {
+    await buildProject("components")
+    await buildProject("protocol")
+}
+
+exports.buildApps = async () => {
+    await buildProject("server")
+    await buildProject("dualies")
+}
+
 exports.buildAllProjects = async () => {
     await buildProject("components")
     await buildProject("protocol")

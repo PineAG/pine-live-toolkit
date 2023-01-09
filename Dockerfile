@@ -5,9 +5,10 @@ WORKDIR /app
 RUN yarn install &&\
     cd maintenance &&\
     npx gulp installAllDependencies &&\
-    npx gulp generateServerSchema &&\
     npx gulp enableProductionFeatures &&\
-    npx gulp buildAllProjects
+    npx gulp buildLibs &&\
+    npx gulp generateServerSchema &&\
+    npx gulp buildApps
 RUN mv /app/projects/dualies/build /web && \
     mv /app/projects/server/lib /server
 
