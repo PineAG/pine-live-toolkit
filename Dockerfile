@@ -16,7 +16,8 @@ RUN mv /app/projects/dualies/build /web && \
     mkdir /server/projects/protocol &&\
     mv /app/projects/protocol/lib /server/projects/protocol/lib &&\
     mv /app/projects/protocol/package.json /server/projects/protocol &&\
-    cp /app/.docker/package.json /server/package.json
+    cp /app/.docker/package.json /server/package.json &&\
+    cp /.docker/start.sh /server/projects/server/start.sh
 
 FROM node:lts-slim
 COPY --chown=1000:1000 --from=FrontendBuild /web /web
@@ -25,4 +26,4 @@ RUN cd /server && yarn install && cd /server/projects/server && yarn install --p
 VOLUME [ "/data", "/files" ]
 ENV PORT=8000
 WORKDIR /server/projects/server
-CMD ["node", "./index.js", "--staticRoot", "/web", "--dbRoot", "/data", "--filesRoot", "/files", "--port", "${PORT}"]
+CMD ["sh", "./start.sh"]
