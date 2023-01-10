@@ -35,7 +35,7 @@ export class KVPathBuilder {
         return `/panel/${panelId}/plugin/${pluginId}/rect`
     }
 
-    pluginConfig<T>(pluginId: number): string {
+    pluginConfig(pluginId: number): string {
         return `/plugin/${pluginId}/config`
     }
 }
