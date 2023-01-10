@@ -11,6 +11,18 @@ import { connectDB } from "./models"
 import { ServerSideDataWrapper } from "./facade"
 import { ServerSideFilesStorage } from "./files"
 import { initializeFilesRoutes } from "./filesRoutes"
+import { ILiveToolkitClient, ILiveToolkitFileStorage } from "@pltk/protocol"
+
+interface LiveToolkitServerOptions {
+    port: number
+    staticRoot?: string
+    dataClient: ILiveToolkitClient
+    filesClient: ILiveToolkitFileStorage
+}
+
+function startLiveToolkitServer(options: LiveToolkitServerOptions) {
+
+}
 
 const args = parseArguments()
 const dataSource = connectDB(args)
@@ -23,9 +35,9 @@ const httpServer = createServer(app.callback())
 
 const io = initializeSubscription(httpServer)
 const api = new ServerSideDataWrapper(io, dataSource)
-initializeAPIRouter(app, api)
 
 const fileClient = new ServerSideFilesStorage(args.filesRoot)
+initializeAPIRouter(app, api)
 initializeFilesRoutes(app, fileClient)
 
 if(args.staticRoot) {
