@@ -1,12 +1,12 @@
 import Koa from "koa"
 import Router from "koa-router"
-import { ServerSideFilesStorage } from "./files";
 import { error } from "./utils";
 import * as uuid from "uuid"
 import rawBody from "raw-body";
+import { ILiveToolkitFileStorage } from "@pltk/protocol";
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
-export function initializeFilesRoutes(app: Koa, fileClient: ServerSideFilesStorage) {
+export function initializeFilesRoutes(app: Koa, fileClient: ILiveToolkitFileStorage) {
     const router = new Router({
         prefix: "/api/files"
     })

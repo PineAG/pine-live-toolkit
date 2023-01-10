@@ -3,12 +3,12 @@ import Router from "koa-router"
 import {koaBody} from "koa-body"
 
 import { error } from "./utils"
-import { ServerSideDataWrapper } from "./facade"
 import { isPanel, isPanelMeta, isRect, isSize, isWidget, isWidgetMeta } from "./schema"
+import { ILiveToolkitClient } from "@pltk/protocol"
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
 
-export function initializeAPIRouter(app: Koa, api: ServerSideDataWrapper) {
+export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
     const router = new Router({
         prefix: "/api/data"
     })

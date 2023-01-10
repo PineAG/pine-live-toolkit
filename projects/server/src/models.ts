@@ -1,7 +1,6 @@
 import { IPanel, IPanelMeta, IWidget, IWidgetMeta, Rect, Size } from "@pltk/protocol"
 import path from "path"
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, DataSource} from "typeorm"
-import { LiveToolkitArgs } from "./args"
 import fs from "fs/promises"
 
 @Entity()
@@ -38,8 +37,8 @@ export class Widget implements IWidget<any> {
 }
 
 
-export function connectDB(args: LiveToolkitArgs): DataSource {
-    const dbPath = path.resolve(args.dbRoot, "pltk.db")
+export function connectDB(sqliteDir: string): DataSource {
+    const dbPath = path.resolve(sqliteDir, "pltk.db")
     const dataSource = new DataSource({
         type: "sqlite",
         database: dbPath,
@@ -49,7 +48,7 @@ export function connectDB(args: LiveToolkitArgs): DataSource {
         synchronize: true
     })
     async function initialize() {
-        await fs.mkdir(args.dbRoot, {recursive: true})
+        await fs.mkdir(sqliteDir, {recursive: true})
         await dataSource.initialize()
         dataSource.getRepository(Panel)
     }

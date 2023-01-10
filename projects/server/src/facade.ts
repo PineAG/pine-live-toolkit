@@ -1,15 +1,9 @@
-import SocketIO from "socket.io"
-import {ILiveToolkitClient, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionEvent} from "@pltk/protocol"
-import { emitMessage } from "./subscription";
+import {ILiveToolkitClient, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size} from "@pltk/protocol"
 import {DataSource} from "typeorm"
 import * as models from "./models";
 
 export class ServerSideDataWrapper implements ILiveToolkitClient {
-    constructor(private io: SocketIO.Server, private dataSource: DataSource) {}
-
-    private notify(evt: SubscriptionEvent) {
-        emitMessage(this.io, evt)
-    }
+    constructor(private dataSource: DataSource) {}
 
     private get panels() {
         return this.dataSource.getRepository(models.Panel)
@@ -34,36 +28,20 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
     }
     async createPanel(panel: IPanel): Promise<number> {
         const result = await this.panels.insert([panel])
-        this.notify({
-            type: "PanelList",
-            parameters: {}
-        })
         return result.identifiers[0].id
     }
     async deletePanel(panelId: number): Promise<void> {
         await this.panels.delete({id: panelId})
-        this.notify({
-            type: "PanelList",
-            parameters: {}
-        })
     }
     async setPanelMeta(panelId: number, meta: IPanelMeta): Promise<void> {
         const item = await this.panels.findOne({where: {id: panelId}})
         item.meta = meta
         await this.panels.save(item)
-        this.notify({
-            type: "Panel",
-            parameters: {panelId}
-        })
     }
     async setPanelSize(panelId: number, size: Size): Promise<void> {
         const item = await this.panels.findOne({where: {id: panelId}})
         item.size = size
         await this.panels.save(item)
-        this.notify({
-            type: "Panel",
-            parameters: {panelId}
-        })
     }
     async getWidgetsOfPanel(panelId: number): Promise<IWidgetReference[]> {
         const result = await this.panels.findOne({
@@ -107,45 +85,24 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
         newWidget.config = widget.config
         newWidget.panel = panel
         const result = await this.widgets.save(newWidget)
-        this.notify({
-            type: "WidgetListOfPanel",
-            parameters: {panelId}
-        })
         return result.id
     }
     async deleteWidget(panelId: number, widgetId: number): Promise<void> {
         await this.widgets.delete({id: widgetId})
-        this.notify({
-            type: "WidgetListOfPanel",
-            parameters: {panelId}
-        })
     }
     async setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void> {
         const item = await this.widgets.findOne({where: {id: widgetId}})
         item.meta = meta
         await this.widgets.save(item)
-        this.notify({
-            type: "WidgetListOfPanel",
-            parameters: {panelId}
-        })
     }
     async setWidgetRect(panelId: number, widgetId: number, rect: Rect): Promise<void> {
         const item = await this.widgets.findOne({where: {id: widgetId}})
         item.rect = rect
         await this.widgets.save(item)
-        this.notify({
-            type: "WidgetRect",
-            parameters: {panelId, widgetId}
-        })
     }
     async setWidgetConfig<Config>(panelId: number, widgetId: number, config: Config): Promise<void> {
         const item = await this.widgets.findOne({where: {id: widgetId}})
         item.config = config
         await this.widgets.save(item)
-        this.notify({
-            type: "WidgetConfig",
-            parameters: {panelId, widgetId}
-        })
     }
-
 }

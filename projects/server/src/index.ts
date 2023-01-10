@@ -1,49 +1,24 @@
 import "reflect-metadata"
-import {createServer} from "http"
-import Koa from "koa"
-import KoaLogger from "koa-logger"
-import KoaStatic from "koa-static"
 
-import { initializeSubscription } from "./subscription"
-import { initializeAPIRouter } from "./apiRoutes"
 import { parseArguments } from "./args"
 import { connectDB } from "./models"
 import { ServerSideDataWrapper } from "./facade"
 import { ServerSideFilesStorage } from "./files"
-import { initializeFilesRoutes } from "./filesRoutes"
-import { ILiveToolkitClient, ILiveToolkitFileStorage } from "@pltk/protocol"
+import {startLiveToolkitServer} from "./rest-server"
 
-interface LiveToolkitServerOptions {
-    port: number
-    staticRoot?: string
-    dataClient: ILiveToolkitClient
-    filesClient: ILiveToolkitFileStorage
+
+function main() {
+    const args = parseArguments()
+    const dataSource = connectDB(args.dbRoot)
+    const api = new ServerSideDataWrapper(dataSource)
+    const fileClient = new ServerSideFilesStorage(args.filesRoot)
+
+    startLiveToolkitServer({
+        dataClient: api,
+        filesClient: fileClient,
+        port: args.port,
+        staticRoot: args.staticRoot
+    })
 }
 
-function startLiveToolkitServer(options: LiveToolkitServerOptions) {
-
-}
-
-const args = parseArguments()
-const dataSource = connectDB(args)
-
-const app = new Koa()
-
-app.use(KoaLogger())
-
-const httpServer = createServer(app.callback())
-
-const io = initializeSubscription(httpServer)
-const api = new ServerSideDataWrapper(io, dataSource)
-
-const fileClient = new ServerSideFilesStorage(args.filesRoot)
-initializeAPIRouter(app, api)
-initializeFilesRoutes(app, fileClient)
-
-if(args.staticRoot) {
-    app.use(KoaStatic(args.staticRoot, {
-        index: "index.html"
-    }))
-}
-
-httpServer.listen(args.port, "0.0.0.0")
+main()
