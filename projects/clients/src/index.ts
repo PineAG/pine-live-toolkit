@@ -1,1 +1,0 @@
-export {RestClient} from "./rest"
