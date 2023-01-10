@@ -15,7 +15,13 @@ function execCommand(command, args, cwd) {
             shell: true
         })
         child.on("error", code => reject(code))
-        child.on("close", code => resolve(code))
+        child.on("close", code => {
+            if(code === 0) {
+                resolve(code)
+            } else {
+                reject(code)
+            }
+        })
     })
 } 
 
