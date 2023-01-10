@@ -1,4 +1,3 @@
-import { RestClient } from "@pltk/clients"
 import { IPanelMeta, Size, Rect, IWidgetMeta, SubscriptionCallback, IDisposable, IPanelReference } from "@pltk/protocol"
 import { IKVBackend, IKVDataClient } from "./kv"
 import { error } from "./utils"
@@ -196,20 +195,3 @@ export class PluginClient {
     }
 }
 
-export class FileClient {
-    private client = new RestClient({
-        path: "/api"
-    })
-
-    async upload(data: Blob | Uint8Array | string): Promise<string> {
-        if(data instanceof Uint8Array) {
-            data = new Blob([data])
-        }
-        const fileId = await this.client.files().create(data)
-        return fileId
-    }
-
-    async download(fileId: string): Promise<Blob> {
-        return await this.client.files().read(fileId)
-    }
-}
