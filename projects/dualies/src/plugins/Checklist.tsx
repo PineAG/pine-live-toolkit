@@ -39,12 +39,12 @@ function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
     }
 }
 
-export function ChecklistPreview({configStore}: PropsWithConfig<ChecklistConfig>) {
-    const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
+export function ChecklistPreview({configBinding: configBinding}: PropsWithConfig<ChecklistConfig>) {
+    const itemsBinding = arrayBinding(propertyBinding(configBinding, "items"))
     return <Grid container spacing={0}>
         {itemsBinding.value.filter(it => it.show).map((item, i) => (
             <Grid span={12} key={i}>
-                <div style={textStyle(item.done, configStore.value)}>
+                <div style={textStyle(item.done, configBinding.value)}>
                     {item.content}
                 </div>
             </Grid>
@@ -75,10 +75,10 @@ function ChecklistVisibleButton(props: ChecklistIconButtonProps) {
     />
 }
 
-export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
-    const config = configStore.value
+export function ChecklistEdit({configBinding: configBinding}: PropsWithConfig<ChecklistConfig>) {
+    const config = configBinding.value
     const newItemBinding = useLocalDBinding("")
-    const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
+    const itemsBinding = arrayBinding(propertyBinding(configBinding, "items"))
     return (<Flex direction="vertical" nowrap>
         {itemsBinding.items.filter(it => it.value.show).map((item, i) => (
             <Flex direction="horizontal" alignment="space-between" nowrap>
@@ -101,10 +101,10 @@ export function ChecklistEdit({configStore}: PropsWithConfig<ChecklistConfig>) {
     </Flex>)
 }
 
-export function ChecklistConfigPanel({configStore}: PropsWithConfig<ChecklistConfig>) {
+export function ChecklistConfigPanel({configBinding: configBinding}: PropsWithConfig<ChecklistConfig>) {
     const newItemContentStore = useLocalDBinding("")
-    const itemsBinding = arrayBinding(propertyBinding(configStore, "items"))
-    const textStyle = propertyBinding(configStore, "textStyle")
+    const itemsBinding = arrayBinding(propertyBinding(configBinding, "items"))
+    const textStyle = propertyBinding(configBinding, "textStyle")
 
     function createItem(){
         if(newItemContentStore.value === "") return;
@@ -161,10 +161,10 @@ export const ChecklistPlugin: Plugin<ChecklistConfig> = {
         })
     },
     render: {
-        edit: (configStore) => <ChecklistEdit configStore={configStore}/>,
-        preview: (configStore) => <ChecklistPreview configStore={configStore}/>,
-        move: (configStore) => <ChecklistPreview configStore={configStore}/>,
-        config: (configStore) => <ChecklistConfigPanel configStore={configStore}/>
+        edit: (configBinding) => <ChecklistEdit configBinding={configBinding}/>,
+        preview: (configBinding) => <ChecklistPreview configBinding={configBinding}/>,
+        move: (configBinding) => <ChecklistPreview configBinding={configBinding}/>,
+        config: (configBinding) => <ChecklistConfigPanel configBinding={configBinding}/>
     }
 }
 

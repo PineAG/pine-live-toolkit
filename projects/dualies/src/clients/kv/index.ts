@@ -1,15 +1,12 @@
 import { SubscriptionEvent } from "@pltk/protocol";
 import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
-import { APIWrapper, GlobalClient, PanelClient, PluginClient } from "./api";
-import { BrowserStorageBackend, IndexedDBFileClient } from "./indexedDB";
+import { APIWrapper, GlobalClient, PanelClient, PluginClient, SubscriptionWrapper } from "./api";
+import { IKVDataClientFactory, IKVFileClient, IKVSubscriptionFactory } from "./kv";
 
-export {clearIndexedDBBackendData} from "./indexedDB"
-
-export class BrowserClient implements ILiveToolkitClient, ILiveToolkitSubscription {
+export class KVDataClient implements ILiveToolkitClient {
     private api: APIWrapper
-    constructor() {
-        const backend = new BrowserStorageBackend()
-        this.api = new APIWrapper(backend)
+    constructor(clientFactory: IKVDataClientFactory) {
+        this.api = new APIWrapper(clientFactory)
     }
 
     async getPanels(): Promise<IPanelReference[]> {
@@ -39,21 +36,6 @@ export class BrowserClient implements ILiveToolkitClient, ILiveToolkitSubscripti
     async setPanelSize(id: number, size: Size): Promise<void> {
         const panelClient = new PanelClient(this.api, id)
         await panelClient.resize(size)
-    }
-    subscribePanels(callback: SubscriptionCallback): IDisposable {
-        const client = new GlobalClient(this.api)
-        return client.subscribePanels(callback)
-    }
-    subscribePanel(id: number, callback: SubscriptionCallback): IDisposable {
-        const client = new PanelClient(this.api, id)
-        const meta = client.subscribeMeta(callback)
-        const size = client.subscribeMeta(callback)
-        return {
-            close: () => {
-                meta.close()
-                size.close()
-            }
-        }
     }
     async getWidgetsOfPanel(panelId: number): Promise<IWidgetReference[]> {
         const client = new PanelClient(this.api, panelId)
@@ -96,17 +78,35 @@ export class BrowserClient implements ILiveToolkitClient, ILiveToolkitSubscripti
         const client = new PluginClient(this.api, panelId, widgetId)
         await client.setConfig(config)
     }
-    subscribeWidgetsOfPanel(panelId: number, callback: SubscriptionCallback): IDisposable {
-        const client = new PanelClient(this.api, panelId)
-        return client.subscribePlugins(callback)
+    
+}
+
+export class KVSubscription implements ILiveToolkitSubscription {
+    private subs: SubscriptionWrapper
+    constructor(subscriptionFactory: IKVSubscriptionFactory) {
+        this.subs = new SubscriptionWrapper(subscriptionFactory)
     }
-    subscribeWidgetRect(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable {
-        const client = new PluginClient(this.api, panelId, widgetId)
-        return client.subscribeSize(callback)
+    private subscribePanels(callback: SubscriptionCallback): IDisposable {
+        return this.subs.subscribePanels(callback)
     }
-    subscribeWidgetConfig(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable {
-        const client = new PluginClient(this.api, panelId, widgetId)
-        return client.subscribeConfig(callback)
+    private subscribePanel(id: number, callback: SubscriptionCallback): IDisposable {
+        const meta = this.subs.subscribePanelMeta(id, callback)
+        const size = this.subs.subscribePanelSize(id, callback)
+        return {
+            close: () => {
+                meta.close()
+                size.close()
+            }
+        }
+    }
+    private subscribeWidgetsOfPanel(panelId: number, callback: SubscriptionCallback): IDisposable {
+        return this.subs.subscribePlugins(panelId, callback)
+    }
+    private subscribeWidgetRect(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable {
+        return this.subs.subscribePluginSize(panelId, widgetId, callback)
+    }
+    private subscribeWidgetConfig(panelId: number, widgetId: number, callback: SubscriptionCallback): IDisposable {
+        return this.subs.subscribePluginConfig(panelId, widgetId, callback)
     }
 
     subscribe(evt: SubscriptionEvent, cb: SubscriptionCallback): IDisposable {
@@ -124,14 +124,11 @@ export class BrowserClient implements ILiveToolkitClient, ILiveToolkitSubscripti
             throw new Error("Unknown event: "+JSON.stringify(evt))
         }
     }
+
 }
 
-export class BrowserFileStorage implements ILiveToolkitFileStorage {
-    private client: IndexedDBFileClient
-    constructor() {
-        const backend = new BrowserStorageBackend()
-        this.client = backend.files()
-    }
+export class KVFileStorage implements ILiveToolkitFileStorage {
+    constructor(private client: IKVFileClient) {}
 
     create(data: Blob): Promise<string> {
         return this.client.create(data)
@@ -146,3 +143,25 @@ export class BrowserFileStorage implements ILiveToolkitFileStorage {
         return this.client.delete(id)
     }
 }
+
+export interface KVBackendOptions {
+    clientFactory: IKVDataClientFactory
+    subscriptionFactory: IKVSubscriptionFactory
+    files: IKVFileClient
+}
+
+export interface KVBackendResult {
+    client: ILiveToolkitClient
+    subscription: ILiveToolkitSubscription
+    fileStorage: ILiveToolkitFileStorage
+}
+
+export function createKVBackend(options: KVBackendOptions): KVBackendResult {
+    return {
+        client: new KVDataClient(options.clientFactory),
+        subscription: new KVSubscription(options.subscriptionFactory),
+        fileStorage: new KVFileStorage(options.files)
+    }
+}
+
+export type { IKVDataClient, IKVFileClient, IKVSubscriptionClient } from "./kv";

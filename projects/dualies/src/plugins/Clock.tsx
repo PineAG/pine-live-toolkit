@@ -27,9 +27,9 @@ function useDate(format: string) {
 }
 
 
-const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
+const Clock = ({configBinding: configBinding}: PropsWithConfig<ClockConfig>) => {
     const ref = useRef<HTMLDivElement>(null)
-    const date = useDate(configStore.value.format)
+    const date = useDate(configBinding.value.format)
     const [fontSize, setFontSize] = useState<number>(100)
     useEffect(() => {
         setFontSize(ref.current?.clientHeight ?? 100)
@@ -37,16 +37,16 @@ const Clock = ({configStore}: PropsWithConfig<ClockConfig>) => {
     return <div ref={ref} style={{
             width: "100%",
             height: "100%",
-            ...convertTextStyleToCSS(configStore.value.textStyle),
+            ...convertTextStyleToCSS(configBinding.value.textStyle),
             fontSize: fontSize * 0.8,
         }}>
         {date}
     </div>
 }
 
-const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
-    const format = propertyBinding(configStore, "format")
-    const textStyle = propertyBinding(configStore, "textStyle")
+const ClockConfiguration = ({configBinding: configBinding}: PropsWithConfig<ClockConfig>) => {
+    const format = propertyBinding(configBinding, "format")
+    const textStyle = propertyBinding(configBinding, "textStyle")
     return <Grid container alignment="left">
         <Grid span={12}>
             <FormItem label="时间格式">
@@ -62,7 +62,7 @@ const ClockConfiguration = ({configStore}: PropsWithConfig<ClockConfig>) => {
         </Grid>
         <Grid span={12}>
             <div style={{height: "100px"}}>
-                <Clock configStore={configStore}/>
+                <Clock configBinding={configBinding}/>
             </div>
         </Grid>
     </Grid>
@@ -89,10 +89,10 @@ const ClockPlugin: Plugin<ClockConfig> = {
         defaultSize: () => ({width: 300, height: 150})
     },
     render: {
-        preview: (configStore) => <Clock configStore={configStore}/>,
-        edit: (configStore) => <Clock configStore={configStore}/>,
-        move: (configStore) => <Clock configStore={configStore}/>,
-        config: (configStore) => <ClockConfiguration configStore={configStore}/>
+        preview: (configBinding) => <Clock configBinding={configBinding}/>,
+        edit: (configBinding) => <Clock configBinding={configBinding}/>,
+        move: (configBinding) => <Clock configBinding={configBinding}/>,
+        config: (configBinding) => <ClockConfiguration configBinding={configBinding}/>
     }
 }
 

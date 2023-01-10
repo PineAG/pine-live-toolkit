@@ -10,15 +10,15 @@ export interface Config {
     textStyle: TextStyleAndSize
 }
 
-function Text({configStore}: PropsWithConfig<Config>) {
-    return <div style={{...convertTextStyleToCSS(configStore.value.textStyle)}}>
-        {configStore.value.content}
+function Text({configBinding: configBinding}: PropsWithConfig<Config>) {
+    return <div style={{...convertTextStyleToCSS(configBinding.value.textStyle)}}>
+        {configBinding.value.content}
     </div>
 }
 
 function TextConfig(props: PropsWithConfig<Config>) {
-    const contentStore = propertyBinding(props.configStore, "content")
-    const textStyle = propertyBinding(props.configStore, "textStyle")
+    const contentStore = propertyBinding(props.configBinding, "content")
+    const textStyle = propertyBinding(props.configBinding, "textStyle")
 
     return <Grid container>
         <Grid span={12}>
@@ -58,10 +58,10 @@ export const TextPlugin: Plugin<Config> = {
         defaultSize: () => ({width: 300, height: 200})
     },
     render: {
-        preview: configStore => <Text configStore={configStore}/>,
-        move: configStore => <Text configStore={configStore}/>,
-        edit: configStore => <Text configStore={configStore}/>,
-        config: configStore => <TextConfig configStore={configStore}/>
+        preview: configBinding => <Text configBinding={configBinding}/>,
+        move: configBinding => <Text configBinding={configBinding}/>,
+        edit: configBinding => <Text configBinding={configBinding}/>,
+        config: configBinding => <TextConfig configBinding={configBinding}/>
     }
 }
 

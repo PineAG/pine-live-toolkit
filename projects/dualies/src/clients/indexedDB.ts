@@ -1,6 +1,6 @@
 import { IDisposable, SubscriptionCallback } from "@pltk/protocol";
 import * as idb from "idb";
-import { IKVBackend, IKVDataClient, IKVFileClient } from "./kv";
+import { createKVBackend, IKVDataClient, IKVFileClient, IKVSubscriptionClient, KVBackendResult } from "./kv";
 
 const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
 
@@ -69,8 +69,7 @@ module DBWrapper {
     }
 }
 
-class IndexedDBDataClient<T> implements IKVDataClient<T> {
-
+export class IndexedDBDataClient<T> implements IKVDataClient<T> {
     constructor(private key: string) {}
 
     private broadcastMessage() {
@@ -97,6 +96,10 @@ class IndexedDBDataClient<T> implements IKVDataClient<T> {
         await this.db.delete()
         this.broadcastMessage()
     }
+}
+
+export class IndexedDBSubscriptionDataClient implements IKVSubscriptionClient {
+    constructor(private key: string) {}
 
     subscribe(callback: SubscriptionCallback): IDisposable {
         const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
@@ -145,13 +148,12 @@ export class IndexedDBFileClient implements IKVFileClient {
     }    
 }
 
-export class BrowserStorageBackend implements IKVBackend {
-    data<T>(path: string): IndexedDBDataClient<T> {
-        return new IndexedDBDataClient(path)
-    }
-    files(): IndexedDBFileClient {
-        return new IndexedDBFileClient()
-    }
+export function createIndexedDBBackend(): KVBackendResult {
+    return createKVBackend({
+        clientFactory: key => new IndexedDBDataClient(key),
+        subscriptionFactory: key => new IndexedDBSubscriptionDataClient(key),
+        files: new IndexedDBFileClient()
+    })
 }
 
 export async function clearIndexedDBBackendData() {

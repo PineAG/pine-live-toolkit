@@ -1,45 +1,120 @@
-import { IPanelMeta, Size, Rect, IWidgetMeta, SubscriptionCallback, IDisposable, IPanelReference } from "@pltk/protocol"
-import { IKVBackend, IKVDataClient } from "./kv"
+import { IPanelMeta, Size, Rect, IWidgetMeta, IPanelReference, IDisposable, SubscriptionCallback } from "@pltk/protocol"
+import { IKVDataClient, IKVSubscriptionFactory } from "./kv"
 import { error } from "./utils"
 
+export class KVPathBuilder {
+    panelsCounter(): string {
+        return "/panels/counter"
+    }
+
+    panelsList(): string {
+        return "/panels/enabled"
+    }
+
+    panelMeta(panelId: number): string {
+        return `/panel/${panelId}/meta`
+    }
+
+    panelSize(panelId: number): string {
+        return `/panel/${panelId}/size`
+    }
+
+    pluginsCounter(): string {
+        return `/plugins/counter`
+    }
+
+    pluginsList(panelId: number): string {
+        return `/panel/${panelId}/plugins/enabled`
+    }
+
+    pluginMeta(pluginId: number): string {
+        return `/plugin/${pluginId}/meta`
+    }
+    
+    pluginRect(panelId: number, pluginId: number): string {
+        return `/panel/${panelId}/plugin/${pluginId}/rect`
+    }
+
+    pluginConfig<T>(pluginId: number): string {
+        return `/plugin/${pluginId}/config`
+    }
+}
+
 export class APIWrapper {
-    constructor(private client: IKVBackend){}
+    constructor(private clientFactory: <T>(key: string) => IKVDataClient<T>){}
+
+    private get paths(): KVPathBuilder {
+        return new KVPathBuilder()
+    }
 
     panelsCounter(): IKVDataClient<number> {
-        return this.client.data("/panels/counter")
+        return this.clientFactory(this.paths.panelsCounter())
     }
 
     panelsList(): IKVDataClient<number[]> {
-        return this.client.data("/panels/enabled")
+        return this.clientFactory(this.paths.panelsList())
     }
 
     panelMeta(panelId: number): IKVDataClient<IPanelMeta> {
-        return this.client.data(`/panel/${panelId}/meta`)
+        return this.clientFactory(this.paths.panelMeta(panelId))
     }
 
     panelSize(panelId: number): IKVDataClient<Size> {
-        return this.client.data(`/panel/${panelId}/size`)
+        return this.clientFactory(this.paths.panelSize(panelId))
     }
 
     pluginsCounter(): IKVDataClient<number> {
-        return this.client.data(`/plugins/counter`)
+        return this.clientFactory(this.paths.pluginsCounter())
     }
 
     pluginsList(panelId: number): IKVDataClient<number[]> {
-        return this.client.data(`/panel/${panelId}/plugins/enabled`)
+        return this.clientFactory(this.paths.pluginsList(panelId))
     }
 
     pluginMeta(pluginId: number): IKVDataClient<IWidgetMeta> {
-        return this.client.data(`/plugin/${pluginId}/meta`)
+        return this.clientFactory(this.paths.pluginMeta(pluginId))
     }
     
     pluginRect(panelId: number, pluginId: number): IKVDataClient<Rect> {
-        return this.client.data(`/panel/${panelId}/plugin/${pluginId}/rect`)
+        return this.clientFactory(this.paths.pluginRect(panelId, pluginId))
     }
 
     pluginConfig<T>(pluginId: number): IKVDataClient<T> {
-        return this.client.data(`/plugin/${pluginId}/config`)
+        return this.clientFactory(this.paths.pluginConfig(pluginId))
     }
+}
+
+export class SubscriptionWrapper {
+    constructor(private factory: IKVSubscriptionFactory) {}
+
+    private get paths(): KVPathBuilder {
+        return new KVPathBuilder()
+    }
+
+    subscribePanels(cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.panelsList()).subscribe(cb)
+    }
+
+    subscribePanelMeta(panelId: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.panelMeta(panelId)).subscribe(cb)
+    }
+
+    subscribePanelSize(panelId: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.panelSize(panelId)).subscribe(cb)
+    }
+
+    subscribePlugins(panelId: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.pluginsList(panelId)).subscribe(cb)
+    }
+
+    subscribePluginSize(panelId: number, pluginId: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.pluginRect(panelId, pluginId)).subscribe(cb)
+    }
+
+    subscribePluginConfig(panelId: number, pluginId: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.pluginConfig(pluginId)).subscribe(cb)
+    }
+
 }
 
 export class GlobalClient {
@@ -54,10 +129,6 @@ export class GlobalClient {
             const meta = await this.api.panelMeta(id).get() ?? error(`Panel not exists: ${id}`)
             return {meta, id}
         }))
-    }
-
-    subscribePanels(callback: SubscriptionCallback): IDisposable {
-        return this.api.panelsList().subscribe(callback)
     }
 
     async createPanel(meta: IPanelMeta, size: Size): Promise<number> {
@@ -124,19 +195,6 @@ export class PanelClient {
         await this.api.panelMeta(this.panelId).delete()
         await this.api.panelSize(this.panelId).delete()
     }
-
-    subscribeMeta(callback: SubscriptionCallback): IDisposable {
-        return this.api.panelMeta(this.panelId).subscribe(callback)
-    }
-
-    subscribePlugins(callback: SubscriptionCallback): IDisposable {
-        return this.api.pluginsList(this.panelId).subscribe(callback)
-    }
-
-    subscribeSize(callback: SubscriptionCallback): IDisposable {
-        return this.api.panelSize(this.panelId).subscribe(callback)
-    }
-    
 }
 
 export class PluginClient {
@@ -180,18 +238,6 @@ export class PluginClient {
         await this.api.pluginMeta(this.pluginId).delete()
         await this.api.pluginRect(this.panelId, this.pluginId).delete()
         await this.api.pluginConfig(this.pluginId).delete()
-    }
-
-    subscribeMeta(callback: SubscriptionCallback): IDisposable {
-        return this.api.pluginMeta(this.pluginId).subscribe(callback)
-    }
-
-    subscribeSize(callback: SubscriptionCallback): IDisposable {
-        return this.api.pluginRect(this.panelId, this.pluginId).subscribe(callback)
-    }
-
-    subscribeConfig<T>(callback: SubscriptionCallback): IDisposable {
-        return this.api.pluginConfig<T>(this.pluginId).subscribe(callback)
     }
 }
 

@@ -1,25 +1,16 @@
 import React, { useState } from 'react';
 
 import features from './features.json';
-import { BackendOptions, BrowserClient, BrowserFileStorage, clearIndexedDBBackendData, DualiesApp } from './ui';
+import { BackendOptions, DualiesApp } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
-import { RestClient, RestFileStorage, RestSubscription } from './ui/backend/rest';
+import { clearIndexedDBBackendData, createIndexedDBBackend, createRestfulBackend } from './clients';
 
 function createBackend(): BackendOptions {
   if(features.Use_LocalStorage_Backend) {
-    const client = new BrowserClient()
-    return {
-      client,
-      fileStorage: new BrowserFileStorage(),
-      subscription: client
-    }
+    return createIndexedDBBackend()
   } else {
-    return {
-      client: new RestClient(),
-      subscription: new RestSubscription(),
-      fileStorage: new RestFileStorage()
-    }
+    return createRestfulBackend()
   }
 }
 

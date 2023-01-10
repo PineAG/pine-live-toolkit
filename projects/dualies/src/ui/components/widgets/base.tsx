@@ -7,10 +7,10 @@ export enum EditableState {
 }
 
 interface Renderer<Config> {
-    move: (configStore: DBinding<Config>) => ReactNode
-    edit: (configStore: DBinding<Config>) => ReactNode
-    preview: (configStore: DBinding<Config>) => ReactNode
-    config: (configStore: DBinding<Config>) => ReactNode
+    move: (configBinding: DBinding<Config>) => ReactNode
+    edit: (configBinding: DBinding<Config>) => ReactNode
+    preview: (configBinding: DBinding<Config>) => ReactNode
+    config: (configBinding: DBinding<Config>) => ReactNode
 }
 
 export interface WidgetDefinition<Config> {
@@ -25,7 +25,7 @@ export interface WidgetDefinition<Config> {
 }
 
 export interface PropsWithConfig<Config> {
-    configStore: DBinding<Config>
+    configBinding: DBinding<Config>
 }
 
 interface EnabledWidgetsStore {

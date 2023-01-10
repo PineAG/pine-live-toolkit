@@ -30,9 +30,9 @@ function renderImage(url: string, opacity?: number, onClick?: () => void) {
     />
 }
 
-function ImageViewer({configStore}: PropsWithConfig<Config>) {
-    const fileResult = useFileId(configStore.value.fileId)
-    if(!configStore.value.visible) {
+function ImageViewer({configBinding: configBinding}: PropsWithConfig<Config>) {
+    const fileResult = useFileId(configBinding.value.fileId)
+    if(!configBinding.value.visible) {
         return <div/>
     }
     if(fileResult.status === "Loaded") {
@@ -59,11 +59,11 @@ function VisibleSwitch({binding}: {binding: DBinding<boolean>}) {
     />
 }
 
-function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
+function ImageViewerEdit({configBinding: configBinding}: PropsWithConfig<Config>) {
     const fileClient = useLiveToolkitFileStorage()
     const ref = useRef<HTMLInputElement>(null)
-    const fileResult = useFileId(configStore.value.fileId)
-    const fileIdBinding = propertyBinding(configStore, "fileId")
+    const fileResult = useFileId(configBinding.value.fileId)
+    const fileIdBinding = propertyBinding(configBinding, "fileId")
     async function onChangeInternal(files: FileList | null) {
         if(files === null || files.length === 0) return;
         const file = files[0]
@@ -76,7 +76,7 @@ function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
         }
     }
     const fileHandler = <input ref={ref} type="file" style={{display: "none"}} accept="image/*" onChange={evt => onChangeInternal(evt.target.files)}></input>
-    if(configStore.value.fileId === null) {
+    if(configBinding.value.fileId === null) {
         return <>
             <EmptyImageIcon onClick={onClick}/>
             {fileHandler}
@@ -84,8 +84,8 @@ function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
     }
     if(fileResult.status === "Loaded"){
         return <>
-            {renderImage(fileResult.url, configStore.value.visible ? 1 : 0.2, onClick)}
-            <VisibleSwitch binding={propertyBinding(configStore, "visible")}/>
+            {renderImage(fileResult.url, configBinding.value.visible ? 1 : 0.2, onClick)}
+            <VisibleSwitch binding={propertyBinding(configBinding, "visible")}/>
             {fileHandler}
         </>
     }else if(fileResult.status === "Pending") {
@@ -95,10 +95,10 @@ function ImageViewerEdit({configStore}: PropsWithConfig<Config>) {
     }
 }
 
-function ImageViewerMove({configStore}: PropsWithConfig<Config>) {
-    const fileResult = useFileId(configStore.value.fileId) 
+function ImageViewerMove({configBinding: configBinding}: PropsWithConfig<Config>) {
+    const fileResult = useFileId(configBinding.value.fileId) 
     if (fileResult.status === "Loaded") {
-        return renderImage(fileResult.url, configStore.value.visible ? 1 : 0.2)
+        return renderImage(fileResult.url, configBinding.value.visible ? 1 : 0.2)
     } else if(fileResult.status === "Pending") {
         return <Loading/>
     } else {
@@ -106,9 +106,9 @@ function ImageViewerMove({configStore}: PropsWithConfig<Config>) {
     }
 }
 
-function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
+function ImageViewerConfig({configBinding: configBinding}: PropsWithConfig<Config>) {
     const fileClient = useLiveToolkitFileStorage()
-    const fileIdStore = propertyBinding(configStore, "fileId")
+    const fileIdStore = propertyBinding(configBinding, "fileId")
     const fileResult = useFileId(fileIdStore.value)
     async function onFileChange(files: FileList | null) {
         if(files === null) return;
@@ -131,7 +131,7 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
                 <Grid span={7}>
                     <Flex alignment="end" spacing={20}>
                         <FormItem label="显示图片">
-                            <Switch binding={propertyBinding(configStore, "visible")}/>
+                            <Switch binding={propertyBinding(configBinding, "visible")}/>
                         </FormItem>
                         <DangerButton icon={<Icons.Delete/>} onClick={() => fileIdStore.update(null)}>删除图片</DangerButton>
                     </Flex>
@@ -142,7 +142,7 @@ function ImageViewerConfig({configStore}: PropsWithConfig<Config>) {
                     <img alt="" src={fileResult.url} style={{
                         maxWidth: "min(500px, 100%)",
                         minHeight: "min(500px, 100%)",
-                        opacity: configStore.value.visible ? 1 : 0.2
+                        opacity: configBinding.value.visible ? 1 : 0.2
                     }}></img> :
                     fileResult.status === "NotFound" ?
                         <EmptyImageIcon/> :
@@ -159,10 +159,10 @@ export const ImageViewerPlugin: Plugin<Config> = {
         defaultConfig: () => ({fileId: null, visible: true})
     },
     render: {
-        config: (configStore) => <ImageViewerConfig configStore={configStore}/>,
-        move: (configStore) => <ImageViewerMove configStore={configStore}/>,
-        edit: (configStore) => <ImageViewerEdit configStore={configStore}/>,
-        preview: (configStore) => <ImageViewer configStore={configStore}/>
+        config: (configBinding) => <ImageViewerConfig configBinding={configBinding}/>,
+        move: (configBinding) => <ImageViewerMove configBinding={configBinding}/>,
+        edit: (configBinding) => <ImageViewerEdit configBinding={configBinding}/>,
+        preview: (configBinding) => <ImageViewer configBinding={configBinding}/>
     }
 }
 

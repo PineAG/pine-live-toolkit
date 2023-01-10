@@ -212,3 +212,17 @@ export class RestFileStorage implements ILiveToolkitFileStorage {
         }
     }
 }
+
+export interface RestfulBackendResult {
+    client: ILiveToolkitClient
+    subscription: ILiveToolkitSubscription
+    fileStorage: ILiveToolkitFileStorage
+}
+
+export function createRestfulBackend(): RestfulBackendResult {
+    return {
+        client: new RestClient(),
+        subscription: new RestSubscription(),
+        fileStorage: new RestFileStorage()
+    }
+}
