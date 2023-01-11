@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import features from './features.json';
-import { BackendOptions, DualiesApp } from './ui';
+import { BackendOptions, LiveToolkit } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
 import { clearIndexedDBBackendData, createIndexedDBBackend } from '@pltk/indexdb-backend';
@@ -18,7 +18,7 @@ function createBackend(): BackendOptions {
 function App() {
   const backend = React.useMemo(createBackend, [])
   return <>
-    <DualiesApp
+    <LiveToolkit
       language='zhCN'
       backend={backend}
       plugins={builtinPlugins}

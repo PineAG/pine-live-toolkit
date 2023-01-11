@@ -73,11 +73,12 @@ exports.buildLibs = async () => {
     await buildProject("backend-kv-adapter")
     await buildProject("backend-indexeddb")
     await buildProject("backend-rest-client")
+    await buildProject("backend-rest-server")
 }
 
 exports.buildApps = async () => {
     await buildProject("server")
-    await buildProject("dualies")
+    await buildProject("frontend")
 }
 
 exports.watchDependencies = gulp.task("watchDependencies", () => {

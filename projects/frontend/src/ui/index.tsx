@@ -3,13 +3,13 @@ import { EnabledWidgetProvider, WidgetDefinition } from './components/widgets';
 import { RouterRoot } from './routes';
 import { BackendProvider, BackendOptions } from "./backend";
 
-export interface DualiesAppProps {
+export interface LiveToolkitAppProps {
     backend: BackendOptions
     language: SupportedLanguages
     plugins: WidgetDefinition<any>[]
 }
 
-export function DualiesApp(props: DualiesAppProps) {
+export function LiveToolkit(props: LiveToolkitAppProps) {
     return <BackendProvider fileStorage={props.backend.fileStorage} client={props.backend.client} subscription={props.backend.subscription}>
       <InternationalProvider language={props.language}>
         <EnabledWidgetProvider widgets={props.plugins}>
