@@ -91,6 +91,7 @@ export function CopyableInput(props: CopyableInputProps){
         const clipboard = navigator.clipboard
         if(!clipboard){
             api.error({message: "无法连接剪贴板"})
+            return
         }
         try{
             clipboard.writeText(props.value)
