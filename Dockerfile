@@ -9,7 +9,7 @@ RUN yarn install &&\
     npx gulp buildApps &&\
     npx gulp bundleBackend
 RUN mv /app/projects/frontend/build /web && \
-    mv /backend-release /server
+    mv /app/backend-release /server
 
 FROM node:lts-slim
 COPY --chown=1000:1000 --from=FrontendBuild /web /web

@@ -4,6 +4,7 @@
   "typings": "src/index.ts",
   "main": "lib/index.js",
   "license": "MIT",
+  "files": ["lib"],
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
     "@types/axios": "^0.14.0",

@@ -4,6 +4,8 @@
   "typing": "src/index.ts",
   "main": "lib/index.js",
   "license": "MIT",
+  "private": false,
+  "files": ["lib", "src"],
   "scripts": {
     "build": "tsc"
   },
