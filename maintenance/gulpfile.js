@@ -2,8 +2,10 @@ const gulp = require("gulp")
 const process = require("process")
 const path = require("path")
 const fs = require("fs/promises")
+const {existsSync} = require("fs")
 
 const rootDir = path.resolve(__dirname, "..")
+
 
 function execCommand(command, args, cwd) {
     const {spawn} = require("child_process")
@@ -94,6 +96,9 @@ async function copyBackendProject(src, dst) {
 
 exports.bundleBackend = async () => {
     const outDir = path.resolve(rootDir, "backend-release")
+    if(existsSync(outDir)){
+        await fs.rm(outDir, {recursive: true})
+    }
     await fs.mkdir(outDir)
     const projDir = path.resolve(outDir, "projects")
     await fs.mkdir(projDir)
