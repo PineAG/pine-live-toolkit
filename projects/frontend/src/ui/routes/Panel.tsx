@@ -1,4 +1,4 @@
-import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Notification, Select, Switch, useLocalDBinding } from "@pltk/components"
+import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Select, Switch, useLocalDBinding, CopyableInput } from "@pltk/components"
 import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
 import { TransparentBackground } from "../components/backgrounds"
 import { PreviewModeContext } from "../components/context"
@@ -9,21 +9,12 @@ import "./Panel.css"
 import { usePanelIdFromParams } from "./utils"
 
 function ShareButton() {
-    const displayNotification = useLocalDBinding(false)
-    async function copyLink() {
-        const url = `${window.location.href}/exhibition`
-        await navigator.clipboard.writeText(url)
-        displayNotification.update(true)
-    }
-    return <>
-        <ActionButton icon={<Icons.Share/>} onClick={copyLink}>
-            展示页链接
-        </ActionButton>
-        <Notification
-            title="已复制展示页链接"
-            binding={displayNotification}
+    return <FormItem label="展示页链接">
+        <CopyableInput
+            value={`${window.location.href}/exhibition`}
+            successMessage="已复制展示页链接"
         />
-    </>
+    </FormItem>
 }
 
 function AddPluginButton() {

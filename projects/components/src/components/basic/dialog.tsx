@@ -56,7 +56,8 @@ export interface NotificationProps {
     binding: DBinding<boolean>
     title: string
     content?: string | JSX.Element | JSX.Element[] | null
-    icon?: JSX.Element
+    icon?: JSX.Element,
+    type?: "success" | "info" | "error" | "warning"
 }
 
 export function Notification(props: NotificationProps) {
@@ -67,12 +68,13 @@ export function Notification(props: NotificationProps) {
                 message: props.title,
                 description: props.content,
                 icon: props.icon,
+                type: props.type,
                 onClose: () => {
                     props.binding.update(false)
                 }
             })
         }
-    }, [props.binding.value])
+    }, [props.binding.value, props.title, props.content, props.type])
     return <>
         {contextHolder}
     </>

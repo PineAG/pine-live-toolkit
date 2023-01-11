@@ -1,6 +1,8 @@
-import { Form as AntdForm, Input, InputNumber } from "antd"
+import { Form as AntdForm, Input, InputNumber, Button as AntdButton, notification, Tooltip } from "antd"
+import { CopyOutlined as CopyIcon} from "@ant-design/icons"
 import TextArea from "antd/es/input/TextArea"
 import { DBinding } from "../../store"
+import { HStack } from "./grid"
 
 export interface FieldBaseProps {
     placeholder?: string
@@ -76,4 +78,36 @@ export function FormItem(props: FormItemProps) {
     return <AntdForm.Item label={props.label}>
         {props.children}
     </AntdForm.Item>
+}
+
+export interface CopyableInputProps {
+    value: string
+    successMessage: string
+}
+
+export function CopyableInput(props: CopyableInputProps){
+    const [api, contextHolder] = notification.useNotification()
+    async function onCopy(){
+        const clipboard = navigator.clipboard
+        if(!clipboard){
+            api.error({message: "无法连接剪贴板"})
+        }
+        try{
+            clipboard.writeText(props.value)
+            api.success({message: props.successMessage})
+        }catch(e) {
+            api.error({message: `写入剪贴板时出现问题`})
+            throw e
+        }
+    }
+    return <>
+    <HStack layout={["1fr", "auto"]} spacing={5}>
+        <Input value={props.value}/>
+        <AntdButton
+            icon={<CopyIcon/>}
+            onClick={onCopy}
+        />
+    </HStack>
+    {contextHolder}
+    </>
 }
