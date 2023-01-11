@@ -111,4 +111,5 @@ exports.bundleBackend = async () => {
         await copyBackendProject(path.resolve(rootDir, "projects", p), path.resolve(projDir, p))
     }
     await fs.copyFile(path.resolve(rootDir, ".docker", "package.json"), path.resolve(outDir, "package.json"))
+    await fs.copyFile(path.resolve(rootDir, ".docker", "start.sh"), path.resolve(outDir, "projects", "server", "start.sh"))
 }
