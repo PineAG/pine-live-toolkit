@@ -85,3 +85,25 @@ exports.watchDependencies = gulp.task("watchDependencies", () => {
     watchProject("protocol")
     watchProject("components")
 })
+
+async function copyBackendProject(src, dst) {
+    await fs.mkdir(dst)
+    await fs.cp(path.resolve(src, "lib"), path.resolve(dst, "lib"), {recursive: true})
+    await fs.copyFile(path.resolve(src, "package.json"), path.resolve(dst, "package.json"))
+}
+
+exports.bundleBackend = async () => {
+    const outDir = path.resolve(rootDir, "backend-release")
+    await fs.mkdir(outDir)
+    const projDir = path.resolve(outDir, "projects")
+    await fs.mkdir(projDir)
+    const projects = [
+        "protocol",
+        "backend-rest-server",
+        "server"
+    ]
+    for(const p of projects) {
+        await copyBackendProject(path.resolve(rootDir, "projects", p), path.resolve(projDir, p))
+    }
+    await fs.copyFile(path.resolve(rootDir, ".docker", "package.json"), path.resolve(outDir, "package.json"))
+}
