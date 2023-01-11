@@ -4,7 +4,7 @@ import { parseArguments } from "./args"
 import { connectDB } from "./models"
 import { ServerSideDataWrapper } from "./facade"
 import { ServerSideFilesStorage } from "./files"
-import {startLiveToolkitServer} from "./rest-server"
+import {startLiveToolkitServer} from "@pltk/restful-backend-server"
 
 
 function main() {

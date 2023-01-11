@@ -21,7 +21,7 @@ function execCommand(command, args, cwd) {
 }
 
 exports.generateSchema = async function() {
-    const schemaRoot = path.resolve(".", "src", "rest-server", "schema")
+    const schemaRoot = path.resolve(".", "src", "schema")
     const typeFile = path.resolve(schemaRoot, "types.ts")
     const types = ["IDType", "PanelType", "WidgetType", "RectType", "WidgetMetaType", "SizeType", "PanelMetaType", "EventType"]
     for(const t of types) {

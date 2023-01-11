@@ -1,0 +1,35 @@
+{
+    "name": "@pltk/restful-backend-server",
+    "version": "1.0.0",
+    "typing": "src/index.ts",
+    "main": "lib/index.js",
+    "license": "MIT",
+    "scripts": {
+      "build": "yarn generate-schema && yarn build-ts",
+      "generate-schema": "gulp generateSchema",
+      "build-ts": "tsc"
+    },
+    "dependencies": {
+      "typescript": "^4.9.4",
+      "@pltk/protocol": "*",
+      "ajv": "^8.12.0",
+      "koa": "^2.14.1",
+      "koa-body": "^6.0.1",
+      "koa-logger": "^3.2.1",
+      "koa-router": "^12.0.0",
+      "koa-static": "^5.0.0",
+      "raw-body": "^2.5.1",
+      "socket.io": "^4.5.4"
+    },
+    "devDependencies": {
+      "typescript": "^4.9.4",
+      "@types/koa": "^2.13.5",
+      "@types/koa-logger": "^3.1.2",
+      "@types/koa-router": "^7.4.4",
+      "@types/koa-static": "^4.0.2",
+      "@types/socket.io": "^3.0.2",
+      "typescript-json-schema": "^0.55.0",
+      "gulp": "^4.0.2"
+    }
+  }
+  

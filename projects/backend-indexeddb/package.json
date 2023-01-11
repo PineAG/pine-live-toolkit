@@ -1,16 +1,16 @@
 {
-    "name": "@pltk/indexdb-backend",
-    "version": "1.0.0",
-    "typing": "src/index.ts",
-    "main": "lib/index.js",
-    "license": "MIT",
-    "scripts": {
-      "build": "tsc"
-    },
-    "dependencies": {
-      "typescript": "^4.9.4",
-      "@pltk/kv-backend-adaptor": "*",
-      "@pltk/protocol": "*"
-    }
+  "name": "@pltk/indexdb-backend",
+  "version": "1.0.0",
+  "typing": "src/index.ts",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@pltk/kv-backend-adaptor": "*",
+    "@pltk/protocol": "*",
+    "idb": "^7.1.1",
+    "typescript": "^4.9.4"
   }
-  
+}
