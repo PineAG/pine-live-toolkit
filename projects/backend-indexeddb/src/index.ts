@@ -1,6 +1,6 @@
 import { IDisposable, SubscriptionCallback } from "@pltk/protocol";
 import * as idb from "idb";
-import { createKVBackend, IKVDataClient, IKVFileClient, IKVSubscriptionClient, KVBackendResult } from "./kv";
+import { createKVBackend, IKVDataClient, IKVFileClient, IKVSubscriptionClient, KVBackendResult } from "@pltk/kv-backend-adaptor";
 
 const BROADCAST_CHANNEL_NAME = "dualise.mock.notification"
 

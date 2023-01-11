@@ -4,10 +4,8 @@ WORKDIR /app
 # RUN yarn config set registry https://registry.npm.taobao.org/
 RUN yarn install &&\
     cd maintenance &&\
-    npx gulp installAllDependencies &&\
     npx gulp enableProductionFeatures &&\
     npx gulp buildLibs &&\
-    npx gulp generateServerSchema &&\
     npx gulp buildApps
 RUN mv /app/projects/dualies/build /web && \
     mkdir -p /server/projects &&\

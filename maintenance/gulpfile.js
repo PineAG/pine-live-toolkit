@@ -23,7 +23,7 @@ function execCommand(command, args, cwd) {
             }
         })
     })
-} 
+}
 
 async function buildProject(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
@@ -43,13 +43,6 @@ function watchProject(projName) {
         ignoreInitial: false
         
     }, () => buildProject(projDir))
-}
-
-exports.installAllDependencies = async () => {
-    await installProjectDependencies("components")
-    await installProjectDependencies("protocol")
-    await installProjectDependencies("dualies")
-    await installProjectDependencies("server")
 }
 
 async function updateFeatures(newfeatures) {
@@ -77,16 +70,12 @@ exports.enableProductionFeatures = async () => {
 exports.buildLibs = async () => {
     await buildProject("components")
     await buildProject("protocol")
+    await buildProject("backend-kv-adapter")
+    await buildProject("backend-indexeddb")
+    await buildProject("backend-rest-client")
 }
 
 exports.buildApps = async () => {
-    await buildProject("server")
-    await buildProject("dualies")
-}
-
-exports.buildAllProjects = async () => {
-    await buildProject("components")
-    await buildProject("protocol")
     await buildProject("server")
     await buildProject("dualies")
 }
@@ -95,11 +84,3 @@ exports.watchDependencies = gulp.task("watchDependencies", () => {
     watchProject("protocol")
     watchProject("components")
 })
-
-exports.generateServerSchema = async () => {
-    const projDir = path.resolve(rootDir, "projects", "server")
-    const types = ["IDType", "PanelType", "WidgetType", "RectType", "WidgetMetaType", "SizeType", "PanelMetaType", "EventType"]
-    for(const t of types) {
-        await execCommand("npx", ["typescript-json-schema", "./src/schema/types.ts", t, "-o", `./src/schema/${t}.json`], projDir)
-    }
-}

@@ -1,17 +1,18 @@
 {
     "compilerOptions": {
         "experimentalDecorators": true,
-        "target": "ES5",
+        "target": "ES2015",
         "outDir": "lib",
         "composite": true,
         "moduleResolution": "node",
         "esModuleInterop": true,
         "rootDir": "src",
         "resolveJsonModule": true,
+        "declaration": true,
+        "declarationMap": true,
         "emitDecoratorMetadata": true
     },
     "include": [
-        "./src/**/*",
-        "./src/rest-server/schema/*.json"
+        "./src/**/*"
     ]
 }

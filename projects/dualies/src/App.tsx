@@ -4,7 +4,8 @@ import features from './features.json';
 import { BackendOptions, DualiesApp } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
-import { clearIndexedDBBackendData, createIndexedDBBackend, createRestfulBackend } from './clients';
+import { clearIndexedDBBackendData, createIndexedDBBackend } from '@pltk/indexdb-backend';
+import { createRestfulBackend } from '@pltk/restful-backend-client';
 
 function createBackend(): BackendOptions {
   if(features.Use_LocalStorage_Backend) {

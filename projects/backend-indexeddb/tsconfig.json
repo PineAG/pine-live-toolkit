@@ -8,10 +8,11 @@
         "esModuleInterop": true,
         "rootDir": "src",
         "resolveJsonModule": true,
+        "declaration": true,
+        "declarationMap": true,
         "emitDecoratorMetadata": true
     },
     "include": [
-        "./src/**/*",
-        "./src/rest-server/schema/*.json"
+        "./src/**/*"
     ]
 }
