@@ -8,7 +8,7 @@ RUN yarn install &&\
     npx gulp buildLibs &&\
     npx gulp buildApps &&\
     npx gulp bundleBackend
-RUN mv /app/projects/dualies/build /web && \
+RUN mv /app/projects/frontend/build /web && \
     mv /backend-release /server
 
 FROM node:lts-slim

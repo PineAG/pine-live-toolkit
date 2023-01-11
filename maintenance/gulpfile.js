@@ -46,7 +46,7 @@ function watchProject(projName) {
 }
 
 async function updateFeatures(newfeatures) {
-    const featureFile = path.resolve(rootDir, "projects", "dualies", "src", "features.json")
+    const featureFile = path.resolve(rootDir, "projects", "frontend", "src", "features.json")
     const features = JSON.parse(await fs.readFile(featureFile))
     Object.assign(features, newfeatures)
     await fs.writeFile(featureFile, JSON.stringify(features))
