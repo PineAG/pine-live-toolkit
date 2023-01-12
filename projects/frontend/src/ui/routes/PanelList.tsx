@@ -14,8 +14,8 @@ interface NewPanelInfo {
 function defaultNewPanel(): NewPanelInfo {
     return {
         title: "新界面",
-        width: 1280,
-        height: 720
+        width: 1920,
+        height: 1080
     }
 }
 

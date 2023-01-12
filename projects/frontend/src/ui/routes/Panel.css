@@ -8,9 +8,9 @@
 
 .route-panel-header {
     position: absolute;
-    width: calc(100vw - 100px); height: 100vh;
+    width: calc(100vw - 100px); height: 120px;
     left: 50px; right: 50px;
-    top: 25px;
+    top: 20px;
     bottom: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -18,9 +18,9 @@
 
 .route-panel-body {
     position: absolute;
-    width: calc(100vw - 100px); height: calc(100vh - 150px);
+    width: calc(100vw - 100px); height: calc(100vh - 160px);
     left: 50px; right: 50px;
-    top: 150px;
+    top: 140px;
     bottom: 50px;
     overflow: hidden;
 }

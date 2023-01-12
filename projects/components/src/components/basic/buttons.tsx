@@ -36,6 +36,10 @@ export function DangerButton(props: ButtonProps) {
     return <AntdButton type="primary" danger {...buttonPropsToAntdProps(props)}>{props.children}</AntdButton>
 }
 
+export function LiteDangerButton(props: ButtonProps) {
+    return <AntdButton type="default" danger {...buttonPropsToAntdProps(props)}>{props.children}</AntdButton>
+}
+
 export function DangerLink(props: ButtonProps) {
     return <AntdButton type="link" danger {...buttonPropsToAntdProps(props)}>{props.children}</AntdButton>
 }
