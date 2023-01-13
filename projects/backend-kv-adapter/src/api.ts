@@ -1,4 +1,4 @@
-import { IPanelMeta, Size, Rect, IWidgetMeta, IPanelReference, IDisposable, SubscriptionCallback } from "@pltk/protocol"
+import { IPanelMeta, Size, Rect, IWidgetMeta, IPanelReference, IDisposable, SubscriptionCallback, INewWarehouse, IWarehouse, IWarehouseReference } from "@pltk/protocol"
 import { IKVDataClient, IKVSubscriptionFactory } from "./kv"
 import { error } from "./utils"
 
@@ -37,6 +37,22 @@ export class KVPathBuilder {
 
     pluginConfig(pluginId: number): string {
         return `/plugin/${pluginId}/config`
+    }
+
+    warehouseCounter(type: string): string {
+        return `/warehouses/${type}/counter`
+    }
+
+    warehouseList(type: string): string {
+        return `/warehouses/${type}/enabled`
+    }
+
+    warehouseTitle(type: string, id: number): string {
+        return `/warehouse/${type}/${id}/title`
+    }
+
+    warehouseConfig(type: string, id: number): string {
+        return `/warehouse/${type}/${id}/config`
     }
 }
 
@@ -82,6 +98,22 @@ export class APIWrapper {
     pluginConfig<T>(pluginId: number): IKVDataClient<T> {
         return this.clientFactory(this.paths.pluginConfig(pluginId))
     }
+
+    warehouseCounter(type: string): IKVDataClient<number> {
+        return this.clientFactory(this.paths.warehouseCounter(type))
+    }
+
+    warehouseList(type: string): IKVDataClient<number[]> {
+        return this.clientFactory(this.paths.warehouseList(type))
+    }
+
+    warehouseTitle(type: string, id: number): IKVDataClient<string> {
+        return this.clientFactory(this.paths.warehouseTitle(type, id))
+    }
+    
+    warehouseConfig<C>(type: string, id: number): IKVDataClient<C> {
+        return this.clientFactory(this.paths.warehouseConfig(type, id))
+    }
 }
 
 export class SubscriptionWrapper {
@@ -113,6 +145,18 @@ export class SubscriptionWrapper {
 
     subscribePluginConfig(panelId: number, pluginId: number, cb: SubscriptionCallback): IDisposable {
         return this.factory(this.paths.pluginConfig(pluginId)).subscribe(cb)
+    }
+
+    subscribeWarehouseList(type: string, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.warehouseList(type)).subscribe(cb)
+    }
+
+    subscribeWarehouseTitle(type: string, id: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.warehouseTitle(type, id)).subscribe(cb)
+    }
+
+    subscribeWarehouseConfig(type: string, id: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.warehouseConfig(type, id)).subscribe(cb)
     }
 
 }
@@ -239,5 +283,55 @@ export class PluginClient {
         await this.api.pluginRect(this.panelId, this.pluginId).delete()
         await this.api.pluginConfig(this.pluginId).delete()
     }
+}
+
+export class WarehouseClient {
+    constructor(private api: APIWrapper) {}
+
+    async create<C>(type: string, warehouse: INewWarehouse<C>): Promise<number> {
+        const id = await this.api.warehouseCounter(type).get() ?? 0
+        const data: IWarehouse<C> = {
+            type,
+            id,
+            ...warehouse
+        }
+        const list = await this.api.warehouseList(type).get() ?? []
+        await this.api.warehouseTitle(type, id).set(warehouse.title)
+        await this.api.warehouseConfig(type, id).set(warehouse.config)
+        list.push(id)
+        await this.api.warehouseCounter(type).set(id + 1)
+        await this.api.warehouseList(type).set(list)
+        return id
+    }
+
+    async get<C>(type: string, id: number): Promise<IWarehouse<C>> {
+        const title = await this.api.warehouseTitle(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+        const config = await this.api.warehouseConfig<C>(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+        return {id, type, title, config}
+    }
+
+    async list<C>(type: string): Promise<IWarehouseReference<C>[]> {
+        const idList = await this.api.warehouseList(type).get()
+        return await Promise.all(idList.map(async id => {
+            const title = await this.api.warehouseTitle(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+            return {id, title}
+        }))
+    }
+
+    async setTitle(type: string, id: number, title: string): Promise<void> {
+        await this.api.warehouseTitle(type, id).set(title)
+    }
+
+    async setConfig<C>(type: string, id: number, config: C): Promise<void> {
+        await this.api.warehouseConfig(type, id).set(config)
+    }
+
+    async delete(type: string, id: number): Promise<void> {
+        const list = await this.api.warehouseList(type).get() ?? []
+        await this.api.warehouseList(type).set(list.filter(i => i !== id))
+        await this.api.warehouseTitle(type, id).delete()
+        await this.api.warehouseConfig(type, id).delete()
+    }
+
 }
 

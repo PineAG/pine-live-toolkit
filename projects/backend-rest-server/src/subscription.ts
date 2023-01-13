@@ -1,4 +1,4 @@
-import { ILiveToolkitClient, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionEvent } from "@pltk/protocol"
+import { ILiveToolkitClient, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionEvent } from "@pltk/protocol"
 import { createServer } from "http"
 import * as SocketIO from "socket.io"
 import { isEvent } from "./schema"
@@ -141,5 +141,41 @@ export class DataSubscriptionWrapper implements ILiveToolkitClient {
             parameters: {panelId, widgetId}
         })
     }
+
+    async getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+        return this.api.getWarehouseList(type)
+    }
+    async getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>> {
+        return this.api.getWarehouse(type, id)
+    }
+    async createWarehouse<C>(type: string, warehouse: INewWarehouse<C>): Promise<number> {
+        const id = await this.api.createWarehouse(type, warehouse)
+        this.notify({
+            type: "WarehouseList",
+            parameters: {warehouseType: type}
+        })
+        return id
+    }
+    async setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
+        await this.api.setWarehouseTitle(type, id, title)
+        this.notify({
+            type: "Warehouse",
+            parameters: {warehouseId: id, warehouseType: type}
+        })
+    }
+    async setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
+        await this.api.setWarehouseConfig(type, id, config)
+        this.notify({
+            type: "Warehouse",
+            parameters: {warehouseId: id, warehouseType: type}
+        })
+    }
     
+    async deleteWarehouse(type: string, id: number): Promise<void> {
+        await this.api.deleteWarehouse(type, id)
+        this.notify({
+            type: "WarehouseList",
+            parameters: {warehouseType: type}
+        })
+    }
 }

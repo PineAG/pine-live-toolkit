@@ -1,4 +1,4 @@
-import { IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size } from "./base";
+import { INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size } from "./base";
 import { SubscriptionEvent } from "./events";
 
 export type SubscriptionCallback = () => void
@@ -25,6 +25,13 @@ export interface ILiveToolkitClient {
     setWidgetMeta(panelId: number, widgetId: number, meta: IWidgetMeta): Promise<void>
     setWidgetRect(panelId: number, widgetId: number, rect: Rect): Promise<void>
     setWidgetConfig<Config>(panelId: number, widgetId: number, config: Config): Promise<void>
+
+    getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]>
+    getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>>
+    createWarehouse<C>(type: string, warehouse: INewWarehouse<C>): Promise<number>
+    setWarehouseTitle(type: string, id: number, title: string): Promise<void>
+    setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void>
+    deleteWarehouse(type: string, id: number): Promise<void>
 }
 
 export interface ILiveToolkitSubscription {

@@ -1,6 +1,6 @@
-import { SubscriptionEvent } from "@pltk/protocol";
+import { INewWarehouse, IWarehouse, IWarehouseReference, SubscriptionEvent } from "@pltk/protocol";
 import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
-import { APIWrapper, GlobalClient, PanelClient, PluginClient, SubscriptionWrapper } from "./api";
+import { APIWrapper, GlobalClient, PanelClient, PluginClient, SubscriptionWrapper, WarehouseClient } from "./api";
 import { IKVDataClientFactory, IKVFileClient, IKVSubscriptionFactory } from "./kv";
 
 export class KVDataClient implements ILiveToolkitClient {
@@ -78,6 +78,31 @@ export class KVDataClient implements ILiveToolkitClient {
         const client = new PluginClient(this.api, panelId, widgetId)
         await client.setConfig(config)
     }
+
+    async getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+        const client = new WarehouseClient(this.api)
+        return await client.list<C>(type)
+    }
+    async getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>> {
+        const client = new WarehouseClient(this.api)
+        return await client.get<C>(type, id)
+    }
+    async createWarehouse<C>(type: string, warehouse: INewWarehouse<C>): Promise<number> {
+        const client = new WarehouseClient(this.api)
+        return await client.create(type, warehouse)
+    }
+    async setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
+        const client = new WarehouseClient(this.api)
+        return await client.setTitle(type, id, title)
+    }
+    async setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
+        const client = new WarehouseClient(this.api)
+        return await client.setConfig<C>(type, id, config)
+    }
+    async deleteWarehouse(type: string, id: number): Promise<void> {
+        const client = new WarehouseClient(this.api)
+        await client.delete(type, id)
+    }
     
 }
 
@@ -109,6 +134,21 @@ export class KVSubscription implements ILiveToolkitSubscription {
         return this.subs.subscribePluginConfig(panelId, widgetId, callback)
     }
 
+    private subscribeWarehouseList(type: string, cb: SubscriptionCallback): IDisposable {
+        return this.subs.subscribeWarehouseList(type, cb)
+    }
+
+    private subscribeWarehouse(type: string, id: number, cb: SubscriptionCallback): IDisposable {
+        const title = this.subs.subscribeWarehouseTitle(type, id, cb)
+        const config = this.subs.subscribeWarehouseConfig(type, id, cb)
+        return {
+            close: () => {
+                title.close()
+                config.close()
+            }
+        }
+    }
+
     subscribe(evt: SubscriptionEvent, cb: SubscriptionCallback): IDisposable {
         if(evt.type === "PanelList") {
             return this.subscribePanels(cb)
@@ -120,6 +160,10 @@ export class KVSubscription implements ILiveToolkitSubscription {
             return this.subscribeWidgetRect(evt.parameters.panelId, evt.parameters.widgetId, cb)
         } else if(evt.type === "WidgetConfig") {
             return this.subscribeWidgetConfig(evt.parameters.panelId, evt.parameters.widgetId, cb)
+        } else if(evt.type === "WarehouseList") {
+            return this.subscribeWarehouseList(evt.parameters.warehouseType, cb)
+        } else if(evt.type === "Warehouse") {
+            return this.subscribeWarehouse(evt.parameters.warehouseType, evt.parameters.warehouseId, cb)
         } else {
             throw new Error("Unknown event: "+JSON.stringify(evt))
         }

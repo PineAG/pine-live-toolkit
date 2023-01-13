@@ -97,6 +97,47 @@
                 }
             },
             "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "warehouseType": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "WarehouseList"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "warehouseId": {
+                            "type": "number"
+                        },
+                        "warehouseType": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "Warehouse"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
         }
     ]
 }

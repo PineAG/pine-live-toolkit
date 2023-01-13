@@ -54,10 +54,16 @@ export class CacheStore {
     private stringifyEvent(evt: SubscriptionEvent): string {
         const parts: string[] = [evt.type]
         if("panelId" in evt.parameters) {
-            parts.push(`panel${evt.parameters.panelId}`)
+            parts.push(`panelId=${evt.parameters.panelId}`)
         }
         if("widgetId" in evt.parameters) {
-            parts.push(`widget${evt.parameters.widgetId}`)
+            parts.push(`widgetId=${evt.parameters.widgetId}`)
+        }
+        if("warehouseType" in evt.parameters){
+            parts.push(`warehouseType=${evt.parameters.warehouseType}`)
+        }
+        if("warehouseId" in evt.parameters){
+            parts.push(`warehouseId=${evt.parameters.warehouseId}`)
         }
         return parts.join("_")
     }

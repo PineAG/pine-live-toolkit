@@ -1,4 +1,4 @@
-import { IPanel, IPanelMeta, IWidget, IWidgetMeta, Rect, Size } from "@pltk/protocol"
+import { IPanel, IPanelMeta, IWarehouse, IWidget, IWidgetMeta, Rect, Size } from "@pltk/protocol"
 import path from "path"
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, DataSource} from "typeorm"
 import fs from "fs/promises"
@@ -36,6 +36,21 @@ export class Widget implements IWidget<any> {
     panel: Panel
 }
 
+@Entity()
+export class Warehouse implements IWarehouse<any> {
+    @Column()
+    id: number
+
+    @Column()
+    title: string
+
+    @Column()
+    type: string
+
+    @Column("simple-json")
+    config: any
+}
+
 
 export function connectDB(sqliteDir: string): DataSource {
     const dbPath = path.resolve(sqliteDir, "pltk.db")
@@ -43,7 +58,7 @@ export function connectDB(sqliteDir: string): DataSource {
         type: "sqlite",
         database: dbPath,
         entities: [
-            Panel, Widget
+            Panel, Widget, Warehouse
         ],
         synchronize: true
     })

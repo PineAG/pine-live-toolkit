@@ -3,7 +3,7 @@ import Router from "koa-router"
 import {koaBody} from "koa-body"
 
 import { error } from "./utils"
-import { isPanel, isPanelMeta, isRect, isSize, isWidget, isWidgetMeta } from "./schema"
+import { isNewWarehouse, isPanel, isPanelMeta, isRect, isSize, isTitle, isWidget, isWidgetMeta } from "./schema"
 import { ILiveToolkitClient } from "@pltk/protocol"
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
@@ -20,6 +20,15 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
 
     function parseWidgetId(ctx: Ctx): number {
         const s = ctx.params["widgetId"] ?? error("Missing widget ID")
+        return parseInt(s)
+    }
+
+    function parseWarehouseType(ctx: Ctx): string {
+        return ctx.params["warehouseType"] ?? error("Missing warehouse type")
+    }
+
+    function parseWarehouseId(ctx: Ctx): number {
+        const s = ctx.params["warehouseId"] ?? error("Missing warehouse ID")
         return parseInt(s)
     }
 
@@ -175,6 +184,65 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
         await api.deleteWidget(panelId, widgetId)
         ctx.body = "true"
     })
+
+    // getWarehouse
+    router.get("/warehouses/:warehouseType", async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const result = await api.getWarehouseList(warehouseType)
+        ctx.body = JSON.stringify(result)
+    })
+
+    // getWarehouseList
+    router.get("/warehouse/:warehouseType/:warehouseId", async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const warehouseId = parseWarehouseId(ctx)
+        const result = await api.getWarehouse(warehouseType, warehouseId)
+        ctx.body = JSON.stringify(result)
+    })
+
+    // createWarehouse
+    router.post("/warehouse/:warehouseType", koaBody(), async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const item = ctx.request.body
+        if(isNewWarehouse(item)) {
+            const result = await api.createWarehouse(warehouseType, item)
+            ctx.body = JSON.stringify(result)
+        } else {
+            invalidBody(ctx)
+        }
+
+    })
+
+    // setWarehouseTitle
+    router.put("/warehouse/:warehouseType/:warehouseId/title", koaBody(), async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const warehouseId = parseWarehouseId(ctx)
+        const item = ctx.request.body
+        if(isTitle(item)) {
+            await api.setWarehouseTitle(warehouseType, warehouseId, item)
+            ctx.body = "true"
+        } else {
+            invalidBody(ctx)
+        }
+    })
+
+    // setWarehouseConfig
+    router.put("/warehouse/:warehouseType/:warehouseId/config", koaBody(), async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const warehouseId = parseWarehouseId(ctx)
+        const item = ctx.request.body
+        await api.setWarehouseTitle(warehouseType, warehouseId, item)
+        ctx.body = "true"
+    })
+
+    // deleteWarehouse
+    router.del("/warehouse/:warehouseType/:warehouseId", async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const warehouseId = parseWarehouseId(ctx)
+        await api.deleteWarehouse(warehouseType, warehouseId)
+        ctx.body = "true"
+    })
+
 
     app.use(router.routes()).use(router.allowedMethods())
 }

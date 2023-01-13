@@ -1,8 +1,7 @@
 import {io, Socket} from "socket.io-client"
-import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionCallback, SubscriptionEvent} from "@pltk/protocol"
+import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionCallback, SubscriptionEvent} from "@pltk/protocol"
 
 export class RestClient implements ILiveToolkitClient {
-    
     private path(parts: (string|number)[]): string {
         const cleanParts = parts.map(p => {
             if(typeof p === "number") {
@@ -98,7 +97,25 @@ export class RestClient implements ILiveToolkitClient {
     setWidgetConfig<Config>(panelId: number, widgetId: number, config: Config): Promise<void> {
         return this.put(["panel", panelId, "widget", widgetId, "config"], config)
     }
-    
+
+    getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+        return this.get(["warehouses", type])
+    }
+    getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>> {
+        return this.get(["warehouse", type, id])
+    }
+    createWarehouse<C>(type: string, warehouse: INewWarehouse<C>): Promise<number> {
+        return this.post(["warehouses", type], warehouse)
+    }
+    setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
+        return this.put(["warehouse", type, id, "title"], title)
+    }
+    setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
+        return this.put(["warehouse", type, id, "config"], config)
+    }
+    deleteWarehouse(type: string, id: number): Promise<void> {
+        return this.del(["warehouse", type, id])
+    }
 }
 
 export class RestSubscription implements ILiveToolkitSubscription {
@@ -122,10 +139,16 @@ export class RestSubscription implements ILiveToolkitSubscription {
     private stringifyEvent(evt: SubscriptionEvent): string {
         const parts: string[] = [evt.type]
         if("panelId" in evt.parameters) {
-            parts.push(`panel${evt.parameters.panelId}`)
+            parts.push(`panelId=${evt.parameters.panelId}`)
         }
         if("widgetId" in evt.parameters) {
-            parts.push(`widget${evt.parameters.widgetId}`)
+            parts.push(`widgetId=${evt.parameters.widgetId}`)
+        }
+        if("warehouseType" in evt.parameters){
+            parts.push(`warehouseType=${evt.parameters.warehouseType}`)
+        }
+        if("warehouseId" in evt.parameters){
+            parts.push(`warehouseId=${evt.parameters.warehouseId}`)
         }
         return parts.join("_")
     }

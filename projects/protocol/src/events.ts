@@ -1,4 +1,4 @@
-import { IPanel, IPanelReference, IWidgetReference, Rect } from "./base"
+import { IPanel, IPanelReference, IWarehouse, IWarehouseReference, IWidgetReference, Rect } from "./base"
 
 type SubscriptionEventsDefinition = {
     PanelList: {
@@ -20,6 +20,14 @@ type SubscriptionEventsDefinition = {
     WidgetConfig: {
         args: {panelId: number, widgetId: number}
         returns: any
+    },
+    WarehouseList: {
+        args: {warehouseType: string},
+        returns: IWarehouseReference<any>[]
+    },
+    Warehouse: {
+        args: {warehouseType: string, warehouseId: number},
+        returns: IWarehouse<any>
     }
 }
 

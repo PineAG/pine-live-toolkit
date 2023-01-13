@@ -1,4 +1,4 @@
-import {ILiveToolkitClient, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size} from "@pltk/protocol"
+import {ILiveToolkitClient, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size} from "@pltk/protocol"
 import {DataSource} from "typeorm"
 import * as models from "./models";
 
@@ -11,6 +11,10 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
 
     private get widgets() {
         return this.dataSource.getRepository(models.Widget)
+    }
+
+    private get warehouses(){
+        return this.dataSource.getRepository(models.Warehouse)
     }
 
     async getPanels(): Promise<IPanelReference[]> {
@@ -104,5 +108,39 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
         const item = await this.widgets.findOne({where: {id: widgetId}})
         item.config = config
         await this.widgets.save(item)
+    }
+    
+    async getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+        const items = await this.warehouses.find({where: [{type}], select: ["id", "title"]})
+        return items.map(it => ({
+            id: it.id,
+            title: it.title
+        }))
+    }
+    async getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>> {
+        const item = await this.warehouses.findOne({where: [{type, id}], select: ["id", "title", "config"]})
+        return {
+            id,
+            type,
+            title: item.title,
+            config: item.config
+        }
+    }
+    async createWarehouse<C>(type: string, {title, config}: INewWarehouse<C>): Promise<number> {
+        const result = await this.warehouses.insert([{type, title, config: config as any}])
+        return result.identifiers[0].id
+    }
+    async setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
+        const item = await this.warehouses.findOne({where: [{type, id}]})
+        item.title = title
+        await this.warehouses.save(item)
+    }
+    async setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
+        const item = await this.warehouses.findOne({where: [{type, id}]})
+        item.config = config
+        await this.warehouses.save(item)
+    }
+    async deleteWarehouse(type: string, id: number): Promise<void> {
+        await this.warehouses.delete({type, id})
     }
 }
