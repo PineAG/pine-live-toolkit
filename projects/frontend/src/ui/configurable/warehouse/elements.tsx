@@ -1,5 +1,6 @@
-import { ActionButton, BasicEmpty, CardWithActions, DBinding, Divider, Flex, FormItem, HStack, LiteDangerButton, propertyBinding, QuickConfirm, Select, SimpleCard, StringField, Tooltip, useLocalDBinding, useTemporaryBinding } from "@pltk/components";
+import { ActionButton, BasicEmpty, CardWithActions, DBinding, Divider, Flex, FormItem, HStack, LiteDangerButton, Loading, propertyBinding, QuickConfirm, Select, SimpleCard, StringField, Tooltip, useLocalDBinding, useTemporaryBinding } from "@pltk/components";
 import { IWarehouseMeta } from "@pltk/protocol";
+import { useEffect, useState } from "react";
 import { useLiveToolkitClient, useWarehouseConfigBinding, useWarehouseList, useWarehouseMetaBinding } from "../../backend";
 import { createNullableContext, useNullableContext } from "../../backend/hooks/utils";
 import { unwrapAsyncBinding, unwrapAsyncSubs, useAsyncTemporaryBinding } from "../../components/subs";
@@ -15,6 +16,25 @@ const WarehouseDefinitionContext = createNullableContext<WarehouseObject<any>>("
 const WarehouseIdBindingContext = createNullableContext<DBinding<null | number>>("Warehouse* components are only available within a WarehouseProvider")
 
 export function WarehouseProvider<C>(props: WarehouseProviderProps<C>) {
+    const warehouseListReq = useWarehouseList(props.warehouse.type)
+    const [valid, setValid] = useState<null | boolean>(null)
+    useEffect(() => {
+        if(warehouseListReq.status === "success") {
+            const list = warehouseListReq.value
+            const id = props.binding.value
+            const isValid = id === null || list.some(it => it.id === id)
+            setValid(isValid)
+            if(!isValid) {
+                props.binding.update(null)
+            }
+        }
+        return () => setValid(null)
+    }, [warehouseListReq.status === "success" ? warehouseListReq.value : undefined, props.binding.value])
+    if(valid === null) {
+        return <Loading/>
+    } else if(!valid) {
+        return <></>
+    }
     return <WarehouseDefinitionContext.Provider value={props.warehouse}>
         <WarehouseIdBindingContext.Provider value={props.binding}>
             {props.children}
