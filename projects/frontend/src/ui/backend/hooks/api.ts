@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react"
-import { IDisposable, IPanel, IPanelReference, IWidgetReference, Rect } from "@pltk/protocol";
+import { IDisposable, IPanel, IPanelReference, IWarehouseMeta, IWarehouseReference, IWidgetReference, Rect } from "@pltk/protocol";
 import { useAPISubscriptionCache, useLiveToolkitClient as useClient, usePanelId, useWidgetId } from "./base";
 import { CacheStore } from "./cache";
 import { AsyncBindingResult, AsyncSubscriptionResult } from "./subs";
@@ -56,4 +56,20 @@ export function useWidgetConfigBinding<Config>(): AsyncBindingResult<Config> {
     const client = useClient()
     const result = useSubsCacheResult<Config>([panelId, widgetId], (c, cb) => c.subscribeWidgetConfig(panelId, widgetId, cb))
     return resultToBinding<Config>(result, value => client.setWidgetConfig(panelId, widgetId, value))
+}
+
+export function useWarehouseList(warehouseType: string): AsyncSubscriptionResult<IWarehouseReference[]> {
+    return useSubsCacheResult<IWarehouseReference[]>([warehouseType], (c, cb) => c.subscribeWarehouseList(warehouseType, cb))
+}
+
+export function useWarehouseMetaBinding(warehouseType: string, warehouseId: number): AsyncBindingResult<IWarehouseMeta> {
+    const client = useClient()
+    const result = useSubsCacheResult<IWarehouseMeta>([warehouseType, warehouseId], (c, cb) => c.subscribeWarehouseMeta(warehouseType, warehouseId, cb))
+    return resultToBinding<IWarehouseMeta>(result, value => client.setWarehouseMeta(warehouseType, warehouseId, value))
+}
+
+export function useWarehouseConfigBinding<C>(warehouseType: string, warehouseId: number): AsyncBindingResult<C> {
+    const client = useClient()
+    const result = useSubsCacheResult<C>([warehouseType, warehouseId], (c, cb) => c.subscribeWarehouseConfig<C>(warehouseType, warehouseId, cb))
+    return resultToBinding<C>(result, value => client.setWarehouseConfig<C>(warehouseType, warehouseId, value))
 }

@@ -132,7 +132,29 @@
                 },
                 "type": {
                     "enum": [
-                        "Warehouse"
+                        "WarehouseMeta"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "parameters": {
+                    "properties": {
+                        "warehouseId": {
+                            "type": "number"
+                        },
+                        "warehouseType": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "WarehouseConfig"
                     ],
                     "type": "string"
                 }

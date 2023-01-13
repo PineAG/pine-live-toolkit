@@ -23,7 +23,7 @@ function execCommand(command, args, cwd) {
 exports.generateSchema = async function() {
     const schemaRoot = path.resolve(".", "src", "schema")
     const typeFile = path.resolve(schemaRoot, "types.ts")
-    const types = ["IDType", "PanelType", "WidgetType", "RectType", "WidgetMetaType", "SizeType", "PanelMetaType", "EventType", "NewWarehouseType", "TitleType"]
+    const types = ["IDType", "PanelType", "WidgetType", "RectType", "WidgetMetaType", "SizeType", "PanelMetaType", "EventType", "NewWarehouseType", "WarehouseMetaType"]
     for(const t of types) {
         const outFile = path.resolve(schemaRoot, `${t}.json`)
         await execCommand("npx", ["typescript-json-schema", typeFile, t, "-o", outFile], ".")

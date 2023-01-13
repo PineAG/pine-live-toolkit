@@ -8,9 +8,9 @@ import widgetMetaSchemaConfig from "./WidgetMetaType.json"
 import sizeSchema from "./SizeType.json"
 import panelMetaSchema from "./PanelMetaType.json"
 import eventSchema from "./EventType.json"
-import titleSchema from "./TitleType.json"
+import warehouseMetaSchema from "./WarehouseMetaType.json"
 import newWarehouseSchema from "./NewWarehouseType.json"
-import { IDType, PanelType, RectType, WidgetMetaType, WidgetType, SizeType, PanelMetaType, EventType, NewWarehouseType, TitleType } from "./types"
+import { IDType, PanelType, RectType, WidgetMetaType, WidgetType, SizeType, PanelMetaType, EventType, NewWarehouseType, WarehouseMetaType } from "./types"
 
 const ajv = new Ajv()
 
@@ -55,9 +55,9 @@ export function isEvent(obj: any): obj is EventType {
     return validateEvent(obj)
 }
 
-const validateTitle = ajv.compile(titleSchema)
-export function isTitle(obj: any): obj is TitleType {
-    return validateTitle(obj)
+const validateWarehouseMeta = ajv.compile(warehouseMetaSchema)
+export function isWarehouseMeta(obj: any): obj is WarehouseMetaType {
+    return validateWarehouseMeta(obj)
 }
 
 const validateNewWarehouse = ajv.compile(newWarehouseSchema)

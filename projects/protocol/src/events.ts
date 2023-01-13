@@ -23,11 +23,15 @@ type SubscriptionEventsDefinition = {
     },
     WarehouseList: {
         args: {warehouseType: string},
-        returns: IWarehouseReference<any>[]
+        returns: IWarehouseReference[]
     },
-    Warehouse: {
+    WarehouseMeta: {
         args: {warehouseType: string, warehouseId: number},
-        returns: IWarehouse<any>
+        returns: string
+    },
+    WarehouseConfig: {
+        args: {warehouseType: string, warehouseId: number},
+        returns: any
     }
 }
 

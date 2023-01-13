@@ -1,4 +1,4 @@
-import { ILiveToolkitClient, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionEvent } from "@pltk/protocol"
+import { ILiveToolkitClient, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseMeta, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionEvent } from "@pltk/protocol"
 import { createServer } from "http"
 import * as SocketIO from "socket.io"
 import { isEvent } from "./schema"
@@ -142,7 +142,7 @@ export class DataSubscriptionWrapper implements ILiveToolkitClient {
         })
     }
 
-    async getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+    async getWarehouseList<C>(type: string): Promise<IWarehouseReference[]> {
         return this.api.getWarehouseList(type)
     }
     async getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>> {
@@ -156,17 +156,23 @@ export class DataSubscriptionWrapper implements ILiveToolkitClient {
         })
         return id
     }
-    async setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
-        await this.api.setWarehouseTitle(type, id, title)
+    async getWarehouseMeta(type: string, id: number): Promise<IWarehouseMeta> {
+        return await this.api.getWarehouseMeta(type, id)
+    }
+    async getWarehouseConfig<C>(type: string, id: number): Promise<C> {
+        return await this.api.getWarehouseConfig<C>(type, id)
+    }
+    async setWarehouseMeta(type: string, id: number, meta: IWarehouseMeta): Promise<void> {
+        await this.api.setWarehouseMeta(type, id, meta)
         this.notify({
-            type: "Warehouse",
+            type: "WarehouseMeta",
             parameters: {warehouseId: id, warehouseType: type}
         })
     }
     async setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
         await this.api.setWarehouseConfig(type, id, config)
         this.notify({
-            type: "Warehouse",
+            type: "WarehouseConfig",
             parameters: {warehouseId: id, warehouseType: type}
         })
     }

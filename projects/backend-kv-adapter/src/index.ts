@@ -1,4 +1,4 @@
-import { INewWarehouse, IWarehouse, IWarehouseReference, SubscriptionEvent } from "@pltk/protocol";
+import { INewWarehouse, IWarehouse, IWarehouseMeta, IWarehouseReference, SubscriptionEvent } from "@pltk/protocol";
 import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IPanel, IPanelMeta, IPanelReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionCallback} from "@pltk/protocol"
 import { APIWrapper, GlobalClient, PanelClient, PluginClient, SubscriptionWrapper, WarehouseClient } from "./api";
 import { IKVDataClientFactory, IKVFileClient, IKVSubscriptionFactory } from "./kv";
@@ -79,7 +79,7 @@ export class KVDataClient implements ILiveToolkitClient {
         await client.setConfig(config)
     }
 
-    async getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+    async getWarehouseList<C>(type: string): Promise<IWarehouseReference[]> {
         const client = new WarehouseClient(this.api)
         return await client.list<C>(type)
     }
@@ -91,9 +91,17 @@ export class KVDataClient implements ILiveToolkitClient {
         const client = new WarehouseClient(this.api)
         return await client.create(type, warehouse)
     }
-    async setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
+    async getWarehouseMeta(type: string, id: number): Promise<IWarehouseMeta> {
         const client = new WarehouseClient(this.api)
-        return await client.setTitle(type, id, title)
+        return await client.getMeta(type, id)
+    }
+    async getWarehouseConfig<C>(type: string, id: number): Promise<C> {
+        const client = new WarehouseClient(this.api)
+        return await client.getConfig(type, id)
+    }
+    async setWarehouseMeta(type: string, id: number, meta: IWarehouseMeta): Promise<void> {
+        const client = new WarehouseClient(this.api)
+        return await client.setMeta(type, id, meta)
     }
     async setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
         const client = new WarehouseClient(this.api)
@@ -138,15 +146,12 @@ export class KVSubscription implements ILiveToolkitSubscription {
         return this.subs.subscribeWarehouseList(type, cb)
     }
 
-    private subscribeWarehouse(type: string, id: number, cb: SubscriptionCallback): IDisposable {
-        const title = this.subs.subscribeWarehouseTitle(type, id, cb)
-        const config = this.subs.subscribeWarehouseConfig(type, id, cb)
-        return {
-            close: () => {
-                title.close()
-                config.close()
-            }
-        }
+    private subscribeWarehouseMeta(type: string, id: number, cb: SubscriptionCallback): IDisposable {
+        return this.subs.subscribeWarehouseMeta(type, id, cb)
+    }
+
+    private subscribeWarehouseConfig(type: string, id: number, cb: SubscriptionCallback): IDisposable {
+        return this.subs.subscribeWarehouseConfig(type, id, cb)
     }
 
     subscribe(evt: SubscriptionEvent, cb: SubscriptionCallback): IDisposable {
@@ -162,8 +167,10 @@ export class KVSubscription implements ILiveToolkitSubscription {
             return this.subscribeWidgetConfig(evt.parameters.panelId, evt.parameters.widgetId, cb)
         } else if(evt.type === "WarehouseList") {
             return this.subscribeWarehouseList(evt.parameters.warehouseType, cb)
-        } else if(evt.type === "Warehouse") {
-            return this.subscribeWarehouse(evt.parameters.warehouseType, evt.parameters.warehouseId, cb)
+        } else if(evt.type === "WarehouseMeta") {
+            return this.subscribeWarehouseMeta(evt.parameters.warehouseType, evt.parameters.warehouseId, cb)
+        } else if(evt.type === "WarehouseConfig") {
+            return this.subscribeWarehouseConfig(evt.parameters.warehouseType, evt.parameters.warehouseId, cb)
         } else {
             throw new Error("Unknown event: "+JSON.stringify(evt))
         }

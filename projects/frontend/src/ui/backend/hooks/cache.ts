@@ -1,4 +1,4 @@
-import { IDisposable, ILiveToolkitClient, ILiveToolkitSubscription, IPanel, IPanelReference, IWidgetReference, Rect, SubscriptionEvent } from "@pltk/protocol";
+import { IDisposable, ILiveToolkitClient, ILiveToolkitSubscription, IPanel, IPanelReference, IWarehouseMeta, IWarehouseReference, IWidgetReference, Rect, SubscriptionEvent } from "@pltk/protocol";
 
 export class CacheStore {
     constructor(private client: ILiveToolkitClient, private subs: ILiveToolkitSubscription) {}
@@ -102,5 +102,28 @@ export class CacheStore {
             () => this.client.getWidgetConfig<C>(panelId, widgetId), 
             cb)
     }
-    
+
+    subscribeWarehouseList(type: string, cb: (config: IWarehouseReference[]) => void): IDisposable {
+        return this.registerCallback(
+            {type: "WarehouseList", parameters: {warehouseType: type}},
+            () => this.client.getWarehouseList(type),
+            cb
+        )
+    }
+
+    subscribeWarehouseMeta(type: string, id: number, cb: (meta: IWarehouseMeta) => void): IDisposable {
+        return this.registerCallback(
+            {type: "WarehouseMeta", parameters: {warehouseType: type, warehouseId: id}},
+            () => this.client.getWarehouseMeta(type, id),
+            cb
+        )
+    }
+
+    subscribeWarehouseConfig<C>(type: string, id: number, cb: (config: C) => void): IDisposable {
+        return this.registerCallback(
+            {type: "WarehouseConfig", parameters: {warehouseType: type, warehouseId: id}},
+            () => this.client.getWarehouseConfig<C>(type, id),
+            cb
+        )
+    }
 }

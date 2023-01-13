@@ -1,5 +1,5 @@
 import {io, Socket} from "socket.io-client"
-import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionCallback, SubscriptionEvent} from "@pltk/protocol"
+import {IDisposable, ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, INewWarehouse, IPanel, IPanelMeta, IPanelReference, IWarehouse, IWarehouseMeta, IWarehouseReference, IWidget, IWidgetMeta, IWidgetReference, Rect, Size, SubscriptionActionType, SubscriptionCallback, SubscriptionEvent} from "@pltk/protocol"
 
 export class RestClient implements ILiveToolkitClient {
     private path(parts: (string|number)[]): string {
@@ -98,7 +98,7 @@ export class RestClient implements ILiveToolkitClient {
         return this.put(["panel", panelId, "widget", widgetId, "config"], config)
     }
 
-    getWarehouseList<C>(type: string): Promise<IWarehouseReference<C>[]> {
+    getWarehouseList<C>(type: string): Promise<IWarehouseReference[]> {
         return this.get(["warehouses", type])
     }
     getWarehouse<C>(type: string, id: number): Promise<IWarehouse<C>> {
@@ -107,8 +107,14 @@ export class RestClient implements ILiveToolkitClient {
     createWarehouse<C>(type: string, warehouse: INewWarehouse<C>): Promise<number> {
         return this.post(["warehouses", type], warehouse)
     }
-    setWarehouseTitle(type: string, id: number, title: string): Promise<void> {
-        return this.put(["warehouse", type, id, "title"], title)
+    getWarehouseMeta(type: string, id: number): Promise<IWarehouseMeta> {
+        return this.get(["warehouse", type, id, "meta"])
+    }
+    getWarehouseConfig<C>(type: string, id: number): Promise<C> {
+        return this.get(["warehouse", type, id, "config"])
+    }
+    setWarehouseMeta(type: string, id: number, meta: IWarehouseMeta): Promise<void> {
+        return this.put(["warehouse", type, id, "meta"], meta)
     }
     setWarehouseConfig<C>(type: string, id: number, config: C): Promise<void> {
         return this.put(["warehouse", type, id, "config"], config)

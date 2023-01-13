@@ -1,4 +1,4 @@
-import { IPanelMeta, Size, Rect, IWidgetMeta, IPanelReference, IDisposable, SubscriptionCallback, INewWarehouse, IWarehouse, IWarehouseReference } from "@pltk/protocol"
+import { IPanelMeta, Size, Rect, IWidgetMeta, IPanelReference, IDisposable, SubscriptionCallback, INewWarehouse, IWarehouse, IWarehouseReference, IWarehouseMeta } from "@pltk/protocol"
 import { IKVDataClient, IKVSubscriptionFactory } from "./kv"
 import { error } from "./utils"
 
@@ -47,7 +47,7 @@ export class KVPathBuilder {
         return `/warehouses/${type}/enabled`
     }
 
-    warehouseTitle(type: string, id: number): string {
+    warehouseMeta(type: string, id: number): string {
         return `/warehouse/${type}/${id}/title`
     }
 
@@ -107,8 +107,8 @@ export class APIWrapper {
         return this.clientFactory(this.paths.warehouseList(type))
     }
 
-    warehouseTitle(type: string, id: number): IKVDataClient<string> {
-        return this.clientFactory(this.paths.warehouseTitle(type, id))
+    warehouseMeta(type: string, id: number): IKVDataClient<IWarehouseMeta> {
+        return this.clientFactory(this.paths.warehouseMeta(type, id))
     }
     
     warehouseConfig<C>(type: string, id: number): IKVDataClient<C> {
@@ -151,8 +151,8 @@ export class SubscriptionWrapper {
         return this.factory(this.paths.warehouseList(type)).subscribe(cb)
     }
 
-    subscribeWarehouseTitle(type: string, id: number, cb: SubscriptionCallback): IDisposable {
-        return this.factory(this.paths.warehouseTitle(type, id)).subscribe(cb)
+    subscribeWarehouseMeta(type: string, id: number, cb: SubscriptionCallback): IDisposable {
+        return this.factory(this.paths.warehouseMeta(type, id)).subscribe(cb)
     }
 
     subscribeWarehouseConfig(type: string, id: number, cb: SubscriptionCallback): IDisposable {
@@ -296,7 +296,7 @@ export class WarehouseClient {
             ...warehouse
         }
         const list = await this.api.warehouseList(type).get() ?? []
-        await this.api.warehouseTitle(type, id).set(warehouse.title)
+        await this.api.warehouseMeta(type, id).set(warehouse.meta)
         await this.api.warehouseConfig(type, id).set(warehouse.config)
         list.push(id)
         await this.api.warehouseCounter(type).set(id + 1)
@@ -305,21 +305,29 @@ export class WarehouseClient {
     }
 
     async get<C>(type: string, id: number): Promise<IWarehouse<C>> {
-        const title = await this.api.warehouseTitle(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+        const meta = await this.api.warehouseMeta(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
         const config = await this.api.warehouseConfig<C>(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
-        return {id, type, title, config}
+        return {id, type, meta, config}
     }
 
-    async list<C>(type: string): Promise<IWarehouseReference<C>[]> {
+    async list<C>(type: string): Promise<IWarehouseReference[]> {
         const idList = await this.api.warehouseList(type).get()
         return await Promise.all(idList.map(async id => {
-            const title = await this.api.warehouseTitle(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
-            return {id, title}
+            const meta = await this.api.warehouseMeta(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+            return {id, meta}
         }))
     }
 
-    async setTitle(type: string, id: number, title: string): Promise<void> {
-        await this.api.warehouseTitle(type, id).set(title)
+    async getMeta(type: string, id: number): Promise<IWarehouseMeta> {
+        return this.api.warehouseMeta(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+    }
+
+    async getConfig<C>(type: string, id: number): Promise<C> {
+        return this.api.warehouseConfig<C>(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
+    }
+
+    async setMeta(type: string, id: number, meta: IWarehouseMeta): Promise<void> {
+        await this.api.warehouseMeta(type, id).set(meta)
     }
 
     async setConfig<C>(type: string, id: number, config: C): Promise<void> {
@@ -329,7 +337,7 @@ export class WarehouseClient {
     async delete(type: string, id: number): Promise<void> {
         const list = await this.api.warehouseList(type).get() ?? []
         await this.api.warehouseList(type).set(list.filter(i => i !== id))
-        await this.api.warehouseTitle(type, id).delete()
+        await this.api.warehouseMeta(type, id).delete()
         await this.api.warehouseConfig(type, id).delete()
     }
 

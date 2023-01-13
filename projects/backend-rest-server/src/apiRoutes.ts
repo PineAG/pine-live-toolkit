@@ -3,7 +3,7 @@ import Router from "koa-router"
 import {koaBody} from "koa-body"
 
 import { error } from "./utils"
-import { isNewWarehouse, isPanel, isPanelMeta, isRect, isSize, isTitle, isWidget, isWidgetMeta } from "./schema"
+import { isNewWarehouse, isPanel, isPanelMeta, isRect, isSize, isWarehouseMeta, isWidget, isWidgetMeta } from "./schema"
 import { ILiveToolkitClient } from "@pltk/protocol"
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
@@ -213,13 +213,29 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
 
     })
 
-    // setWarehouseTitle
-    router.put("/warehouse/:warehouseType/:warehouseId/title", koaBody(), async (ctx, next) => {
+    // getWarehouseMeta
+    router.get("/warehouse/:warehouseType/:warehouseId/meta", koaBody(), async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const warehouseId = parseWarehouseId(ctx)
+        const result = api.getWarehouseMeta(warehouseType, warehouseId)
+        ctx.body = JSON.stringify(result)
+    })
+
+    // getWarehouseConfig
+    router.get("/warehouse/:warehouseType/:warehouseId/config", koaBody(), async (ctx, next) => {
+        const warehouseType = parseWarehouseType(ctx)
+        const warehouseId = parseWarehouseId(ctx)
+        const result = await api.getWarehouseConfig(warehouseType, warehouseId)
+        ctx.body = JSON.stringify(result)
+    })
+
+    // setWarehouseMeta
+    router.put("/warehouse/:warehouseType/:warehouseId/meta", koaBody(), async (ctx, next) => {
         const warehouseType = parseWarehouseType(ctx)
         const warehouseId = parseWarehouseId(ctx)
         const item = ctx.request.body
-        if(isTitle(item)) {
-            await api.setWarehouseTitle(warehouseType, warehouseId, item)
+        if(isWarehouseMeta(item)) {
+            await api.setWarehouseMeta(warehouseType, warehouseId, item)
             ctx.body = "true"
         } else {
             invalidBody(ctx)
@@ -231,7 +247,7 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
         const warehouseType = parseWarehouseType(ctx)
         const warehouseId = parseWarehouseId(ctx)
         const item = ctx.request.body
-        await api.setWarehouseTitle(warehouseType, warehouseId, item)
+        await api.setWarehouseConfig(warehouseType, warehouseId, item)
         ctx.body = "true"
     })
 

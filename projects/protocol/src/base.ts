@@ -39,17 +39,21 @@ export interface IWidgetReference {
 
 export interface IWarehouse<Config> {
     id: number
-    title: string
+    meta: IWarehouseMeta
     type: string
     config: Config
 }
 
-export interface IWarehouseReference<Config> {
-    id: number
+export interface IWarehouseMeta {
     title: string
 }
 
+export interface IWarehouseReference {
+    id: number
+    meta: IWarehouseMeta
+}
+
 export interface INewWarehouse<C>{
-    title: string
+    meta: IWarehouseMeta
     config: C
 }

@@ -1,4 +1,4 @@
-import { IPanel, IPanelMeta, IWarehouse, IWidget, IWidgetMeta, Rect, Size } from "@pltk/protocol"
+import { IPanel, IPanelMeta, IWarehouse, IWarehouseMeta, IWidget, IWidgetMeta, Rect, Size } from "@pltk/protocol"
 import path from "path"
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, DataSource} from "typeorm"
 import fs from "fs/promises"
@@ -41,8 +41,8 @@ export class Warehouse implements IWarehouse<any> {
     @Column()
     id: number
 
-    @Column()
-    title: string
+    @Column("simple-json")
+    meta: IWarehouseMeta
 
     @Column()
     type: string
