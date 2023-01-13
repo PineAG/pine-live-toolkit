@@ -4,11 +4,11 @@ import {koaBody} from "koa-body"
 
 import { error } from "./utils"
 import { isNewWarehouse, isPanel, isPanelMeta, isRect, isSize, isWarehouseMeta, isWidget, isWidgetMeta } from "./schema"
-import { ILiveToolkitClient } from "@pltk/protocol"
+import { DataSubscriptionWrapper } from "./subscription"
 
 type Ctx = Koa.ParameterizedContext<any, Router.IRouterParamContext<any, any>, any>
 
-export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
+export function initializeAPIRouter(app: Koa, api: DataSubscriptionWrapper) {
     const router = new Router({
         prefix: "/api/data"
     })
@@ -30,6 +30,16 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
     function parseWarehouseId(ctx: Ctx): number {
         const s = ctx.params["warehouseId"] ?? error("Missing warehouse ID")
         return parseInt(s)
+    }
+
+    async function handleError(ctx: Ctx, next: Koa.Next) {
+        try {
+            await next()
+        }catch(e) {
+            ctx.status = 500
+            ctx.body = e.toString()
+            console.warn(e)
+        }
     }
 
     function invalidBody(ctx: Ctx) {
@@ -201,7 +211,7 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
     })
 
     // createWarehouse
-    router.post("/warehouse/:warehouseType", koaBody(), async (ctx, next) => {
+    router.post("/warehouses/:warehouseType", koaBody(), async (ctx, next) => {
         const warehouseType = parseWarehouseType(ctx)
         const item = ctx.request.body
         if(isNewWarehouse(item)) {
@@ -217,7 +227,7 @@ export function initializeAPIRouter(app: Koa, api: ILiveToolkitClient) {
     router.get("/warehouse/:warehouseType/:warehouseId/meta", koaBody(), async (ctx, next) => {
         const warehouseType = parseWarehouseType(ctx)
         const warehouseId = parseWarehouseId(ctx)
-        const result = api.getWarehouseMeta(warehouseType, warehouseId)
+        const result = await api.getWarehouseMeta(warehouseType, warehouseId)
         ctx.body = JSON.stringify(result)
     })
 

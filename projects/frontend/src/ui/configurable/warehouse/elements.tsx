@@ -12,10 +12,14 @@ export interface WarehouseProviderProps<C> {
     children: any
 }
 
+type AfterNextValidationCallback = () => void
+
+const WarehouseAfterNextValidationCallbackContext = createNullableContext<AfterNextValidationCallback[]>("Warehouse internal context")
 const WarehouseDefinitionContext = createNullableContext<WarehouseObject<any>>("Warehouse* components are only available within a WarehouseProvider")
 const WarehouseIdBindingContext = createNullableContext<DBinding<null | number>>("Warehouse* components are only available within a WarehouseProvider")
 
 export function WarehouseProvider<C>(props: WarehouseProviderProps<C>) {
+    const [nextValidCB, setNextValidCB] = useState<AfterNextValidationCallback[]>([])
     const warehouseListReq = useWarehouseList(props.warehouse.type)
     const [valid, setValid] = useState<null | boolean>(null)
     useEffect(() => {
@@ -27,6 +31,10 @@ export function WarehouseProvider<C>(props: WarehouseProviderProps<C>) {
             if(!isValid) {
                 props.binding.update(null)
             }
+            for(const cb of nextValidCB){
+                cb()
+            }
+            setNextValidCB([])
         }
         return () => setValid(null)
     }, [warehouseListReq.status === "success" ? warehouseListReq.value : undefined, props.binding.value])
@@ -37,7 +45,9 @@ export function WarehouseProvider<C>(props: WarehouseProviderProps<C>) {
     }
     return <WarehouseDefinitionContext.Provider value={props.warehouse}>
         <WarehouseIdBindingContext.Provider value={props.binding}>
-            {props.children}
+            <WarehouseAfterNextValidationCallbackContext.Provider value={nextValidCB}>
+                {props.children}
+            </WarehouseAfterNextValidationCallbackContext.Provider>
         </WarehouseIdBindingContext.Provider>
     </WarehouseDefinitionContext.Provider>
 }
@@ -144,17 +154,21 @@ function CreateWarehouse() {
     const configBinding = useLocalDBinding(warehouseDef.initialize.defaultConfig())
     const metaBinding = useLocalDBinding<IWarehouseMeta>({title: ""})
     const titleBinding = propertyBinding(metaBinding, "title")
+    const nextValidCallbacks = useNullableContext(WarehouseAfterNextValidationCallbackContext)
     async function createWarehouse() {
         if(titleBinding.value === "") {
             return
         }
-        const id = await client.createWarehouse(warehouseDef.type, {
+        let id: null | number = null
+        nextValidCallbacks.push(() => {
+            warehouseIdBinding.update(id)
+        })
+        id = await client.createWarehouse(warehouseDef.type, {
             meta: {
                 title: titleBinding.value
             },
             config: configBinding.value
         })
-        await warehouseIdBinding.update(id)
     }
     return <CardWithActions
             title={`创建 ${warehouseDef.title}`}
