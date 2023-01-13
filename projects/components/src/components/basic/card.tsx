@@ -1,4 +1,4 @@
-import { Card as AntdCard } from "antd"
+import { Card as AntdCard, Divider as AntdDivider } from "antd"
 import { CSSProperties } from "react"
 
 export interface CardGridItem {
@@ -32,4 +32,31 @@ export function CardGrid(props: CardGridProps) {
             ))
         }
     </AntdCard>
+}
+
+export interface SimpleCardProps {
+    children: React.ReactNode
+}
+
+export function SimpleCard(props: SimpleCardProps) {
+    return <AntdCard>
+        {props.children}
+    </AntdCard>
+}
+
+export interface CardWithActionsProps {
+    title?: string
+    actions: React.ReactNode[]
+    children: React.ReactNode
+    style?: React.CSSProperties
+}
+
+export function CardWithActions(props: CardWithActionsProps) {
+    return <AntdCard title={props.title} actions={props.actions} style={props.style}>
+        {props.children}
+    </AntdCard>
+}
+
+export function Divider() {
+    return <AntdDivider/>
 }

@@ -75,7 +75,7 @@ export interface FormItemProps {
 }
 
 export function FormItem(props: FormItemProps) {
-    return <AntdForm.Item label={props.label}>
+    return <AntdForm.Item label={props.label} style={{margin: 0}}>
         {props.children}
     </AntdForm.Item>
 }

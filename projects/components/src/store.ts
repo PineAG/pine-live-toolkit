@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export interface DBinding<T> {
     value: T
@@ -205,4 +205,30 @@ class NullablePropertyBinding<T extends MappingObject, K extends keyof T> implem
 
 export function nullablePropertyBinding<T extends MappingObject, K extends keyof T>(parent: DBinding<T | null>, key: K): NullablePropertyBinding<T, K> {
     return new NullablePropertyBinding(parent, key)
+}
+
+export function haltBinding<T>(): DBinding<T> {
+    return {
+        get value(): T {
+            throw new Error("Operation not allowed")
+        },
+        async update(value: T) {
+            throw new Error("Operation not allowed")
+        }
+    }
+}
+
+export function useTemporaryBinding<T>(parent: DBinding<T>): [DBinding<T>, () => Promise<void>] {
+    const [tmp, setTmp] = useState<T>(parent.value)
+    useEffect(() => {
+        setTmp(parent.value)
+    }, [parent.value])
+    const saver = async () => {
+        await parent.update(tmp)
+    }
+    const binding: DBinding<T> = {
+        value: tmp,
+        update: async val => {setTmp(val)}
+    }
+    return [binding, saver]
 }

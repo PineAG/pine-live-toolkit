@@ -21,3 +21,4 @@ export function LiveToolkit(props: LiveToolkitAppProps) {
 
 export type { WidgetDefinition as Plugin, PropsWithConfig } from './components/widgets'
 export * from "./backend"
+export * from "./configurable"

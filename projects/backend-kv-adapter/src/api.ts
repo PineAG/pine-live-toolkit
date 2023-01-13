@@ -311,7 +311,7 @@ export class WarehouseClient {
     }
 
     async list<C>(type: string): Promise<IWarehouseReference[]> {
-        const idList = await this.api.warehouseList(type).get()
+        const idList = await this.api.warehouseList(type).get() ?? []
         return await Promise.all(idList.map(async id => {
             const meta = await this.api.warehouseMeta(type, id).get() ?? error(`Warehouse not found: ${type}, ${id}`)
             return {id, meta}

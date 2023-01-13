@@ -38,7 +38,7 @@ export class Widget implements IWidget<any> {
 
 @Entity()
 export class Warehouse implements IWarehouse<any> {
-    @Column()
+    @PrimaryGeneratedColumn()
     id: number
 
     @Column("simple-json")

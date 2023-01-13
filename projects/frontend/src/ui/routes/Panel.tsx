@@ -145,7 +145,7 @@ const PanelInfoContext = createNullableContext<IPanel>("Panel meta not initializ
 
 function WidgetsPanel() {
     const previewModeBinding = useNullableContext(PreviewModeBindingContext)
-    return (<Flex direction="vertical">
+    return (<Flex direction="vertical" spacing={16}>
         <ShareButton/>
         <Flex direction="horizontal" alignment="end" spacing={20} nowrap>
             <AddPluginButton/>

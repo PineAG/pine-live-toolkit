@@ -1,13 +1,13 @@
-import { DBinding } from "@pltk/components"
-
 export interface WarehouseDefinition<Config> {
     title: string
     type: string
-    warehouseDependencies?: WarehouseDefinition<any>[]
+    initialize: {
+        defaultConfig: () => Config
+    }
     render: {
-        config: (binding: DBinding<Config>) => JSX.Element
+        config: () => React.ReactNode
+        preview: () => React.ReactNode
     }
 }
 
 export type WarehouseObject<C> = WarehouseDefinition<C>
-

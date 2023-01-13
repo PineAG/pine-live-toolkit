@@ -142,6 +142,7 @@ export function HStack(props: StackProps) {
         display: "grid",
         gridTemplateRows: "1fr",
         gridTemplateColumns: props.layout.join(" "),
+        alignItems: "baseline",
         ...props.style
     }
     return <div style={style} className={props.className}>

@@ -1,55 +1,56 @@
-import { arrayBinding, ButtonProps, Collapse, convertTextStyleToCSS, DBinding, Flex, Grid, IconButton, Icons, IconSwitch, propertyBinding, QuickConfirm, StringField, TextStyleAndSize, TextStyleAndSizePicker, useLocalDBinding } from "@pltk/components";
+import { arrayBinding, ButtonProps, Collapse, convertTextStyleToCSS, DBinding, Flex, Grid, IconButton, Icons, IconSwitch, propertyBinding, StringField, TextStyleAndSize, TextStyleAndSizePicker, useLocalDBinding } from "@pltk/components";
 import { CSSProperties } from "react";
-import { Plugin, PropsWithConfig } from "../ui";
+import { Plugin, PropsWithConfig, WarehouseConsumer, WarehouseEditor, WarehouseProvider, WarehouseSelect } from "../ui";
 
 import "@fontsource/zcool-kuaile";
+import { ChecklistWarehouse } from "./ChecklistWarehouse";
 
 const DEFAULT_FONT = '"ZCOOL KuaiLe"'
 
-export interface ChecklistItem {
-    done: boolean
-    show: boolean
-    content: string
-}
-
 export interface ChecklistConfig {
     textStyle: TextStyleAndSize
-    items: ChecklistItem[]
+    warehouseId: number | null
 }
 
-function textStyle(done: boolean, config: ChecklistConfig): CSSProperties {
+function textStyle(done: boolean, textStyle: TextStyleAndSize): CSSProperties {
     if(done) {
         return {
             opacity: 0.5,
             textDecoration: "line-through",
-            textDecorationColor: config.textStyle.borderColor,
+            textDecorationColor: textStyle.borderColor,
             textDecorationStyle: "solid",
-            textDecorationThickness: 0.1 * config.textStyle.fontSize,
+            textDecorationThickness: 0.1 * textStyle.fontSize,
             width: "100%",
             height: "100%",
-            ...convertTextStyleToCSS(config.textStyle)
+            ...convertTextStyleToCSS(textStyle)
         }
     } else {
         return {
             opacity: 1,
             width: "100%",
             height: "100%",
-            ...convertTextStyleToCSS(config.textStyle)
+            ...convertTextStyleToCSS(textStyle)
         }
     }
 }
 
-export function ChecklistPreview({configBinding: configBinding}: PropsWithConfig<ChecklistConfig>) {
-    const itemsBinding = arrayBinding(propertyBinding(configBinding, "items"))
-    return <Grid container spacing={0}>
-        {itemsBinding.value.filter(it => it.show).map((item, i) => (
-            <Grid span={12} key={i}>
-                <div style={textStyle(item.done, configBinding.value)}>
-                    {item.content}
-                </div>
-            </Grid>
-        ))}
-    </Grid>
+export function ChecklistPreview({configBinding}: PropsWithConfig<ChecklistConfig>) {
+    return <WarehouseProvider warehouse={ChecklistWarehouse} binding={propertyBinding(configBinding, "warehouseId")}>
+        <WarehouseConsumer warehouse={ChecklistWarehouse}>
+            {(meta, config) => {
+                const itemsBinding = arrayBinding(propertyBinding(config, "items"))
+                return (<Grid container spacing={0}>
+                    {itemsBinding.value.filter(it => it.show).map((item, i) => (
+                        <Grid span={12} key={i}>
+                            <div style={textStyle(item.done, configBinding.value.textStyle)}>
+                                {item.content}
+                            </div>
+                        </Grid>
+                    ))}
+                </Grid>)
+            }}
+        </WarehouseConsumer>
+    </WarehouseProvider>
 }
 
 interface ChecklistIconButtonProps {
@@ -66,80 +67,50 @@ function ChecklistDoneButton(props: ChecklistIconButtonProps) {
     />
 }
 
-function ChecklistVisibleButton(props: ChecklistIconButtonProps) {
-    return <IconSwitch
-        binding={props.binding}
-        size={props.size}
-        enabledIcon={<Icons.Show/>}
-        disabledIcon={<Icons.Hide/>}
-    />
-}
-
-export function ChecklistEdit({configBinding: configBinding}: PropsWithConfig<ChecklistConfig>) {
-    const config = configBinding.value
+export function ChecklistEdit({configBinding}: PropsWithConfig<ChecklistConfig>) {
     const newItemBinding = useLocalDBinding("")
-    const itemsBinding = arrayBinding(propertyBinding(configBinding, "items"))
-    return (<Flex direction="vertical" nowrap>
-        {itemsBinding.items.filter(it => it.value.show).map((item, i) => (
-            <Flex direction="horizontal" alignment="space-between" nowrap>
-                <div style={textStyle(item.value.done, config)}>
-                    {item.value.content}
-                </div>
-                <ChecklistDoneButton binding={propertyBinding(item, "done")} size="large"/>
-            </Flex>
-        ))}
-        <Flex direction="horizontal" alignment="space-between" nowrap>
-            <StringField binding={newItemBinding}/>
-            <IconButton onClick={async () => {
-                    if(newItemBinding.value === "") return;
-                    await itemsBinding.append({done: false, content: newItemBinding.value, show: true})
-                    newItemBinding.update("")
+    const warehouseIdBinding = propertyBinding(configBinding, "warehouseId")
+    return (<WarehouseProvider binding={warehouseIdBinding} warehouse={ChecklistWarehouse}>
+            <WarehouseConsumer warehouse={ChecklistWarehouse}>
+                {(meta, config) => {
+                    const itemsBinding = arrayBinding(propertyBinding(config, "items"))
+                    return <Flex direction="vertical" nowrap>
+                        {itemsBinding.items.map(item => (
+                            <Flex direction="horizontal" alignment="space-between" nowrap>
+                                <div style={textStyle(item.value.done, configBinding.value.textStyle)}>
+                                    {item.value.content}
+                                </div>
+                                <ChecklistDoneButton binding={propertyBinding(item, "done")} size="large"/>
+                            </Flex>
+                        ))}
+                        <Flex direction="horizontal" alignment="space-between" nowrap>
+                            <StringField binding={newItemBinding}/>
+                            <IconButton onClick={async () => {
+                            if(newItemBinding.value === "") return;
+                                await itemsBinding.append({done: false, content: newItemBinding.value, show: true})
+                                newItemBinding.update("")
+                            }}
+                            icon={<Icons.Add/>}
+                            />
+                        </Flex>
+                    </Flex>
                 }}
-                icon={<Icons.Add/>}
-                />
-        </Flex>
-    </Flex>)
+            </WarehouseConsumer>
+        </WarehouseProvider>)
 }
 
-export function ChecklistConfigPanel({configBinding: configBinding}: PropsWithConfig<ChecklistConfig>) {
-    const newItemContentStore = useLocalDBinding("")
-    const itemsBinding = arrayBinding(propertyBinding(configBinding, "items"))
+export function ChecklistConfigPanel({configBinding}: PropsWithConfig<ChecklistConfig>) {
     const textStyle = propertyBinding(configBinding, "textStyle")
+    const warehouseIdBinding = propertyBinding(configBinding, "warehouseId")
 
-    function createItem(){
-        if(newItemContentStore.value === "") return;
-        const newItem: ChecklistItem = {
-            content: newItemContentStore.value,
-            done: false,
-            show: true
-        }
-        itemsBinding.insert(0, newItem)
-        newItemContentStore.update("")
-    }
-    return <Flex direction="vertical" nowrap spacing={16}>
-    <Flex direction="horizontal" nowrap spacing={8}>
-        <StringField binding={newItemContentStore}/>
-        <IconButton onClick={createItem}>
-            <Icons.Add/>
-        </IconButton>
-    </Flex>
-    {itemsBinding.items.map((item, i) => (
-        <Flex direction="horizontal" nowrap style={{width: "100%"}} spacing={8}>
-            <ChecklistDoneButton binding={propertyBinding(item, "done")}/>
-            <ChecklistVisibleButton binding={propertyBinding(item, "show")}/>
-            <StringField binding={propertyBinding(item, "content")}/>
-            <IconButton icon={<Icons.Up/>} disabled={i === 0} onClick={() => item.move(i-1)}/>
-            <IconButton icon={<Icons.Down/>} disabled={i === itemsBinding.value.length - 1} onClick={() => item.move(i+1)}/>
-            <QuickConfirm title="确认要删除吗" description="之后无法恢复" onConfirm={() => item.remove()}>
-                <IconButton>
-                    <Icons.Delete/>
-                </IconButton>
-            </QuickConfirm>
-        </Flex>
-    ))}
-    <Collapse title="字体设置">
-        <TextStyleAndSizePicker binding={textStyle}/>
-    </Collapse>
+    return <Flex direction="vertical" nowrap spacing={8}>
+        <WarehouseProvider binding={warehouseIdBinding} warehouse={ChecklistWarehouse}>
+            <WarehouseSelect/>
+            <WarehouseEditor/>
+        </WarehouseProvider>
+        <Collapse title="字体设置">
+            <TextStyleAndSizePicker binding={textStyle}/>
+        </Collapse>
     </Flex>
 }
 
@@ -157,7 +128,7 @@ export const ChecklistPlugin: Plugin<ChecklistConfig> = {
                 fontSize: 35,
                 alignment: "left"
             },
-            items: []
+            warehouseId: null
         })
     },
     render: {
