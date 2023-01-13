@@ -35,6 +35,8 @@ export class ServerSideDataWrapper implements ILiveToolkitClient {
         return result.identifiers[0].id
     }
     async deletePanel(panelId: number): Promise<void> {
+        const panel = await this.panels.findOne({where: [{id: panelId}], select: ["id"]})
+        await this.widgets.delete({panel})
         await this.panels.delete({id: panelId})
     }
     async setPanelMeta(panelId: number, meta: IPanelMeta): Promise<void> {
