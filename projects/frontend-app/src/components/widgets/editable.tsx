@@ -1,7 +1,7 @@
 import { Dialog, Flex, IconButton, Icons, QuickConfirm, unwrapAsyncBinding, useLocalDBinding, useNullableContext } from "@pltk/components"
 import { Rect, Size } from "@pltk/protocol"
 import React, { CSSProperties, ReactNode, useContext } from "react"
-import { useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "@pltk/core"
+import { useCachedDataProvider, useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "@pltk/core"
 import { useEnabledWidgets, WidgetDefinition } from "@pltk/core"
 import { EditableStateContext, PanelSizeContext, PreviewModeContext } from "../context"
 import { EditableState } from "./base"
@@ -40,32 +40,28 @@ export function DeleteButton(props: ButtonProps) {
 }
 
 export function EditButton(props: ButtonProps) {
-    const client = useLiveToolkitClient()
-    const panelId = usePanelId()
-    const widgetId = useWidgetId()
-    const tmpConfigBinding = useLocalDBinding<null | any>(null)
-    const configReq = useWidgetConfigBinding(panelId, widgetId)
-    return unwrapAsyncBinding(configReq, configBinding => (
-    <>
-        <IconButton onClick={() => tmpConfigBinding.update(configBinding.value)} size="middle">
-            <Icons.Edit/>
-        </IconButton>
-        <Dialog 
-                title={`设置组件 ${props.widgetDef.title}`}
-                onOk={async () => {
-                    if(tmpConfigBinding.value !== null) {
-                        await client.setWidgetConfig(panelId, widgetId, tmpConfigBinding.value)
-                    }
-                    await tmpConfigBinding.update(null)
-                }}
-                onCancel={() => tmpConfigBinding.update(null)}
-                open={tmpConfigBinding.value !== null}>
-                <>
-                {props.widgetDef.render.config()}
-                </>
-        </Dialog>
-    </>
-    ))
+    const showDialog = useLocalDBinding<boolean>(false)
+    const [TmpProvider, saveConfig, isConfigDirty] = useCachedDataProvider()
+    return <>
+    <IconButton onClick={() => showDialog.update(true)} size="middle">
+        <Icons.Edit/>
+    </IconButton>
+    <Dialog 
+            title={`设置组件 ${props.widgetDef.title}`}
+            onOk={async () => {
+                await saveConfig()
+                await showDialog.update(false)
+            }}
+            disableOk={!isConfigDirty}
+            onCancel={() => showDialog.update(false)}
+            open={showDialog.value}>
+            <>
+                <TmpProvider>
+                    {props.widgetDef.render.config()}
+                </TmpProvider>
+            </>
+    </Dialog>
+</>
 }
 
 

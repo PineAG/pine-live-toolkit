@@ -1,6 +1,6 @@
-import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "@pltk/components"
+import { convertTextStyleToCSS, TextStyleAndSize, TextStyleAndSizePicker } from "@pltk/components"
 import moment from "moment"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useWidgetConfigInternal, WidgetDefinition } from "@pltk/core"
 
 import { FormItem, Grid, propertyBinding, StringField } from "@pltk/components"
@@ -10,7 +10,7 @@ const DEFAULT_FONT = '"Baumans"'
 
 interface ClockConfig {
     format: string
-    textStyle: TextStyle
+    textStyle: TextStyleAndSize
 }
 
 function getCurrentTimeOnFormat(format: string) {
@@ -29,17 +29,11 @@ function useDate(format: string) {
 
 const Clock = () => {
     const configBinding = useWidgetConfigInternal<ClockConfig>()
-    const ref = useRef<HTMLDivElement>(null)
     const date = useDate(configBinding.value.format)
-    const [fontSize, setFontSize] = useState<number>(100)
-    useEffect(() => {
-        setFontSize(ref.current?.clientHeight ?? 100)
-    }, [ref.current?.clientHeight])
-    return <div ref={ref} style={{
+    return <div style={{
             width: "100%",
             height: "100%",
-            ...convertTextStyleToCSS(configBinding.value.textStyle),
-            fontSize: fontSize * 0.8,
+            ...convertTextStyleToCSS(configBinding.value.textStyle)
         }}>
         {date}
     </div>
@@ -58,7 +52,7 @@ const ClockConfiguration = () => {
             </FormItem>
         </Grid>
         <Grid span={12}>
-            <TextStylePicker
+            <TextStyleAndSizePicker
                 binding={textStyle}
             />
         </Grid>
@@ -70,13 +64,14 @@ const ClockConfiguration = () => {
     </Grid>
 }
 
-function getDefaultTextStyle(): TextStyle{
+function getDefaultTextStyle(): TextStyleAndSize{
     return {
         fontFamily: DEFAULT_FONT,
         borderColor: "#333333",
         borderWidth: 2.5,
         textColor: "white",
-        alignment: "left"
+        alignment: "left",
+        fontSize: 128
     }
 }
 

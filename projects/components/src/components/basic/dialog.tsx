@@ -10,6 +10,7 @@ export interface DialogProps {
     onOk: () => void
     onCancel: () => void
     children: NodeChildren
+    disableOk?: boolean
 }
 
 export function Dialog(props: DialogProps) {
@@ -18,6 +19,7 @@ export function Dialog(props: DialogProps) {
         open={props.open}
         onOk={props.onOk}
         onCancel={props.onCancel}
+        okButtonProps={{disabled: props.disableOk}}
         width="50%"
     >
         {props.children}

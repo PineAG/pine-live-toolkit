@@ -1,5 +1,6 @@
-import { createNullableContext, DBinding, unwrapAsyncBinding, useNullableContext } from "@pltk/components";
+import { createNullableContext, DBinding, unwrapAsyncBinding, useAsyncTemporaryBinding, useNullableContext } from "@pltk/components";
 import { IWidgetMeta } from "@pltk/protocol";
+import React from "react";
 import { useWidgetConfigBinding, useWidgetMeta } from "../backend";
 import { WidgetDefinition } from "./base";
 
@@ -47,4 +48,32 @@ export function WidgetDataProvider(props: WidgetDataProviderProps) {
             </InternalWidgetConfigContext.Provider>
         </InternalWidgetMetaContext.Provider>
     })
+}
+
+interface WidgetCachedDataProviderProps<C> {
+    binding: DBinding<C>
+    children: React.ReactNode
+}
+
+function WidgetCachedDataProvider<C>(props: WidgetCachedDataProviderProps<C>) {
+    const meta = useWidgetMeta()
+    return <InternalWidgetMetaContext.Provider value={meta}>
+            <InternalWidgetConfigContext.Provider value={props.binding}>
+                {props.children}
+            </InternalWidgetConfigContext.Provider>
+        </InternalWidgetMetaContext.Provider>
+}
+
+export function useCachedDataProvider<C>(): [React.FC<WidgetDataProviderProps>, () => Promise<void>, boolean] {
+    const {panelId, widgetId} = useNullableContext(WidgetIdContext)
+    const configReq = useWidgetConfigBinding<C>(panelId, widgetId)
+    const [tmpConfigReq, saver, isDirty] = useAsyncTemporaryBinding<C>(configReq)
+    const Provider = (props: WidgetDataProviderProps) => {
+        return unwrapAsyncBinding(tmpConfigReq, tmpConfig => {
+            return <WidgetCachedDataProvider<C> binding={tmpConfig}>
+                {props.children}
+            </WidgetCachedDataProvider>
+        })
+    }
+    return [Provider, saver, isDirty]
 }
