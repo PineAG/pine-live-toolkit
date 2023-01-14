@@ -1,6 +1,7 @@
+import { Rect, Size } from "@pltk/protocol"
 import { CSSProperties, useEffect, useState } from "react"
 import * as rnd from "react-rnd"
-import { Rect, Size, useLiveToolkitClient } from "../../backend"
+import { useLiveToolkitClient } from "../../backend"
 import { useNullableContext } from "../../backend/hooks/utils"
 import { PanelSizeContext } from "../context"
 

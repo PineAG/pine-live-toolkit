@@ -1,10 +1,9 @@
-import { useLocalDBinding } from "@pltk/components"
+import { unwrapAsyncBinding, useLocalDBinding } from "@pltk/components"
 import { IWidgetReference } from "@pltk/protocol"
 import { usePanelId, useWidgetId, useWidgetRectBinding } from "../../backend"
 import { useEnabledWidgets, WidgetContextProvider, WidgetDataProvider } from "../../configurable"
 
 import { EditableStateContext } from "../context"
-import { unwrapAsyncBinding } from "../subs"
 import { EditableState } from "./base"
 import { EditableBody } from "./editable"
 import { PreviewFramework } from "./frameworks"

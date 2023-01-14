@@ -2,7 +2,7 @@ import {useState, useEffect} from "react"
 import { IDisposable, IPanel, IPanelReference, IWarehouseMeta, IWarehouseReference, IWidgetReference, Rect } from "@pltk/protocol";
 import { useAPISubscriptionCache, useLiveToolkitClient as useClient} from "./base";
 import { CacheStore } from "./cache";
-import { AsyncBindingResult, AsyncSubscriptionResult } from "./subs";
+import { AsyncBindingResult, AsyncSubscriptionResult } from "@pltk/components";
 
 function useSubsCacheResult<T>(deps: any[], subs: (c: CacheStore, cb: (v: T) => void) => IDisposable): AsyncSubscriptionResult<T> {
     const cache = useAPISubscriptionCache()

@@ -1,4 +1,4 @@
-import { DBinding } from "@pltk/components"
+import {AsyncBindingResult, AsyncSubscriptionResult} from "@pltk/components"
 import { IDisposable, SubscriptionCallback } from "@pltk/protocol"
 import { useEffect, useState } from "react"
 
@@ -7,8 +7,6 @@ export interface UseAsyncSubscriptionOptions<T> {
     subscription: (callback: SubscriptionCallback) => IDisposable
     dependencies: any[]
 }
-
-export type AsyncSubscriptionResult<T> = {status: "pending"} | {status: "success", value: T}
 
 export function useAsyncSubscription<T>(options: UseAsyncSubscriptionOptions<T>): AsyncSubscriptionResult<T> {
     const [value, setValue] = useState<T | null>(null)
@@ -35,7 +33,6 @@ export interface UseAsyncBindingOptions<T> {
     dependencies: any[]
 }
 
-export type AsyncBindingResult<T> = {status: "pending"} | {status: "success", binding: DBinding<T>}
 export function useAsyncBinding<T>(options: UseAsyncBindingOptions<T>): AsyncBindingResult<T> {
     const subs = useAsyncSubscription(options)
     if(subs.status === "success") {

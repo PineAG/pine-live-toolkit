@@ -1,5 +1,5 @@
+import { Rect, Size } from "@pltk/protocol";
 import { CSSProperties } from "react";
-import { Rect, Size } from "../../backend";
 
 export interface PanelProps {
     panelId: number

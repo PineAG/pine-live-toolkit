@@ -1,7 +1,6 @@
 import {useRef, useState, useEffect} from "react"
-import { Rect } from "@pltk/protocol"
+import { Rect, Size } from "@pltk/protocol"
 import { Rnd } from "react-rnd"
-import { Size } from "../../backend"
 import { PanelSize, PanelSizeContext } from "../context"
 import { Loading } from "@pltk/components"
 

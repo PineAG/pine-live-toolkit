@@ -1,10 +1,10 @@
-import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from "@pltk/components"
+import { Dialog, Flex, IconButton, Icons, QuickConfirm, unwrapAsyncBinding, useLocalDBinding } from "@pltk/components"
+import { Rect, Size } from "@pltk/protocol"
 import React, { CSSProperties, ReactNode, useContext } from "react"
-import { Rect, Size, useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "../../backend"
+import { useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "../../backend"
 import { useNullableContext } from "../../backend/hooks/utils"
 import { useEnabledWidgets, WidgetDefinition } from "../../configurable"
 import { EditableStateContext, PanelSizeContext, PreviewModeContext } from "../context"
-import { unwrapAsyncBinding } from "../subs"
 import { EditableState } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"
 

@@ -1,7 +1,6 @@
-import { ActionButton, CardGrid, DBinding, defaultValueBinding, Dialog, Flex, FormItem, Grid, Icons, nullablePropertyBinding, NumberField, StringField, useLocalDBinding } from "@pltk/components"
+import { ActionButton, CardGrid, DBinding, defaultValueBinding, Dialog, Flex, FormItem, Grid, Icons, nullablePropertyBinding, NumberField, StringField, unwrapAsyncSubs, useLocalDBinding } from "@pltk/components"
 import { useNavigate } from "react-router-dom"
 import { useLiveToolkitClient, usePanels } from "../backend"
-import { unwrapAsyncSubs } from "../components/subs"
 import "./PanelList.css"
 
 

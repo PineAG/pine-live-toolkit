@@ -1,8 +1,8 @@
 import { PreviewWidget } from "../components/widgets"
 import { PanelIdProvider, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
-import { unwrapAsyncSubs } from "../components/subs"
 import { usePanelIdFromParams } from "./utils"
 import { PanelSize, PanelSizeContext } from "../components/context"
+import { unwrapAsyncSubs } from "@pltk/components"
 
 function PanelExhibitionBody() {
     const panelId = usePanelId()
