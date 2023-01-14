@@ -39,7 +39,7 @@ async function installProjectDependencies(projName) {
 
 async function publishDependency(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
-    await execCommand("yarn", ["publish", "--access", "public"], projDir)
+    await execCommand("npm", ["publish", "--force", "--access", "public"], projDir)
 }
 
 function watchProject(projName) {
