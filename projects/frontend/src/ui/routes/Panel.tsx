@@ -3,7 +3,7 @@ import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetL
 import { TransparentBackground } from "../components/backgrounds"
 import { PreviewModeContext } from "../components/context"
 import { KeepRatio } from "../components/panels/KeepRatio"
-import { EditableWidget, useEnabledWidgetList, useEnabledWidgets } from "../components/widgets"
+import { EditableWidget } from "../components/widgets"
 import { unwrapAsyncSubs } from "../components/subs"
 import "./Panel.css"
 import { usePanelIdFromParams } from "./utils"
@@ -11,6 +11,7 @@ import { createNullableContext, useNullableContext } from "../backend/hooks/util
 import { IPanel, IPanelMeta, Size } from "@pltk/protocol"
 import { useState } from "react"
 import { useNavigate, useNavigation } from "react-router-dom"
+import { useEnabledWidgetList, useEnabledWidgets } from "../configurable"
 
 function ShareButton() {
     return <FormItem label="展示页链接">
@@ -157,7 +158,8 @@ function WidgetsPanel() {
 }
 
 function PanelHeader() {
-    const panelReq = usePanel()
+    const panelId = usePanelId()
+    const panelReq = usePanel(panelId)
     return (
         <HStack layout={["1fr", "auto"]} className="route-panel-header" spacing={20}>
             {unwrapAsyncSubs(panelReq, panel => (
@@ -171,8 +173,9 @@ function PanelHeader() {
 }
 
 function WidgetContainer() {
-    const panelReq = usePanel()
-    const widgetsReq = useWidgetListOfPanel()
+    const panelId = usePanelId()
+    const panelReq = usePanel(panelId)
+    const widgetsReq = useWidgetListOfPanel(panelId)
     return unwrapAsyncSubs(panelReq, panel => {
         return unwrapAsyncSubs(widgetsReq, widgets => {
             return <div className="route-panel-body">

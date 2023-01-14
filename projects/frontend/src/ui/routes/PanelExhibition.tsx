@@ -1,12 +1,13 @@
 import { PreviewWidget } from "../components/widgets"
-import { PanelIdProvider, usePanel, useWidgetListOfPanel, WidgetProvider } from "../backend"
+import { PanelIdProvider, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
 import { unwrapAsyncSubs } from "../components/subs"
 import { usePanelIdFromParams } from "./utils"
 import { PanelSize, PanelSizeContext } from "../components/context"
 
 function PanelExhibitionBody() {
-    const panelReq = usePanel()
-    const widgetsReq = useWidgetListOfPanel()
+    const panelId = usePanelId()
+    const panelReq = usePanel(panelId)
+    const widgetsReq = useWidgetListOfPanel(panelId)
     return unwrapAsyncSubs(panelReq, panel => {
         const panelSize: PanelSize = {
             scale: 1,

@@ -1,6 +1,6 @@
 import { DBinding } from "@pltk/components";
 import { Rect } from "@pltk/protocol";
-import { useWidgetConfigBinding, useWidgetRectBinding } from "../../backend";
+import { usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetRectBinding } from "../../backend";
 import { createNullableContext, useNullableContext } from "../../backend/hooks/utils";
 import { unwrapAsyncBinding } from "../subs";
 
@@ -25,8 +25,10 @@ export interface PreviewWidgetContextProviderProps {
 }
 
 export function PreviewWidgetContextProvider(props: PreviewWidgetContextProviderProps) {
-    const rectReq = useWidgetRectBinding()
-    const configReq = useWidgetConfigBinding()
+    const panelId = usePanelId()
+    const widgetId = useWidgetId()
+    const rectReq = useWidgetRectBinding(panelId, widgetId)
+    const configReq = useWidgetConfigBinding(panelId, widgetId)
     return unwrapAsyncBinding(rectReq, rectBinding => {
         return unwrapAsyncBinding(configReq, configBinding => {
             const ctx: IWidgetDefinitionContext<any> = {
@@ -52,8 +54,10 @@ export interface EditableWidgetContextProviderProps<C> {
 }
 
 export function EditableWidgetContextProvider(props: EditableWidgetContextProviderProps<any>) {
-    const rectReq = useWidgetRectBinding()
-    const configReq = useWidgetConfigBinding()
+    const panelId = usePanelId()
+    const widgetId = useWidgetId()
+    const rectReq = useWidgetRectBinding(panelId, widgetId)
+    const configReq = useWidgetConfigBinding(panelId, widgetId)
     return unwrapAsyncBinding(rectReq, rectBinding => {
         return unwrapAsyncBinding(configReq, configBinding => {
             const ctx: IWidgetDefinitionContext<any> = {

@@ -1,7 +1,7 @@
 import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "@pltk/components"
 import moment from "moment"
 import { useEffect, useRef, useState } from "react"
-import { Plugin, PropsWithConfig } from "../ui"
+import { useWidgetConfigInternal, WidgetDefinition } from "../ui"
 
 import { FormItem, Grid, propertyBinding, StringField } from "@pltk/components"
 import "@fontsource/baumans"
@@ -27,7 +27,8 @@ function useDate(format: string) {
 }
 
 
-const Clock = ({configBinding: configBinding}: PropsWithConfig<ClockConfig>) => {
+const Clock = () => {
+    const configBinding = useWidgetConfigInternal<ClockConfig>()
     const ref = useRef<HTMLDivElement>(null)
     const date = useDate(configBinding.value.format)
     const [fontSize, setFontSize] = useState<number>(100)
@@ -44,7 +45,8 @@ const Clock = ({configBinding: configBinding}: PropsWithConfig<ClockConfig>) => 
     </div>
 }
 
-const ClockConfiguration = ({configBinding: configBinding}: PropsWithConfig<ClockConfig>) => {
+const ClockConfiguration = () => {
+    const configBinding = useWidgetConfigInternal<ClockConfig>()
     const format = propertyBinding(configBinding, "format")
     const textStyle = propertyBinding(configBinding, "textStyle")
     return <Grid container alignment="left">
@@ -62,7 +64,7 @@ const ClockConfiguration = ({configBinding: configBinding}: PropsWithConfig<Cloc
         </Grid>
         <Grid span={12}>
             <div style={{height: "100px"}}>
-                <Clock configBinding={configBinding}/>
+                <Clock/>
             </div>
         </Grid>
     </Grid>
@@ -78,7 +80,7 @@ function getDefaultTextStyle(): TextStyle{
     }
 }
 
-const ClockPlugin: Plugin<ClockConfig> = {
+const ClockPlugin: WidgetDefinition<ClockConfig> = {
     title: "时钟",
     type: "builtin.clock",
     initialize: {
@@ -89,10 +91,10 @@ const ClockPlugin: Plugin<ClockConfig> = {
         defaultSize: () => ({width: 300, height: 150})
     },
     render: {
-        preview: (configBinding) => <Clock configBinding={configBinding}/>,
-        edit: (configBinding) => <Clock configBinding={configBinding}/>,
-        move: (configBinding) => <Clock configBinding={configBinding}/>,
-        config: (configBinding) => <ClockConfiguration configBinding={configBinding}/>
+        preview: () => <Clock/>,
+        edit: () => <Clock/>,
+        move: () => <Clock/>,
+        config: () => <ClockConfiguration/>
     }
 }
 

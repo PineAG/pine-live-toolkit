@@ -1,6 +1,6 @@
 import { arrayBinding, ButtonProps, Collapse, convertTextStyleToCSS, DBinding, Flex, Grid, IconButton, Icons, IconSwitch, propertyBinding, StringField, TextStyleAndSize, TextStyleAndSizePicker, useLocalDBinding } from "@pltk/components";
 import { CSSProperties } from "react";
-import { Plugin, PropsWithConfig, WarehouseConsumer, WarehouseEditor, WarehouseProvider, WarehouseSelect } from "../ui";
+import { WidgetDefinition, WarehouseConsumer, WarehouseEditor, WarehouseProvider, WarehouseSelect, useWidgetConfigInternal } from "../ui";
 
 import "@fontsource/zcool-kuaile";
 import { ChecklistWarehouse } from "./ChecklistWarehouse";
@@ -34,7 +34,8 @@ function textStyle(done: boolean, textStyle: TextStyleAndSize): CSSProperties {
     }
 }
 
-export function ChecklistPreview({configBinding}: PropsWithConfig<ChecklistConfig>) {
+export function ChecklistPreview() {
+    const configBinding = useWidgetConfigInternal<ChecklistConfig>()
     return <WarehouseProvider warehouse={ChecklistWarehouse} binding={propertyBinding(configBinding, "warehouseId")}>
         <WarehouseConsumer warehouse={ChecklistWarehouse}>
             {(meta, config) => {
@@ -67,7 +68,8 @@ function ChecklistDoneButton(props: ChecklistIconButtonProps) {
     />
 }
 
-export function ChecklistEdit({configBinding}: PropsWithConfig<ChecklistConfig>) {
+export function ChecklistEdit() {
+    const configBinding = useWidgetConfigInternal<ChecklistConfig>()
     const newItemBinding = useLocalDBinding("")
     const warehouseIdBinding = propertyBinding(configBinding, "warehouseId")
     return (<WarehouseProvider binding={warehouseIdBinding} warehouse={ChecklistWarehouse}>
@@ -99,7 +101,8 @@ export function ChecklistEdit({configBinding}: PropsWithConfig<ChecklistConfig>)
         </WarehouseProvider>)
 }
 
-export function ChecklistConfigPanel({configBinding}: PropsWithConfig<ChecklistConfig>) {
+export function ChecklistConfigPanel() {
+    const configBinding = useWidgetConfigInternal<ChecklistConfig>()
     const textStyle = propertyBinding(configBinding, "textStyle")
     const warehouseIdBinding = propertyBinding(configBinding, "warehouseId")
 
@@ -114,7 +117,7 @@ export function ChecklistConfigPanel({configBinding}: PropsWithConfig<ChecklistC
     </Flex>
 }
 
-export const ChecklistPlugin: Plugin<ChecklistConfig> = {
+export const ChecklistPlugin: WidgetDefinition<ChecklistConfig> = {
     title: "待办清单",
     type: "builtin.checklist",
     initialize: {
@@ -132,10 +135,10 @@ export const ChecklistPlugin: Plugin<ChecklistConfig> = {
         })
     },
     render: {
-        edit: (configBinding) => <ChecklistEdit configBinding={configBinding}/>,
-        preview: (configBinding) => <ChecklistPreview configBinding={configBinding}/>,
-        move: (configBinding) => <ChecklistPreview configBinding={configBinding}/>,
-        config: (configBinding) => <ChecklistConfigPanel configBinding={configBinding}/>
+        edit: () => <ChecklistEdit/>,
+        preview: () => <ChecklistPreview/>,
+        move: () => <ChecklistPreview/>,
+        config: () => <ChecklistConfigPanel/>
     }
 }
 

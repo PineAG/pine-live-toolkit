@@ -1,10 +1,10 @@
-import { Plugin } from "../ui"
+import { WidgetDefinition } from "../ui"
 import ChecklistPlugin from "./Checklist"
 import ClockPlugin from "./Clock"
 import ImageViewerPlugin from "./ImageViewer"
 import TextPlugin from "./Text"
 
-export const builtinPlugins: Plugin<any>[] = [
+export const builtinPlugins: WidgetDefinition<any>[] = [
     ClockPlugin,
     TextPlugin,
     ImageViewerPlugin,

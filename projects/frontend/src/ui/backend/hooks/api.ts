@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react"
 import { IDisposable, IPanel, IPanelReference, IWarehouseMeta, IWarehouseReference, IWidgetReference, Rect } from "@pltk/protocol";
-import { useAPISubscriptionCache, useLiveToolkitClient as useClient, usePanelId, useWidgetId } from "./base";
+import { useAPISubscriptionCache, useLiveToolkitClient as useClient} from "./base";
 import { CacheStore } from "./cache";
 import { AsyncBindingResult, AsyncSubscriptionResult } from "./subs";
 
@@ -32,27 +32,21 @@ export function usePanels(): AsyncSubscriptionResult<IPanelReference[]> {
     return useSubsCacheResult([], (c, cb) => c.subscribePanelList(cb))
 }
 
-export function usePanel(): AsyncSubscriptionResult<IPanel> {
-    const panelId = usePanelId()
+export function usePanel(panelId: number): AsyncSubscriptionResult<IPanel> {
     return useSubsCacheResult([panelId], (c, cb) => c.subscribePanel(panelId, cb))
 }
 
-export function useWidgetListOfPanel(): AsyncSubscriptionResult<IWidgetReference[]> {
-    const panelId = usePanelId()
+export function useWidgetListOfPanel(panelId: number): AsyncSubscriptionResult<IWidgetReference[]> {
     return useSubsCacheResult([panelId], (c, cb) => c.subscribeWidgets(panelId, cb))
 }
 
-export function useWidgetRectBinding(): AsyncBindingResult<Rect> {
-    const panelId = usePanelId()
-    const widgetId = useWidgetId()
+export function useWidgetRectBinding(panelId: number, widgetId: number): AsyncBindingResult<Rect> {
     const client = useClient()
     const result = useSubsCacheResult<Rect>([panelId, widgetId], (c, cb) => c.subscribeWidgetRect(panelId, widgetId, cb))
     return resultToBinding(result, value => client.setWidgetRect(panelId, widgetId, value))
 }
 
-export function useWidgetConfigBinding<Config>(): AsyncBindingResult<Config> {
-    const panelId = usePanelId()
-    const widgetId = useWidgetId()
+export function useWidgetConfigBinding<Config>(panelId: number, widgetId: number): AsyncBindingResult<Config> {
     const client = useClient()
     const result = useSubsCacheResult<Config>([panelId, widgetId], (c, cb) => c.subscribeWidgetConfig(panelId, widgetId, cb))
     return resultToBinding<Config>(result, value => client.setWidgetConfig(panelId, widgetId, value))

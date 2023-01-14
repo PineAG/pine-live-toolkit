@@ -1,5 +1,5 @@
 import { convertTextStyleToCSS, FormItem, Grid, MultiLinesStringField, propertyBinding, TextStyleAndSize, TextStyleAndSizePicker } from "@pltk/components"
-import { Plugin, PropsWithConfig } from "../ui"
+import { WidgetDefinition, useWidgetConfigInternal } from "../ui"
 
 import "@fontsource/zcool-kuaile"
 
@@ -10,15 +10,17 @@ export interface Config {
     textStyle: TextStyleAndSize
 }
 
-function Text({configBinding: configBinding}: PropsWithConfig<Config>) {
+function Text() {
+    const configBinding = useWidgetConfigInternal<Config>()
     return <div style={{...convertTextStyleToCSS(configBinding.value.textStyle)}}>
         {configBinding.value.content}
     </div>
 }
 
-function TextConfig(props: PropsWithConfig<Config>) {
-    const contentStore = propertyBinding(props.configBinding, "content")
-    const textStyle = propertyBinding(props.configBinding, "textStyle")
+function TextConfig() {
+    const configBinding = useWidgetConfigInternal<Config>()
+    const contentStore = propertyBinding(configBinding, "content")
+    const textStyle = propertyBinding(configBinding, "textStyle")
 
     return <Grid container>
         <Grid span={12}>
@@ -35,12 +37,12 @@ function TextConfig(props: PropsWithConfig<Config>) {
             </FormItem>
         </Grid>
         <Grid span={12}>
-            <Text {...props}/>
+            <Text/>
         </Grid>
     </Grid>
 }
 
-export const TextPlugin: Plugin<Config> = {
+export const TextPlugin: WidgetDefinition<Config> = {
     title: "文本信息",
     type: "builtin.textView",
     initialize: {
@@ -58,10 +60,10 @@ export const TextPlugin: Plugin<Config> = {
         defaultSize: () => ({width: 300, height: 200})
     },
     render: {
-        preview: configBinding => <Text configBinding={configBinding}/>,
-        move: configBinding => <Text configBinding={configBinding}/>,
-        edit: configBinding => <Text configBinding={configBinding}/>,
-        config: configBinding => <TextConfig configBinding={configBinding}/>
+        preview: () => <Text/>,
+        move: () => <Text/>,
+        edit: () => <Text/>,
+        config: () => <TextConfig/>
     }
 }
 

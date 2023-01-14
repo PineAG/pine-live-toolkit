@@ -2,9 +2,10 @@ import { Dialog, Flex, IconButton, Icons, QuickConfirm, useLocalDBinding } from 
 import React, { CSSProperties, ReactNode, useContext } from "react"
 import { Rect, Size, useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "../../backend"
 import { useNullableContext } from "../../backend/hooks/utils"
+import { useEnabledWidgets, WidgetDefinition } from "../../configurable"
 import { EditableStateContext, PanelSizeContext, PreviewModeContext } from "../context"
 import { unwrapAsyncBinding } from "../subs"
-import { EditableState, useEnabledWidgets, WidgetDefinition } from "./base"
+import { EditableState } from "./base"
 import { ResizableFramework, ScaledFramework } from "./frameworks"
 
 export interface EditableBodyRenderer {
@@ -44,7 +45,7 @@ export function EditButton(props: ButtonProps) {
     const panelId = usePanelId()
     const widgetId = useWidgetId()
     const tmpConfigBinding = useLocalDBinding<null | any>(null)
-    const configReq = useWidgetConfigBinding()
+    const configReq = useWidgetConfigBinding(panelId, widgetId)
     return unwrapAsyncBinding(configReq, configBinding => (
     <>
         <IconButton onClick={() => tmpConfigBinding.update(configBinding.value)} size="middle">
@@ -61,7 +62,7 @@ export function EditButton(props: ButtonProps) {
                 onCancel={() => tmpConfigBinding.update(null)}
                 open={tmpConfigBinding.value !== null}>
                 <>
-                {props.widgetDef.render.config(tmpConfigBinding)}
+                {props.widgetDef.render.config()}
                 </>
         </Dialog>
     </>
@@ -71,7 +72,9 @@ export function EditButton(props: ButtonProps) {
 
 export const EditableSwitch = () => {
     const editableStateBinding = useContext(EditableStateContext);
-    const rectBindingReq = useWidgetRectBinding()
+    const panelId = usePanelId()
+    const widgetId = useWidgetId()
+    const rectBindingReq = useWidgetRectBinding(panelId, widgetId)
     const {configSize} = useNullableContext(PanelSizeContext)
     const enabledWidgets = useEnabledWidgets()
     const meta = useWidgetMeta()
@@ -128,7 +131,9 @@ const scaledFrameworkStyles: React.CSSProperties = {
 
 export const EditableBody = (props: EditableBodyProps) => {
     const previewMode = useContext(PreviewModeContext)
-    const rectReq = useWidgetRectBinding()
+    const panelId = usePanelId()
+    const widgetId = useWidgetId()
+    const rectReq = useWidgetRectBinding(panelId, widgetId)
     const editableStateBinding = useContext(EditableStateContext);
     const content = previewMode ? props.render.preview() : props.render[editableStateBinding.value]()
     const editableSwitch = <EditableSwitch/>

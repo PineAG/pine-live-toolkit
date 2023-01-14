@@ -1,7 +1,7 @@
 import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, Loading, propertyBinding, Switch, UploadButton } from "@pltk/components"
 import { ILiveToolkitFileStorage } from "@pltk/protocol"
 import { useRef } from "react"
-import { Plugin, PropsWithConfig, readFileToBlob, useFileId, useLiveToolkitFileStorage } from "../ui"
+import { WidgetDefinition, readFileToBlob, useFileId, useLiveToolkitFileStorage, useWidgetConfigInternal } from "../ui"
 
 export interface Config {
     fileId: string | null
@@ -30,7 +30,8 @@ function renderImage(url: string, opacity?: number, onClick?: () => void) {
     />
 }
 
-function ImageViewer({configBinding: configBinding}: PropsWithConfig<Config>) {
+function ImageViewer() {
+    const configBinding = useWidgetConfigInternal<Config>()
     const fileResult = useFileId(configBinding.value.fileId)
     if(!configBinding.value.visible) {
         return <div/>
@@ -59,7 +60,8 @@ function VisibleSwitch({binding}: {binding: DBinding<boolean>}) {
     />
 }
 
-function ImageViewerEdit({configBinding: configBinding}: PropsWithConfig<Config>) {
+function ImageViewerEdit() {
+    const configBinding = useWidgetConfigInternal<Config>()
     const fileClient = useLiveToolkitFileStorage()
     const ref = useRef<HTMLInputElement>(null)
     const fileResult = useFileId(configBinding.value.fileId)
@@ -95,7 +97,8 @@ function ImageViewerEdit({configBinding: configBinding}: PropsWithConfig<Config>
     }
 }
 
-function ImageViewerMove({configBinding: configBinding}: PropsWithConfig<Config>) {
+function ImageViewerMove() {
+    const configBinding = useWidgetConfigInternal<Config>()
     const fileResult = useFileId(configBinding.value.fileId) 
     if (fileResult.status === "Loaded") {
         return renderImage(fileResult.url, configBinding.value.visible ? 1 : 0.2)
@@ -106,7 +109,8 @@ function ImageViewerMove({configBinding: configBinding}: PropsWithConfig<Config>
     }
 }
 
-function ImageViewerConfig({configBinding: configBinding}: PropsWithConfig<Config>) {
+function ImageViewerConfig() {
+    const configBinding = useWidgetConfigInternal<Config>()
     const fileClient = useLiveToolkitFileStorage()
     const fileIdStore = propertyBinding(configBinding, "fileId")
     const fileResult = useFileId(fileIdStore.value)
@@ -151,7 +155,7 @@ function ImageViewerConfig({configBinding: configBinding}: PropsWithConfig<Confi
         </Flex>
 }
 
-export const ImageViewerPlugin: Plugin<Config> = {
+export const ImageViewerPlugin: WidgetDefinition<Config> = {
     title: "图片展示框",
     type: "builtin.imageViewer",
     initialize: {
@@ -159,10 +163,10 @@ export const ImageViewerPlugin: Plugin<Config> = {
         defaultConfig: () => ({fileId: null, visible: true})
     },
     render: {
-        config: (configBinding) => <ImageViewerConfig configBinding={configBinding}/>,
-        move: (configBinding) => <ImageViewerMove configBinding={configBinding}/>,
-        edit: (configBinding) => <ImageViewerEdit configBinding={configBinding}/>,
-        preview: (configBinding) => <ImageViewer configBinding={configBinding}/>
+        config: () => <ImageViewerConfig/>,
+        move: () => <ImageViewerMove/>,
+        edit: () => <ImageViewerEdit/>,
+        preview: () => <ImageViewer/>
     }
 }
 

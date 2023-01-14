@@ -1,7 +1,7 @@
 import { InternationalProvider, SupportedLanguages } from '@pltk/components';
-import { EnabledWidgetProvider, WidgetDefinition } from './components/widgets';
 import { RouterRoot } from './routes';
 import { BackendProvider, BackendOptions } from "./backend";
+import { EnabledWidgetProvider, WidgetDefinition } from './configurable';
 
 export interface LiveToolkitAppProps {
     backend: BackendOptions
@@ -19,6 +19,5 @@ export function LiveToolkit(props: LiveToolkitAppProps) {
     </BackendProvider>
 }
 
-export type { WidgetDefinition as Plugin, PropsWithConfig } from './components/widgets'
 export * from "./backend"
 export * from "./configurable"
