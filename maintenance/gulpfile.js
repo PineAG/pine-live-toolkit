@@ -37,6 +37,11 @@ async function installProjectDependencies(projName) {
     await execCommand("yarn", ["install"], projDir)
 }
 
+async function publishDependency(projName) {
+    const projDir = path.resolve(rootDir, "projects", projName)
+    await execCommand("yarn", ["publish", "--access", "public"], projDir)
+}
+
 function watchProject(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
     const files = ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.json", "./src/**/*.css"]
@@ -87,6 +92,15 @@ exports.watchDependencies = gulp.task("watchDependencies", () => {
     watchProject("protocol")
     watchProject("components")
 })
+
+exports.publishAllLibraries = async () => {
+    await publishDependency("protocol")
+    await publishDependency("components")
+    await publishDependency("backend-kv-adapter")
+    await publishDependency("backend-indexeddb")
+    await publishDependency("backend-rest-client")
+    await publishDependency("backend-rest-server")
+}
 
 async function copyBackendProject(src, dst) {
     await fs.mkdir(dst)
