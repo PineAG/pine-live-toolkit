@@ -1,6 +1,7 @@
 # PLTK: Pine's Live Toolkit / 派因的直播工具包
 
 [![Docker Build](https://github.com/PineAG/pine-live-toolkit/actions/workflows/docker-image.yml/badge.svg)](https://github.com/PineAG/pine-live-toolkit/actions/workflows/docker-image.yml)
+[![NPM Publish](https://github.com/PineAG/pine-live-toolkit/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/PineAG/pine-live-toolkit/actions/workflows/npm-publish.yml)
 
 PLTK是一款为OBS用户设计的直播小工具服务器，您可以创建面板，在面板中添加小工具，以及实时修改小工具的位置及设置。
 PLTK无需向OBS安装任何插件，只要将展示页链接作为网页添加到OBS即可。
