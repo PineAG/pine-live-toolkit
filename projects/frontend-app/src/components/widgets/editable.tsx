@@ -1,4 +1,4 @@
-import { Dialog, Flex, IconButton, Icons, QuickConfirm, unwrapAsyncBinding, useLocalDBinding, useNullableContext } from "@pltk/components"
+import { Dialog, Flex, IconButton, Icons, QuickConfirm, unwrapAsyncBinding, unwrapAsyncSubs, useLocalDBinding, useNullableContext } from "@pltk/components"
 import { Rect, Size } from "@pltk/protocol"
 import React, { CSSProperties, ReactNode, useContext } from "react"
 import { useCachedDataProvider, useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "@pltk/core"
@@ -41,27 +41,30 @@ export function DeleteButton(props: ButtonProps) {
 
 export function EditButton(props: ButtonProps) {
     const showDialog = useLocalDBinding<boolean>(false)
-    const [TmpProvider, saveConfig, isConfigDirty] = useCachedDataProvider()
-    return <>
-    <IconButton onClick={() => showDialog.update(true)} size="middle">
-        <Icons.Edit/>
-    </IconButton>
-    <Dialog 
-            title={`设置组件 ${props.widgetDef.title}`}
-            onOk={async () => {
-                await saveConfig()
-                await showDialog.update(false)
-            }}
-            disableOk={!isConfigDirty}
-            onCancel={() => showDialog.update(false)}
-            open={showDialog.value}>
-            <>
-                <TmpProvider>
-                    {props.widgetDef.render.config()}
-                </TmpProvider>
-            </>
-    </Dialog>
-</>
+    const cacheConfigReq = useCachedDataProvider()
+    return unwrapAsyncSubs(cacheConfigReq, ([TmpProvider, saveConfig, isConfigDirty]) => {
+        return <>
+            <IconButton onClick={() => showDialog.update(true)} size="middle">
+                <Icons.Edit/>
+            </IconButton>
+            <Dialog 
+                    title={`设置组件 ${props.widgetDef.title}`}
+                    onOk={async () => {
+                        await saveConfig()
+                        await showDialog.update(false)
+                    }}
+                    disableOk={!isConfigDirty}
+                    onCancel={() => showDialog.update(false)}
+                    open={showDialog.value}>
+                    <>
+                        <TmpProvider>
+                            {props.widgetDef.render.config()}
+                        </TmpProvider>
+                    </>
+            </Dialog>
+        </>
+    })
+    
 }
 
 

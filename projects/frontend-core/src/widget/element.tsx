@@ -1,4 +1,4 @@
-import { createNullableContext, DBinding, unwrapAsyncBinding, useAsyncTemporaryBinding, useNullableContext } from "@pltk/components";
+import { AsyncSubscriptionResult, createNullableContext, DBinding, unwrapAsyncBinding, unwrapAsyncSubs, useAsyncTemporaryBinding, useNullableContext } from "@pltk/components";
 import { IWidgetMeta } from "@pltk/protocol";
 import React from "react";
 import { useWidgetConfigBinding, useWidgetMeta } from "../backend";
@@ -64,16 +64,20 @@ function WidgetCachedDataProvider<C>(props: WidgetCachedDataProviderProps<C>) {
         </InternalWidgetMetaContext.Provider>
 }
 
-export function useCachedDataProvider<C>(): [React.FC<WidgetDataProviderProps>, () => Promise<void>, boolean] {
+export function useCachedDataProvider<C>(): AsyncSubscriptionResult<[React.FC<WidgetDataProviderProps>, () => Promise<void>, boolean]> {
     const {panelId, widgetId} = useNullableContext(WidgetIdContext)
     const configReq = useWidgetConfigBinding<C>(panelId, widgetId)
-    const [tmpConfigReq, saver, isDirty] = useAsyncTemporaryBinding<C>(configReq)
-    const Provider = (props: WidgetDataProviderProps) => {
-        return unwrapAsyncBinding(tmpConfigReq, tmpConfig => {
-            return <WidgetCachedDataProvider<C> binding={tmpConfig}>
-                {props.children}
-            </WidgetCachedDataProvider>
-        })
+    const tmpConfigReq = useAsyncTemporaryBinding<C>(configReq)
+    if(tmpConfigReq.status !== "success") {
+        return tmpConfigReq
+    } else {
+        const [configBinding, saver, isDirty] = tmpConfigReq.value
+        const Provider = (props: WidgetDataProviderProps) => <WidgetCachedDataProvider<C> binding={configBinding}>
+            {props.children}
+        </WidgetCachedDataProvider>
+        return {
+            status: "success",
+            value: [Provider, saver, isDirty]
+        }
     }
-    return [Provider, saver, isDirty]
 }

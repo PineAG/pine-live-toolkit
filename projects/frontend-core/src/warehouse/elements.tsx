@@ -110,14 +110,14 @@ function EditWarehouse({warehouseId}: {warehouseId: number}) {
     const idBinding = useNullableContext(WarehouseIdBindingContext)
     const metaBindingReq = useWarehouseMetaBinding(warehouseDef.type, warehouseId)
     const configBindingReq = useWarehouseConfigBinding(warehouseDef.type, warehouseId)
-    const [configBindingTmpReq, saveConfig, isConfigDirty] = useAsyncTemporaryBinding(configBindingReq)
-    const [metaBindingTmpReq, saveMeta, isMetaDirty] = useAsyncTemporaryBinding(metaBindingReq)
+    const tmpConfigBindingReq = useAsyncTemporaryBinding(configBindingReq)
+    const tmpMetaBindingReq = useAsyncTemporaryBinding(metaBindingReq)
     async function deleteWarehouse() {
         await idBinding.update(null)
         await client.deleteWarehouse(warehouseDef.type, warehouseId)
     }
-    return unwrapAsyncBinding(configBindingTmpReq, configTmp => {
-        return unwrapAsyncBinding(metaBindingTmpReq, metaTmpBinding => {
+    return unwrapAsyncSubs(tmpConfigBindingReq, ([configTmpBinding, saveConfig, isConfigDirty]) => {
+        return unwrapAsyncSubs(tmpMetaBindingReq, ([metaTmpBinding, saveMeta, isMetaDirty]) => {
             const titleBinding = propertyBinding(metaTmpBinding, "title")
             return <CardWithActions
                     title={`编辑 ${warehouseDef.title}`}
@@ -135,7 +135,7 @@ function EditWarehouse({warehouseId}: {warehouseId: number}) {
                         <ActionButton onClick={saveMeta} disabled={!isMetaDirty}>保存</ActionButton>
                     </HStack>
                     <Divider/>
-                    <WarehouseConfigInternalProviderContext.Provider value={configTmp}>
+                    <WarehouseConfigInternalProviderContext.Provider value={configTmpBinding}>
                         <WarehouseMetaInternalProviderContext.Provider value={metaTmpBinding}>
                             {warehouseDef.render.config()}
                         </WarehouseMetaInternalProviderContext.Provider>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Loading } from "./components"
-import { DBinding, useLocalDBinding } from "./store"
+import { DBinding, haltBinding, useLocalDBinding } from "./store"
 
 export type AsyncSubscriptionResult<T> = {status: "pending"} | {status: "success", value: T}
 export type AsyncBindingResult<T> = {status: "pending"} | {status: "success", binding: DBinding<T>}
@@ -29,28 +29,45 @@ export function unwrapAsyncBinding<T, R>(subs: AsyncBindingResult<T>, renderer: 
     }
 }
 
-export function useAsyncTemporaryBinding<T>(bind: AsyncBindingResult<T>): [AsyncBindingResult<T>, () => Promise<void>, boolean] {
-    const tmpBinding = useLocalDBinding<T | undefined>(bind.status === "success" ? bind.binding.value : undefined)
+export function useAsyncTemporaryBinding<T>(bind: AsyncBindingResult<T>): AsyncSubscriptionResult<[DBinding<T>, () => Promise<void>, boolean]> {
+    const [tmpBind, setTmpBind] = useState<AsyncBindingResult<T>>({status: "pending"})
     const [dirty, setDirty] = useState(false)
     useEffect(() => {
         if(bind.status === "success") {
-            tmpBinding.update(bind.binding.value)
-            setDirty(false)
+            const update = async (value: T) => {
+                setTmpBind({
+                    status: "success",
+                    binding: {
+                        value,
+                        update 
+                    }
+                })
+                setDirty(true)
+            }
+            setTmpBind({
+                status: "success",
+                binding: {
+                    value: bind.binding.value,
+                    update
+                }
+            })
+        } else {
+            setTmpBind(bind)
         }
     }, [bind.status === "success" ? bind.binding.value : undefined])
     if(bind.status === "success") {
-        if(tmpBinding.value === undefined) {
-            return [{status: "pending"}, () => {throw new Error("Operation not allowed")}, false]
+        const saver = async () => {
+            await bind.binding.update(bind.binding.value)
+        }
+        if(tmpBind.status === "success") {
+            return {
+                status: "success",
+                value: [tmpBind.binding, saver, dirty]
+            }
         }else{
-            return [{status: "success", binding: {
-                value: tmpBinding.value,
-                update: async (value) => {
-                    await tmpBinding.update(value)
-                    setDirty(true)
-                }
-            }}, () => bind.binding.update(tmpBinding.value as T), dirty]
+            return tmpBind
         }
     } else {
-        return [bind, () => Promise.resolve(), false]
+        return bind
     }
 }
