@@ -1,7 +1,7 @@
 import {useMemo} from "react"
 import { ILiveToolkitClient, ILiveToolkitFileStorage, ILiveToolkitSubscription, IWidgetMeta, IWidgetReference } from "@pltk/protocol"
 import { CacheStore } from "./cache"
-import { createNullableContext, useNullableContext } from "./utils"
+import { createNullableContext, useNullableContext } from "@pltk/components"
 
 const ClientContext = createNullableContext<ILiveToolkitClient>("Backend not initialized")
 const FileStorageContext = createNullableContext<ILiveToolkitFileStorage>("FileStorage not initialized")

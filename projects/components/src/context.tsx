@@ -27,6 +27,6 @@ export function useNullableContext<T>(context: NullableContext<T>): T {
     if(internal.initialized) {
         return internal.value
     } else {
-        throw new Error(internal.message)
+        throw new Error(internal['message'])
     }
 }

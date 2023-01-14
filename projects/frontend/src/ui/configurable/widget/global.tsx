@@ -1,5 +1,5 @@
+import { createNullableContext, useNullableContext } from "@pltk/components"
 import { useMemo } from "react"
-import { createNullableContext, useNullableContext } from "../../backend/hooks/utils"
 import { WidgetDefinition } from "./base"
 
 interface EnabledWidgetsStore {
