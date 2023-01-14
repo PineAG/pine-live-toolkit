@@ -94,7 +94,7 @@ async function publishDependency(projName) {
     version = nextPatchVersion(version)
     console.log("Using version", version, "for", packageName)
     await initializeGitConfig()
-    await execCommand("yarn", ["publish", "--access", "public", "--new-version", version], projDir)
+    await execCommand("yarn", ["publish", "--access", "public", "--new-version", version, "--no-git-tag-version"], projDir)
 }
 
 function watchProject(projName) {
