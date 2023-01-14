@@ -40,11 +40,15 @@ function execCommandGettingOutput(command, cwd) {
     })
 }
 
-async function getProjectVersion(projName) {
+async function getProjectPackageName(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
     const packageFile = path.resolve(projDir, "package.json")
     const package = JSON.parse(await fs.readFile(packageFile, {encoding: "utf-8"}))
     const packageName = package["name"]
+    return packageName
+}
+
+async function getProjectVersion(packageName) {
     console.log("Retrieving version of", packageName)
     let version = null
     try {
@@ -84,8 +88,10 @@ async function installProjectDependencies(projName) {
 
 async function publishDependency(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
-    let version = await getProjectVersion(projName)
+    let packageName = await getProjectPackageName(projName)
+    let version = await getProjectVersion(packageName)
     version = nextPatchVersion(version)
+    console.log("Using version", version, "for", packageName)
     await initializeGitConfig()
     await execCommand("yarn", ["publish", "--access", "public", "--new-version", version], projDir)
 }
