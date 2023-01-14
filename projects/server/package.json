@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "lib/index.js",
   "typings": "src/index",
-  "license": "MIT",
+  "license": "GPL-3.0+",
   "dependencies": {
     "@pltk/protocol": "*",
     "minimist": "^1.2.7",

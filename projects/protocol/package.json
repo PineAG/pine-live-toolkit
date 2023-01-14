@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "typing": "src/index.ts",
   "main": "lib/index.js",
-  "license": "MIT",
+  "license": "GPL-3.0+",
   "private": false,
   "files": ["lib", "src"],
   "scripts": {
