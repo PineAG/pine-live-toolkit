@@ -1,15 +1,15 @@
 import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Select, Switch, useLocalDBinding, CopyableInput, IconButton, ButtonProps, Button, StringField, Tooltip, LiteDangerButton, QuickConfirm, defaultValueBinding, NumberField, propertyBinding, unwrapAsyncSubs, useNullableContext, createNullableContext } from "@pltk/components"
-import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
+import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "@pltk/core"
 import { TransparentBackground } from "../components/backgrounds"
 import { PreviewModeContext } from "../components/context"
 import { KeepRatio } from "../components/panels/KeepRatio"
 import { EditableWidget } from "../components/widgets"
 import "./Panel.css"
 import { usePanelIdFromParams } from "./utils"
-import { IPanel, IPanelMeta, Size } from "@pltk/protocol"
+import { IPanel, Size } from "@pltk/protocol"
 import { useState } from "react"
-import { useNavigate, useNavigation } from "react-router-dom"
-import { useEnabledWidgetList, useEnabledWidgets } from "../configurable"
+import { useNavigate } from "react-router-dom"
+import { useEnabledWidgetList, useEnabledWidgets } from "@pltk/core"
 
 function ShareButton() {
     return <FormItem label="展示页链接">

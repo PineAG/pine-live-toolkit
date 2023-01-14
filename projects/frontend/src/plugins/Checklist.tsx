@@ -1,6 +1,6 @@
 import { arrayBinding, ButtonProps, Collapse, convertTextStyleToCSS, DBinding, Flex, Grid, IconButton, Icons, IconSwitch, propertyBinding, StringField, TextStyleAndSize, TextStyleAndSizePicker, useLocalDBinding } from "@pltk/components";
 import { CSSProperties } from "react";
-import { WidgetDefinition, WarehouseConsumer, WarehouseEditor, WarehouseProvider, WarehouseSelect, useWidgetConfigInternal } from "../ui";
+import { WidgetDefinition, WarehouseConsumer, WarehouseEditor, WarehouseProvider, WarehouseSelect, useWidgetConfigInternal } from "@pltk/core";
 
 import "@fontsource/zcool-kuaile";
 import { ChecklistWarehouse } from "./ChecklistWarehouse";

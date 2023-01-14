@@ -1,7 +1,7 @@
 import { DangerButton, DBinding, Flex, FormItem, Grid, Icons, IconSwitch, Loading, propertyBinding, Switch, UploadButton } from "@pltk/components"
 import { ILiveToolkitFileStorage } from "@pltk/protocol"
 import { useRef } from "react"
-import { WidgetDefinition, readFileToBlob, useFileId, useLiveToolkitFileStorage, useWidgetConfigInternal } from "../ui"
+import { WidgetDefinition, readFileToBlob, useFileId, useLiveToolkitFileStorage, useWidgetConfigInternal } from "@pltk/core"
 
 export interface Config {
     fileId: string | null

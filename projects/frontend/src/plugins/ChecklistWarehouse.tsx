@@ -1,5 +1,5 @@
 import { arrayBinding, ButtonProps, DBinding, Flex, IconButton, Icons, IconSwitch, propertyBinding, QuickConfirm, StringField, useLocalDBinding } from "@pltk/components";
-import { useInternalWarehouseConfig, WarehouseDefinition } from "../ui";
+import { useInternalWarehouseConfig, WarehouseDefinition } from "@pltk/core";
 
 
 interface ChecklistItem {

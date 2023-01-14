@@ -1,5 +1,5 @@
 import { PreviewWidget } from "../components/widgets"
-import { PanelIdProvider, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "../backend"
+import { PanelIdProvider, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "@pltk/core"
 import { usePanelIdFromParams } from "./utils"
 import { PanelSize, PanelSizeContext } from "../components/context"
 import { unwrapAsyncSubs } from "@pltk/components"

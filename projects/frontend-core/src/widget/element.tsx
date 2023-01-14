@@ -1,6 +1,6 @@
 import { createNullableContext, DBinding, unwrapAsyncBinding, useNullableContext } from "@pltk/components";
 import { IWidgetMeta } from "@pltk/protocol";
-import { useWidgetConfigBinding, useWidgetMeta } from "../../backend";
+import { useWidgetConfigBinding, useWidgetMeta } from "../backend";
 import { WidgetDefinition } from "./base";
 
 const WidgetIdContext = createNullableContext<{panelId: number, widgetId: number}>("Widget ID not initialized")

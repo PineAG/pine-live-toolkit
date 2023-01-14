@@ -1,7 +1,7 @@
 import { InternationalProvider, SupportedLanguages } from '@pltk/components';
 import { RouterRoot } from './routes';
-import { BackendProvider, BackendOptions } from "./backend";
-import { EnabledWidgetProvider, WidgetDefinition } from './configurable';
+import { BackendProvider, BackendOptions } from "@pltk/core";
+import { EnabledWidgetProvider, WidgetDefinition } from '@pltk/core';
 
 export interface LiveToolkitAppProps {
     backend: BackendOptions
@@ -9,7 +9,7 @@ export interface LiveToolkitAppProps {
     plugins: WidgetDefinition<any>[]
 }
 
-export function LiveToolkit(props: LiveToolkitAppProps) {
+export function LiveToolkitApp(props: LiveToolkitAppProps) {
     return <BackendProvider fileStorage={props.backend.fileStorage} client={props.backend.client} subscription={props.backend.subscription}>
       <InternationalProvider language={props.language}>
         <EnabledWidgetProvider widgets={props.plugins}>
@@ -18,6 +18,3 @@ export function LiveToolkit(props: LiveToolkitAppProps) {
       </InternationalProvider>
     </BackendProvider>
 }
-
-export * from "./backend"
-export * from "./configurable"

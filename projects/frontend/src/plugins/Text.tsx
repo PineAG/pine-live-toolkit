@@ -1,5 +1,5 @@
 import { convertTextStyleToCSS, FormItem, Grid, MultiLinesStringField, propertyBinding, TextStyleAndSize, TextStyleAndSizePicker } from "@pltk/components"
-import { WidgetDefinition, useWidgetConfigInternal } from "../ui"
+import { WidgetDefinition, useWidgetConfigInternal } from "@pltk/core"
 
 import "@fontsource/zcool-kuaile"
 

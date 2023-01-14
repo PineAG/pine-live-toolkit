@@ -1,6 +1,6 @@
 import { createNullableContext, DBinding, unwrapAsyncBinding, useNullableContext } from "@pltk/components";
 import { Rect } from "@pltk/protocol";
-import { usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetRectBinding } from "../../backend";
+import { usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetRectBinding } from "@pltk/core";
 
 export interface IWidgetBackendContext<Config> {
     config: DBinding<Config>

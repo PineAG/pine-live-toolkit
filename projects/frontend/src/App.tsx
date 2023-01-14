@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
 import features from './features.json';
-import { BackendOptions, LiveToolkit } from './ui';
+import { LiveToolkitApp } from './ui';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
 import { clearIndexedDBBackendData, createIndexedDBBackend } from '@pltk/indexdb-backend';
 import { createRestfulBackend } from '@pltk/restful-backend-client';
+import { BackendOptions } from '@pltk/core';
 
 function createBackend(): BackendOptions {
   if(features.Use_LocalStorage_Backend) {
@@ -18,7 +19,7 @@ function createBackend(): BackendOptions {
 function App() {
   const backend = React.useMemo(createBackend, [])
   return <>
-    <LiveToolkit
+    <LiveToolkitApp
       language='zhCN'
       backend={backend}
       plugins={builtinPlugins}

@@ -1,4 +1,4 @@
-import { WidgetDefinition } from "../ui"
+import { WidgetDefinition } from "@pltk/core"
 import ChecklistPlugin from "./Checklist"
 import ClockPlugin from "./Clock"
 import ImageViewerPlugin from "./ImageViewer"

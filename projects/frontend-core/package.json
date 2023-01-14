@@ -1,0 +1,16 @@
+{
+  "name": "@pltk/core",
+  "version": "1.0.0",
+  "typings": "src/index.ts",
+  "main": "lib/index.js",
+  "files": ["lib"],
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "@pltk/components": "*",
+    "@pltk/protocol": "*"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}

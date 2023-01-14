@@ -1,7 +1,7 @@
 import { ActionButton, BasicEmpty, CardWithActions, createNullableContext, DBinding, Divider, FormItem, HStack, LiteDangerButton, Loading, propertyBinding, QuickConfirm, Select, SimpleCard, StringField, unwrapAsyncBinding, unwrapAsyncSubs, useAsyncTemporaryBinding, useLocalDBinding, useNullableContext } from "@pltk/components";
 import { IWarehouseMeta } from "@pltk/protocol";
 import { useEffect, useState } from "react";
-import { useLiveToolkitClient, useWarehouseConfigBinding, useWarehouseList, useWarehouseMetaBinding } from "../../backend";
+import { useLiveToolkitClient, useWarehouseConfigBinding, useWarehouseList, useWarehouseMetaBinding } from "../backend";
 import { WarehouseObject } from "./base";
 
 export interface WarehouseProviderProps<C> {

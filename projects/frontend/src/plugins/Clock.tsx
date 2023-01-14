@@ -1,7 +1,7 @@
 import { convertTextStyleToCSS, TextStyle, TextStylePicker } from "@pltk/components"
 import moment from "moment"
 import { useEffect, useRef, useState } from "react"
-import { useWidgetConfigInternal, WidgetDefinition } from "../ui"
+import { useWidgetConfigInternal, WidgetDefinition } from "@pltk/core"
 
 import { FormItem, Grid, propertyBinding, StringField } from "@pltk/components"
 import "@fontsource/baumans"
