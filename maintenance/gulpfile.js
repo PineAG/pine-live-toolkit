@@ -6,7 +6,6 @@ const {existsSync} = require("fs")
 
 const rootDir = path.resolve(__dirname, "..")
 
-
 function execCommand(command, args, cwd) {
     const {spawn} = require("child_process")
     return new Promise((resolve, reject) => {
@@ -27,6 +26,47 @@ function execCommand(command, args, cwd) {
     })
 }
 
+function execCommandGettingOutput(command, cwd) {
+    const {exec} = require("child_process")
+    return new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+            console.warn(stderr)
+            if(error) {
+                reject(error)
+            } else {
+                resolve(stdout)
+            }
+        })
+    })
+}
+
+async function getProjectVersion(projName) {
+    const projDir = path.resolve(rootDir, "projects", projName)
+    const packageFile = path.resolve(projDir, "package.json")
+    const package = JSON.parse(await fs.readFile(packageFile, {encoding: "utf-8"}))
+    const packageName = package["name"]
+    console.log("Retrieving version of", packageName)
+    let version = null
+    try {
+        version = await execCommandGettingOutput(`npm view ${packageName} version`, projDir)
+        version = version.trim()
+    } catch(e) {
+        console.error(e)
+    }
+    return version
+}
+
+function nextPatchVersion(version) {
+    if(!version) {
+        return "1.0.0"
+    } else {
+        let [major, minor, patch] = version.split(".")
+        patch = parseInt(patch)
+        patch++
+        return `${major}.${minor}.${patch}`
+    }
+}
+
 async function buildProject(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
     await execCommand("yarn", ["run", "build"], projDir)
@@ -39,7 +79,9 @@ async function installProjectDependencies(projName) {
 
 async function publishDependency(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
-    await execCommand("npm", ["publish", "--force", "--access", "public"], projDir)
+    let version = await getProjectVersion("components")
+    version = nextPatchVersion(version)
+    await execCommand("yarn", ["publish", "--access", "public", "--new-version", version], projDir)
 }
 
 function watchProject(projName) {
