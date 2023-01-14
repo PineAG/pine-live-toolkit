@@ -79,7 +79,7 @@ async function installProjectDependencies(projName) {
 
 async function publishDependency(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
-    let version = await getProjectVersion("components")
+    let version = await getProjectVersion(projName)
     version = nextPatchVersion(version)
     await execCommand("yarn", ["publish", "--access", "public", "--new-version", version], projDir)
 }
