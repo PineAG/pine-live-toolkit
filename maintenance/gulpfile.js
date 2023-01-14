@@ -26,7 +26,7 @@ function execCommand(command, args, cwd) {
     })
 }
 
-function execCommandGettingOutput(command, cwd) {
+function execCommandGettingOutput(command) {
     const {exec} = require("child_process")
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
@@ -52,7 +52,7 @@ async function getProjectVersion(packageName) {
     console.log("Retrieving version of", packageName)
     let version = null
     try {
-        version = await execCommandGettingOutput(`npm view ${packageName} version`, projDir)
+        version = await execCommandGettingOutput(`npm view ${packageName} version`)
         version = version.trim()
     } catch(e) {
         console.error(e)
