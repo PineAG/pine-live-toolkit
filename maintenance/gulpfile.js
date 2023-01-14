@@ -90,6 +90,7 @@ async function publishDependency(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
     let packageName = await getProjectPackageName(projName)
     let version = await getProjectVersion(packageName)
+    console.log(`Current ${packageName} version: ${JSON.stringify(version)}`)
     version = nextPatchVersion(version)
     console.log("Using version", version, "for", packageName)
     await initializeGitConfig()
