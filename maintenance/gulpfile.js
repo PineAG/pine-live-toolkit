@@ -67,6 +67,11 @@ function nextPatchVersion(version) {
     }
 }
 
+async function initializeGitConfig() {
+    await execCommand("git", ["config", "user.name", "AgailAutomation"])
+    await execCommand("git", ["config", "user.email", "automation@pine-ag.com"])
+}
+
 async function buildProject(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
     await execCommand("yarn", ["run", "build"], projDir)
@@ -81,6 +86,7 @@ async function publishDependency(projName) {
     const projDir = path.resolve(rootDir, "projects", projName)
     let version = await getProjectVersion(projName)
     version = nextPatchVersion(version)
+    await initializeGitConfig()
     await execCommand("yarn", ["publish", "--access", "public", "--new-version", version], projDir)
 }
 
