@@ -1,0 +1,21 @@
+{
+  "name": "@pltk/builtin-widgets",
+  "version": "1.0.0",
+  "license": "MIT",
+  "typings": "src/index.ts",
+  "main": "lib/index.js",
+  "files": ["lib"],
+  "dependencies": {
+    "@fontsource/zen-dots": "^4.5.8",
+    "@fontsource/zcool-kuaile": "^4.5.10",
+    "@fontsource/baumans": "^4.5.9",
+    "typescript": "^4.9.3",
+    "react": "^18.2.0",
+    "@pltk/components": "*",
+    "@pltk/protocol": "*",
+    "@pltk/core": "*"
+  },
+  "scripts": {
+    "build": "tsc --build --verbose"
+  }
+}

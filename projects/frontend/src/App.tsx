@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import features from './features.json';
 import { LiveToolkitApp } from '@pltk/app';
-import builtinPlugins from './plugins';
+import builtinPlugins from '@pltk/builtin-widgets';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
 import { clearIndexedDBBackendData, createIndexedDBBackend } from '@pltk/indexdb-backend';
 import { createRestfulBackend } from '@pltk/restful-backend-client';
