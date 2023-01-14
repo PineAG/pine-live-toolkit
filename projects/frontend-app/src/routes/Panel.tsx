@@ -1,5 +1,5 @@
-import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Select, Switch, useLocalDBinding, CopyableInput, IconButton, ButtonProps, Button, StringField, Tooltip, LiteDangerButton, QuickConfirm, defaultValueBinding, NumberField, propertyBinding, unwrapAsyncSubs, useNullableContext, createNullableContext } from "@pltk/components"
-import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetProvider } from "@pltk/core"
+import { ActionButton, DBinding, Dialog, Flex, FormItem, Grid, HStack, Icons, Select, Switch, useLocalDBinding, CopyableInput, IconButton, ButtonProps, Button, StringField, Tooltip, LiteDangerButton, QuickConfirm, defaultValueBinding, NumberField, propertyBinding, unwrapAsyncSubs, useNullableContext, createNullableContext, Divider, Collapse } from "@pltk/components"
+import { PanelIdProvider, useLiveToolkitClient, usePanel, usePanelId, useWidgetListOfPanel, WidgetConfigInternalProvider, WidgetProvider } from "@pltk/core"
 import { TransparentBackground } from "../components/backgrounds"
 import { PreviewModeContext } from "../components/context"
 import { KeepRatio } from "../components/panels/KeepRatio"
@@ -7,7 +7,7 @@ import { EditableWidget } from "../components/widgets"
 import "./Panel.css"
 import { usePanelIdFromParams } from "./utils"
 import { IPanel, Size } from "@pltk/protocol"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useEnabledWidgetList, useEnabledWidgets } from "@pltk/core"
 
@@ -21,43 +21,67 @@ function ShareButton() {
 }
 
 function AddPluginButton() {
+    const showDialog = useLocalDBinding(false)
+    return <>
+        <ActionButton icon={<Icons.Add/>} onClick={() => showDialog.update(true)}>添加组件</ActionButton>
+        <AddPluginDialogInternal showDialog={showDialog}/>
+    </>
+}
+
+function AddPluginDialogInternal(props: {showDialog: DBinding<boolean>, }) {
     const panelId = usePanelId()
     const client = useLiveToolkitClient()
-    const enabledPluginsList = useEnabledWidgetList()
-    const enabledPlugins = useEnabledWidgets()
-    const newPluginTypeBinding = useLocalDBinding<string | null>(null)
-    return <>
-        <ActionButton icon={<Icons.Add/>} onClick={() => newPluginTypeBinding.update(enabledPluginsList[0].type)}>添加组件</ActionButton>
-        <Dialog title="添加组件" open={newPluginTypeBinding.value !== null} 
-                onOk={async () => {
-                    if(newPluginTypeBinding.value === null) return;
-                    const plugin = enabledPlugins[newPluginTypeBinding.value]
-                    await client.createWidget<any>(panelId, {
-                        meta: {type: plugin.type},
-                        rect: {
-                            x: 0, y: 0,
-                            ...plugin.initialize.defaultSize()
-                        },
-                        config: plugin.initialize.defaultConfig()
-                    })
-                    newPluginTypeBinding.update(null)
-                }} 
-                onCancel={() => newPluginTypeBinding.update(null)}>
-            <Grid container>
-                <Grid span={12}>
-                    <FormItem label="组件类型">
-                        <Select
-                            binding={newPluginTypeBinding}
-                            options={enabledPluginsList.map(plugin => ({
-                                value: plugin.type,
-                                label: plugin.title
-                            }))}
-                        />
-                    </FormItem>
-                </Grid>
-            </Grid>
-        </Dialog>
-    </>
+    const enabledWidgetsList = useEnabledWidgetList()
+    const enabledWidgets = useEnabledWidgets()
+    const currentWidgetType = useLocalDBinding(enabledWidgetsList[0].type)
+    const tmpConfig = useLocalDBinding<any>(undefined)
+
+    useEffect(() => {
+        if(props.showDialog.value) {
+            const w = enabledWidgetsList[0]
+            currentWidgetType.update(w.type)
+            tmpConfig.update(w.initialize.defaultConfig())
+        }
+    }, [props.showDialog.value])
+
+    useEffect(() => {
+        const w = enabledWidgets[currentWidgetType.value]
+        tmpConfig.update(w.initialize.defaultConfig())
+    }, [currentWidgetType.value])
+
+    async function create() {
+        const widget = enabledWidgets[currentWidgetType.value]
+        await client.createWidget<any>(panelId, {
+            meta: {type: widget.type},
+            rect: {
+                x: 0, y: 0,
+                ...widget.initialize.defaultSize()
+            },
+            config: tmpConfig.value
+        })
+        await props.showDialog.update(false)
+    }
+
+    const currentWidget = enabledWidgets[currentWidgetType.value]
+
+    return <Dialog title="添加组件" open={props.showDialog.value} 
+            onOk={create} 
+            onCancel={() => props.showDialog.update(false)}>
+        <FormItem label="组件类型">
+            <Select
+                binding={currentWidgetType}
+                options={enabledWidgetsList.map(plugin => ({
+                    value: plugin.type,
+                    label: plugin.title
+                }))}
+            />
+        </FormItem>
+        <Collapse title={`设置 ${currentWidget.title}`}>
+            <WidgetConfigInternalProvider configBinding={tmpConfig}>
+                {currentWidget.render.config()}
+            </WidgetConfigInternalProvider>
+        </Collapse>
+    </Dialog>
 }
 
 function IconBtn(props: ButtonProps) {
