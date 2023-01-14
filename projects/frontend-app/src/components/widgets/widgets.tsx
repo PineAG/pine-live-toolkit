@@ -1,7 +1,7 @@
 import { unwrapAsyncBinding, useLocalDBinding } from "@pltk/components"
 import { IWidgetReference } from "@pltk/protocol"
-import { usePanelId, useWidgetId, useWidgetRectBinding } from "@pltk/core"
-import { useEnabledWidgets, WidgetContextProvider, WidgetDataProvider } from "@pltk/core"
+import { usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetRectBinding, WidgetConfigInternalProvider } from "@pltk/core"
+import { useEnabledWidgets, WidgetContextProvider } from "@pltk/core"
 
 import { EditableStateContext } from "../context"
 import { EditableState } from "./base"
@@ -18,23 +18,26 @@ export function EditableWidget(props: ComponentProps){
     const stateBinding = useLocalDBinding(EditableState.Edit)
     const panelId = usePanelId()
     const widgetId = useWidgetId()
+    const configReq = useWidgetConfigBinding(panelId, widgetId)
 
     const widgetDef = enabledWidgets[meta.type]
     if(!widgetDef) {
         return <div>未安装组件: {meta.type}</div>
     }
-    
-    return <WidgetContextProvider panelId={panelId} widgetId={widgetId} widgetDefinition={widgetDef}>
-        <WidgetDataProvider>
-            <EditableStateContext.Provider value={stateBinding}>
-                <EditableBody render={{
-                    preview: () => widgetDef.render.preview(),
-                    edit: () => widgetDef.render.edit(),
-                    move: () => widgetDef.render.move()
-                }}/>
-            </EditableStateContext.Provider>
-        </WidgetDataProvider>
-    </WidgetContextProvider>
+
+    return unwrapAsyncBinding(configReq, configBinding => {
+        return <WidgetContextProvider panelId={panelId} widgetId={widgetId} widgetDefinition={widgetDef}>
+            <WidgetConfigInternalProvider configBinding={configBinding}>
+                <EditableStateContext.Provider value={stateBinding}>
+                    <EditableBody render={{
+                        preview: () => widgetDef.render.preview(),
+                        edit: () => widgetDef.render.edit(),
+                        move: () => widgetDef.render.move()
+                    }}/>
+                </EditableStateContext.Provider>
+            </WidgetConfigInternalProvider>
+        </WidgetContextProvider>
+    })
 }
 
 export function PreviewWidget(props: ComponentProps){
@@ -43,18 +46,21 @@ export function PreviewWidget(props: ComponentProps){
     const panelId = usePanelId()
     const widgetId = useWidgetId()
     const widgetRectReq = useWidgetRectBinding(panelId, widgetId)
+    const configReq = useWidgetConfigBinding(panelId, widgetId)
     
     const widgetDef = enabledWidgets[meta.type]
     if(!widgetDef) {
         return <div>`未安装组件: ${meta.type}`</div>
     }
-    return unwrapAsyncBinding(widgetRectReq, rectBinding => (
-        <WidgetContextProvider panelId={panelId} widgetId={widgetId} widgetDefinition={widgetDef}>
-            <WidgetDataProvider>
-                <PreviewFramework rect={rectBinding.value}>
-                    {widgetDef.render.preview()}
-                </PreviewFramework>
-            </WidgetDataProvider>
-        </WidgetContextProvider>
-    ))
+    return unwrapAsyncBinding(widgetRectReq, rectBinding => {
+        return unwrapAsyncBinding(configReq, configBinding => {
+            return <WidgetContextProvider panelId={panelId} widgetId={widgetId} widgetDefinition={widgetDef}>
+                <WidgetConfigInternalProvider configBinding={configBinding}>
+                    <PreviewFramework rect={rectBinding.value}>
+                        {widgetDef.render.preview()}
+                    </PreviewFramework>
+                </WidgetConfigInternalProvider>
+            </WidgetContextProvider>
+        })
+    })
 }

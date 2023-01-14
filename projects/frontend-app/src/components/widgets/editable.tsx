@@ -1,7 +1,7 @@
-import { Dialog, Flex, IconButton, Icons, QuickConfirm, unwrapAsyncBinding, unwrapAsyncSubs, useLocalDBinding, useNullableContext } from "@pltk/components"
+import { DBinding, Dialog, Flex, IconButton, Icons, QuickConfirm, unwrapAsyncBinding, unwrapAsyncSubs, useLocalDBinding, useNullableContext, useTemporaryBinding } from "@pltk/components"
 import { Rect, Size } from "@pltk/protocol"
 import React, { CSSProperties, ReactNode, useContext } from "react"
-import { useCachedDataProvider, useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding } from "@pltk/core"
+import { useLiveToolkitClient, usePanelId, useWidgetConfigBinding, useWidgetId, useWidgetMeta, useWidgetRectBinding, WidgetConfigInternalProvider } from "@pltk/core"
 import { useEnabledWidgets, WidgetDefinition } from "@pltk/core"
 import { EditableStateContext, PanelSizeContext, PreviewModeContext } from "../context"
 import { EditableState } from "./base"
@@ -40,31 +40,42 @@ export function DeleteButton(props: ButtonProps) {
 }
 
 export function EditButton(props: ButtonProps) {
+    const panelId = usePanelId()
+    const widgetId = useWidgetId()
     const showDialog = useLocalDBinding<boolean>(false)
-    const cacheConfigReq = useCachedDataProvider()
-    return unwrapAsyncSubs(cacheConfigReq, ([TmpProvider, saveConfig, isConfigDirty]) => {
+    const configBindingReq = useWidgetConfigBinding(panelId, widgetId)
+    return unwrapAsyncBinding(configBindingReq, configBinding => {
         return <>
             <IconButton onClick={() => showDialog.update(true)} size="middle">
                 <Icons.Edit/>
             </IconButton>
-            <Dialog 
-                    title={`设置组件 ${props.widgetDef.title}`}
-                    onOk={async () => {
-                        await saveConfig()
-                        await showDialog.update(false)
-                    }}
-                    disableOk={!isConfigDirty}
-                    onCancel={() => showDialog.update(false)}
-                    open={showDialog.value}>
-                    <>
-                        <TmpProvider>
-                            {props.widgetDef.render.config()}
-                        </TmpProvider>
-                    </>
-            </Dialog>
+            <EditDialogInternal<any>
+                    widgetDef={props.widgetDef}
+                    showDialog={showDialog}
+                    configBinding={configBinding}
+                />
         </>
     })
     
+}
+
+function EditDialogInternal<C>(props: {showDialog: DBinding<boolean>, widgetDef: WidgetDefinition<any>, configBinding: DBinding<C>}) {
+    const [tmpConfig, saveConfig, isConfigDirty] = useTemporaryBinding(props.configBinding)
+    return <>
+        <Dialog 
+                title={`设置组件 ${props.widgetDef.title}`}
+                onOk={async () => {
+                    await saveConfig()
+                    await props.showDialog.update(false)
+                }}
+                disableOk={!isConfigDirty}
+                onCancel={() => props.showDialog.update(false)}
+                open={props.showDialog.value}>
+                <WidgetConfigInternalProvider configBinding={tmpConfig}>
+                    {props.widgetDef.render.config()}
+                </WidgetConfigInternalProvider>
+        </Dialog>
+    </>
 }
 
 

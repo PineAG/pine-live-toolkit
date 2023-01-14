@@ -218,17 +218,22 @@ export function haltBinding<T>(): DBinding<T> {
     }
 }
 
-export function useTemporaryBinding<T>(parent: DBinding<T>): [DBinding<T>, () => Promise<void>] {
+export function useTemporaryBinding<T>(parent: DBinding<T>): [DBinding<T>, () => Promise<void>, boolean] {
     const [tmp, setTmp] = useState<T>(parent.value)
+    const [isDirty, setDirty] = useState(false)
     useEffect(() => {
         setTmp(parent.value)
+        setDirty(false)
     }, [parent.value])
     const saver = async () => {
         await parent.update(tmp)
     }
     const binding: DBinding<T> = {
         value: tmp,
-        update: async val => {setTmp(val)}
+        update: async val => {
+            setTmp(val)
+            setDirty(true)
+        }
     }
-    return [binding, saver]
+    return [binding, saver, isDirty]
 }

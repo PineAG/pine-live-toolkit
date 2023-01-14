@@ -1,4 +1,4 @@
-import { ActionButton, BasicEmpty, CardWithActions, createNullableContext, DBinding, Divider, FormItem, HStack, LiteDangerButton, Loading, propertyBinding, QuickConfirm, Select, SimpleCard, StringField, unwrapAsyncBinding, unwrapAsyncSubs, useAsyncTemporaryBinding, useLocalDBinding, useNullableContext } from "@pltk/components";
+import { ActionButton, BasicEmpty, CardWithActions, createNullableContext, DBinding, Divider, FormItem, HStack, LiteDangerButton, Loading, propertyBinding, QuickConfirm, Select, SimpleCard, StringField, unwrapAsyncBinding, unwrapAsyncSubs, useLocalDBinding, useNullableContext, useTemporaryBinding } from "@pltk/components";
 import { IWarehouseMeta } from "@pltk/protocol";
 import { useEffect, useState } from "react";
 import { useLiveToolkitClient, useWarehouseConfigBinding, useWarehouseList, useWarehouseMetaBinding } from "../backend";
@@ -105,44 +105,56 @@ export function WarehouseEditor() {
 }
 
 function EditWarehouse({warehouseId}: {warehouseId: number}) {
-    const client = useLiveToolkitClient()
     const warehouseDef = useNullableContext(WarehouseDefinitionContext)
-    const idBinding = useNullableContext(WarehouseIdBindingContext)
     const metaBindingReq = useWarehouseMetaBinding(warehouseDef.type, warehouseId)
     const configBindingReq = useWarehouseConfigBinding(warehouseDef.type, warehouseId)
-    const tmpConfigBindingReq = useAsyncTemporaryBinding(configBindingReq)
-    const tmpMetaBindingReq = useAsyncTemporaryBinding(metaBindingReq)
+    
+    return unwrapAsyncBinding(metaBindingReq, metaBinding => {
+        return unwrapAsyncBinding(configBindingReq, configBinding => {
+            return <EditWarehouseInternal
+                warehouseId={warehouseId}
+                metaBinding={metaBinding}
+                configBinding={configBinding}
+            />
+        })
+    })
+}
+
+function EditWarehouseInternal<C>({configBinding, metaBinding, warehouseId}: {configBinding: DBinding<C>, metaBinding: DBinding<IWarehouseMeta>, warehouseId: number}) {
+    const warehouseDef = useNullableContext(WarehouseDefinitionContext)
+    const client = useLiveToolkitClient()
+    const [tmpMeta, saveMeta, isMetaDirty] = useTemporaryBinding(metaBinding)
+    const [tmpConfig, saveConfig, isConfigDirty] = useTemporaryBinding(configBinding)
+    const idBinding = useNullableContext(WarehouseIdBindingContext)
+    const titleBinding = propertyBinding(metaBinding, "title")
+
     async function deleteWarehouse() {
         await idBinding.update(null)
         await client.deleteWarehouse(warehouseDef.type, warehouseId)
     }
-    return unwrapAsyncSubs(tmpConfigBindingReq, ([configTmpBinding, saveConfig, isConfigDirty]) => {
-        return unwrapAsyncSubs(tmpMetaBindingReq, ([metaTmpBinding, saveMeta, isMetaDirty]) => {
-            const titleBinding = propertyBinding(metaTmpBinding, "title")
-            return <CardWithActions
-                    title={`编辑 ${warehouseDef.title}`}
-                    actions={[
-                        <QuickConfirm title={`删除 ${warehouseDef.title}`} description="此操作无法恢复" onConfirm={deleteWarehouse}>
-                            <LiteDangerButton>清除</LiteDangerButton>
-                        </QuickConfirm>,
-                        <ActionButton onClick={saveConfig} disabled={!isConfigDirty}>保存</ActionButton>
-                    ]}
-                >
-                    <HStack layout={["1fr", "auto"]} spacing={10}>
-                        <FormItem label="标题">
-                            <StringField binding={titleBinding}/>
-                        </FormItem>
-                        <ActionButton onClick={saveMeta} disabled={!isMetaDirty}>保存</ActionButton>
-                    </HStack>
-                    <Divider/>
-                    <WarehouseConfigInternalProviderContext.Provider value={configTmpBinding}>
-                        <WarehouseMetaInternalProviderContext.Provider value={metaTmpBinding}>
-                            {warehouseDef.render.config()}
-                        </WarehouseMetaInternalProviderContext.Provider>
-                    </WarehouseConfigInternalProviderContext.Provider>
-            </CardWithActions>
-        })
-    })
+
+    return <CardWithActions
+        title={`编辑 ${warehouseDef.title}`}
+        actions={[
+            <QuickConfirm title={`删除 ${warehouseDef.title}`} description="此操作无法恢复" onConfirm={deleteWarehouse}>
+                <LiteDangerButton>清除</LiteDangerButton>
+            </QuickConfirm>,
+            <ActionButton onClick={saveConfig} disabled={!isConfigDirty}>保存</ActionButton>
+        ]}
+    >
+        <HStack layout={["1fr", "auto"]} spacing={10}>
+            <FormItem label="标题">
+                <StringField binding={titleBinding}/>
+            </FormItem>
+            <ActionButton onClick={saveMeta} disabled={!isMetaDirty}>保存</ActionButton>
+        </HStack>
+        <Divider/>
+        <WarehouseConfigInternalProviderContext.Provider value={tmpConfig}>
+            <WarehouseMetaInternalProviderContext.Provider value={tmpMeta}>
+                {warehouseDef.render.config()}
+            </WarehouseMetaInternalProviderContext.Provider>
+        </WarehouseConfigInternalProviderContext.Provider>
+    </CardWithActions>
 }
 
 function CreateWarehouse() {

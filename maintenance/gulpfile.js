@@ -76,9 +76,9 @@ async function initializeGitConfig() {
     await execCommand("git", ["config", "user.email", "automation@pine-ag.com"])
 }
 
-async function buildProject(projName) {
+async function buildProject(projName, command) {
     const projDir = path.resolve(rootDir, "projects", projName)
-    await execCommand("yarn", ["run", "build"], projDir)
+    await execCommand("yarn", ["run", command ?? "build"], projDir)
 }
 
 async function installProjectDependencies(projName) {
@@ -97,14 +97,14 @@ async function publishDependency(projName) {
     await execCommand("yarn", ["publish", "--access", "public", "--new-version", version, "--no-git-tag-version"], projDir)
 }
 
-function watchProject(projName) {
+function watchProject(projName, command) {
     const projDir = path.resolve(rootDir, "projects", projName)
     const files = ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.json", "./src/**/*.css"]
     return gulp.watch(files, {
         cwd: projDir,
         ignoreInitial: false
         
-    }, () => buildProject(projDir))
+    }, () => buildProject(projDir, command))
 }
 
 async function updateFeatures(newfeatures) {
@@ -147,8 +147,11 @@ exports.buildApps = async () => {
 }
 
 exports.watchDependencies = gulp.task("watchDependencies", () => {
-    watchProject("protocol")
-    watchProject("components")
+    watchProject("protocol", "build")
+    watchProject("components", "build")
+    watchProject("frontend-core", "build")
+    watchProject("frontend-app", "build-ts")
+    watchProject("frontend-widgets", "build")
 })
 
 exports.publishAllLibraries = async () => {

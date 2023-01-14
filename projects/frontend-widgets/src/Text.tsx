@@ -21,7 +21,7 @@ function TextConfig() {
     const configBinding = useWidgetConfigInternal<Config>()
     const contentStore = propertyBinding(configBinding, "content")
     const textStyle = propertyBinding(configBinding, "textStyle")
-
+    console.log("Rerender", configBinding.value)
     return <Grid container>
         <Grid span={12}>
             <TextStyleAndSizePicker
