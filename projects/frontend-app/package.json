@@ -1,0 +1,31 @@
+{
+  "name": "@pltk/app",
+  "version": "1.0.0",
+  "source": "src/index.ts",
+  "typings": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@pltk/components": "*",
+    "@pltk/core": "*",
+    "@pltk/protocol": "*",
+    "@types/react-dom": "^18.0.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-rnd": "^10.3.7",
+    "react-router-dom": "^6.4.4",
+    "typescript": "^4.9.3"
+  },
+  "scripts": {
+    "build": "yarn build-ts && yarn build-copyfiles",
+    "build-ts": "tsc --build --verbose",
+    "build-copyfiles": "gulp copyFiles"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "gulp": "^4.0.2"
+  }
+}

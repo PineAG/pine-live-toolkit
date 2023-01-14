@@ -135,6 +135,8 @@ exports.buildLibs = async () => {
     await buildProject("backend-indexeddb")
     await buildProject("backend-rest-client")
     await buildProject("backend-rest-server")
+    await buildProject("frontend-core")
+    await buildProject("frontend-app")
 }
 
 exports.buildApps = async () => {
@@ -154,6 +156,8 @@ exports.publishAllLibraries = async () => {
     await publishDependency("backend-indexeddb")
     await publishDependency("backend-rest-client")
     await publishDependency("backend-rest-server")
+    await publishDependency("frontend-core")
+    await publishDependency("frontend-app")
 }
 
 async function copyBackendProject(src, dst) {

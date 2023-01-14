@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import features from './features.json';
-import { LiveToolkitApp } from './ui';
+import { LiveToolkitApp } from '@pltk/app';
 import builtinPlugins from './plugins';
 import { DangerLink, Dialog, Icons, QuickConfirm } from '@pltk/components';
 import { clearIndexedDBBackendData, createIndexedDBBackend } from '@pltk/indexdb-backend';
