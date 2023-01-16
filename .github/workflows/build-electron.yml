@@ -28,11 +28,13 @@ jobs:
         cache: 'npm'
     - name: Yarn Install
       run: yarn install
-    - name: Build Dependencies
+    - name: Remove workspace
       run: |
-          cd maintenance
-          npx gulp buildLibs
-          npx gulp buildApps
+          rm package.json
+    - name: Install Dependencies
+      run: |
+          cd projects/desktop
+          yarn install
     - name: Build Electron
       run: |
           cd projects/desktop

@@ -20,10 +20,11 @@
   },
   "scripts": {
     "start": "yarn build-pack && yarn start-electron",
-    "build": "yarn build-pack && yarn copy-manifest && electron-packager lib PineLiveToolkit --out=build --platform=win32 --arch=x64",
+    "build": "yarn build-pack && yarn copy-manifest && yarn copy-node-modules && electron-packager lib PineLiveToolkit --out=build --platform=win32 --arch=x64",
     "start-electron": "electron lib",
     "build-pack": "yarn build-ts && yarn build-html && yarn copy-static",
     "build-ts": "tsc --build --verbose",
+    "copy-node-modules": "cp -r ./node_modules ./lib/node_modules",
     "build-html": "cp src/index.html lib/index.html",
     "copy-static": "cp -r ../frontend/build ./lib/static",
     "copy-manifest": "cp package.json lib/package.json"
