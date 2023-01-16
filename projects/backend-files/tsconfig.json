@@ -8,8 +8,7 @@
         "composite": true,
         "moduleResolution": "node",
         "esModuleInterop": true,
-        "rootDir": "src",
-        "emitDecoratorMetadata": true
+        "rootDir": "src"
     },
     "include": [
         "./src/**/*"

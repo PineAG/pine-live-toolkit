@@ -10,9 +10,9 @@
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.1.4",
     "typeorm": "^0.3.11",
-    "uuid": "^9.0.0",
     "@pltk/restful-backend-server": "*",
-    "@pltk/sql-backend": "*"
+    "@pltk/sql-backend": "*",
+    "@pltk/fs-files-backend": "*"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

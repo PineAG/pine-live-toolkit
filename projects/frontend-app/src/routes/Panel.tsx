@@ -89,12 +89,14 @@ function IconBtn(props: ButtonProps) {
 }
 
 function PanelTitle() {
+    const navigate = useNavigate()
     const panelId = usePanelId()
     const client = useLiveToolkitClient()
     const panel = useNullableContext(PanelInfoContext)
     const [newTitle, setNewTitle] = useState<null | string>(null)
     if(newTitle === null) {
         return <>
+            <IconBtn icon={<Icons.Home/>} onClick={() => navigate("/")}/>
             <div style={{fontSize: "1.5rem"}}>{panel.meta.title}</div>
             <IconBtn icon={<Icons.Edit/>} onClick={() => setNewTitle(panel.meta.title)}/>
         </>

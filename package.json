@@ -4,8 +4,11 @@
   "main": "index.js",
   "license": "GPL-3.0+",
   "private": true,
-  "workspaces": [
-    "projects/*",
-    "maintenance"
-  ]
+  "workspaces": {
+    "nohoist": ["electron"],
+    "packages": [
+      "projects/*",
+      "maintenance"
+    ]
+  }
 }

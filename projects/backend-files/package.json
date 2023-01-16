@@ -1,0 +1,22 @@
+{
+  "name": "@pltk/fs-files-backend",
+  "version": "1.0.0",
+  "typings": "src/index.ts",
+  "main": "lib/index.js",
+  "license": "GPL-3.0+",
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@pltk/protocol": "*",
+    "@types/node": "^18.11.18",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "build": "tsc --build --verbose"
+  }
+}
