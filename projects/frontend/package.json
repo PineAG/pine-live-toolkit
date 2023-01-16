@@ -15,6 +15,7 @@
     "@fontsource/zcool-qingke-huangyou": "^4.5.12",
     "@fontsource/zcool-xiaowei": "^4.5.12",
     "@fontsource/zen-dots": "^4.5.8",
+    "@pltk/app": "*",
     "@pltk/builtin-widgets": "*",
     "@pltk/components": "*",
     "@pltk/core": "*",
