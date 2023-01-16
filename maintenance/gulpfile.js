@@ -185,6 +185,7 @@ exports.bundleBackend = async () => {
     const projects = [
         "protocol",
         "backend-rest-server",
+        "backend-sql",
         "server"
     ]
     for(const p of projects) {
