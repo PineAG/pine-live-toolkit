@@ -4,7 +4,7 @@
   "license": "GPL-3.0+",
   "typings": "src/index.ts",
   "main": "lib/index.js",
-  "files": ["lib"],
+  "files": ["lib", "src"],
   "dependencies": {
     "@fontsource/zen-dots": "^4.5.8",
     "@fontsource/zcool-kuaile": "^4.5.10",

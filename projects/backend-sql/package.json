@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "license": "GPL-3.0+",
   "files": [
-    "lib"
+    "lib", "src"
   ],
   "devDependencies": {
     "typescript": "^4.9.4",

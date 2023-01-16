@@ -7,7 +7,7 @@
     "scripts": {
       "build": "tsc"
     },
-    "files": ["lib"],
+    "files": ["lib", "src"],
     "dependencies": {
       "typescript": "^4.9.4",
       "@pltk/protocol": "*"

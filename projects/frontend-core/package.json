@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "typings": "src/index.ts",
   "main": "lib/index.js",
-  "files": ["lib"],
+  "files": ["lib", "src"],
   "license": "GPL-3.0+",
   "dependencies": {
     "typescript": "^4.9.3",
