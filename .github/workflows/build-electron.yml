@@ -38,13 +38,12 @@ jobs:
           cd projects/desktop
           yarn build
           cd build
-          zip PineLiveToolkit-win32-x64.zip PineLiveToolkit-win32-x64
-          cp PineLiveToolkit-win32-x64.zip /PineLiveToolkit-win32-x64.zip
+          Compress-Archive PineLiveToolkit-win32-x64 PineLiveToolkit-win32-x64.zip
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: /PineLiveToolkit-win32-x64.zip
+        file: projects/desktop/build/PineLiveToolkit-win32-x64.zip
         asset_name: PineLiveToolkit-win32-x64.zip
         tag: ${{ github.ref }}
         overwrite: true
