@@ -2,9 +2,9 @@ import "reflect-metadata"
 
 import { parseArguments } from "./args"
 import { connectDB } from "./models"
-import { ServerSideDataWrapper } from "./facade"
 import { ServerSideFilesStorage } from "./files"
 import {startLiveToolkitServer} from "@pltk/restful-backend-server"
+import { ServerSideDataWrapper } from "@pltk/sql-backend"
 
 
 function main() {

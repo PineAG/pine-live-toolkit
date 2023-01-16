@@ -11,7 +11,8 @@
     "sqlite3": "^5.1.4",
     "typeorm": "^0.3.11",
     "uuid": "^9.0.0",
-    "@pltk/restful-backend-server": "*"
+    "@pltk/restful-backend-server": "*",
+    "@pltk/sql-backend": "*"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

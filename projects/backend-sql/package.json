@@ -1,0 +1,19 @@
+{
+  "name": "@pltk/sql-backend",
+  "version": "1.0.0",
+  "typings": "src/index.ts",
+  "main": "lib/index.js",
+  "license": "GPL-3.0+",
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "typescript": "^4.9.4",
+    "typeorm": "^0.3.11",
+    "minimist": "^1.2.7",
+    "@pltk/protocol": "*"
+  },
+  "scripts": {
+    "build": "tsc --build --verbose"
+  }
+}
