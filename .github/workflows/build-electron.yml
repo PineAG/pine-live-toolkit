@@ -54,7 +54,6 @@ jobs:
     - name: Build Electron
       run: |
           cd projects/desktop
-          yarn build
           npx gulp buildProduction --platform=${{ matrix.electron_platform }} --arch=${{ matrix.electron_arch }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2

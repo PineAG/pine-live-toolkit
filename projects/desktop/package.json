@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "gulp buildDevelopment && yarn start-electron",
-    "build": "gulp buildProduction",
+    "build": "gulp buildProduction --platform=win32 --arch=x86_64",
     "start-electron": "electron lib",
     "build-ts": "tsc --build --verbose"
   }
