@@ -30,7 +30,7 @@ jobs:
           - os: ubuntu-latest
             electron_platform: linux
             electron_arch: arm64
-      runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
