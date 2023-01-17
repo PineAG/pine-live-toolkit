@@ -16,16 +16,16 @@ jobs:
         include:
           - os: windows-latest
             electron_platform: win32
-            electron_arch: x86_64
+            electron_arch: x64
           - os: macos-latest
             electron_platform: darwin
-            electron_arch: x86_64
+            electron_arch: x64
           - os: macos-latest
             electron_platform: darwin
             electron_arch: arm64
           - os: ubuntu-latest
             electron_platform: linux
-            electron_arch: x86_64
+            electron_arch: x64
           - os: ubuntu-latest
             electron_platform: linux
             electron_arch: arm64

@@ -23,7 +23,7 @@ PLTK无需向OBS安装任何插件，只要将展示页链接作为网页添加�
 
 ### 桌面版
 
-基于Electron的桌面版(Windows): [下载](https://github.com/PineAG/pine-live-toolkit/releases/download/master/PineLiveToolkit-win32-x86_64.zip)
+基于Electron的桌面版(Windows): [下载](https://github.com/PineAG/pine-live-toolkit/releases/download/master/PineLiveToolkit-win32-x64.zip)
 
 ### Docker镜像
 
