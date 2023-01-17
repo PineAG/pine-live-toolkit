@@ -13,7 +13,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node-version: 18.x
+        node-version: [18.x]
         include:
           - os: windows-latest
             electron_platform: win32
