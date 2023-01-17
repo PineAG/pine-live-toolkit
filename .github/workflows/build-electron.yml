@@ -11,12 +11,26 @@ on:
 
 jobs:
   build:
-
-    runs-on: windows-latest
-
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: 18.x
+        include:
+          - os: windows-latest
+            electron_platform: win32
+            electron_arch: x64
+          - os: macos-latest
+            electron_platform: darwin
+            electron_arch: x86_64
+          - os: macos-latest
+            electron_platform: darwin
+            electron_arch: arm64
+          - os: ubuntu-latest
+            electron_platform: linux
+            electron_arch: x86_64
+          - os: ubuntu-latest
+            electron_platform: linux
+            electron_arch: arm64
+
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -41,13 +55,13 @@ jobs:
       run: |
           cd projects/desktop
           yarn build
-          cd build
+          npx gulp buildProduction --platform=${{ matrix.electron_platform }} --arch=${{ matrix.electron_arch }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: projects/desktop/build/PineLiveToolkit-win32-x64.zip
-        asset_name: PineLiveToolkit-win32-x64.zip
+        file: projects/desktop/build/PineLiveToolkit-${{ matrix.electron_platform }}-${{ matrix.electron_arch }}.zip
+        asset_name: PineLiveToolkit-${{ matrix.electron_platform }}-${{ matrix.electron_arch }}.zip
         tag: ${{ github.ref }}
         overwrite: true
         body: "Uploaded from Github Actions"

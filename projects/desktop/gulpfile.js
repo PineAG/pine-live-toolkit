@@ -3,6 +3,7 @@ const {existsSync} = require("fs")
 const path = require("path")
 const gulp = require("gulp")
 const zip = require("gulp-zip")
+const minimist = require("minimist")
 
 function execCommand(command, args, cwd) {
     const {spawn} = require("child_process")
@@ -83,9 +84,23 @@ async function createPackage({platform, arch}) {
     })
 }
 
-exports.createPackage_win32_x64 = gulp.task("createPackage_win32_x64", async function() {
-    createPackage({platform: "win32", arch: "x64"})
+const options = minimist(process.argv.slice(2), {
+    string: ["platform", "arch"]
+})
+
+exports.createPackageForPlatform = gulp.task("checkPlatformArgv", async function() {
+    const {platform, arch} = options
+    console.log("Platform:", platform)
+    console.log("Arch:", arch)
+    if(!platform || !arch) {
+        throw new Error("Missing args.")
+    }
+})
+
+exports.createPackageForPlatform = gulp.task("createPackageForPlatform", async function() {
+    const {platform, arch} = options
+    createPackage({platform, arch})
 })
 
 exports.buildDevelopment = gulp.task("buildDevelopment", gulp.series("buildTypescript", "copyAssets", "copyFrontendFiles"))
-exports.buildProduction = gulp.task("buildProduction", gulp.series("buildTypescript", "copyAssets", "copyFrontendFiles", "cleanUserData", "initializePackages", "createPackage_win32_x64"))
+exports.buildProduction = gulp.task("buildProduction", gulp.series("checkPlatformArgv", "buildTypescript", "copyAssets", "copyFrontendFiles", "cleanUserData", "initializePackages", "createPackageForPlatform"))
