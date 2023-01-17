@@ -2,6 +2,7 @@ const fs = require("fs/promises")
 const {existsSync} = require("fs")
 const path = require("path")
 const gulp = require("gulp")
+const zip = require("gulp-zip")
 
 function execCommand(command, args, cwd) {
     const {spawn} = require("child_process")
@@ -62,11 +63,24 @@ exports.copyAssets = gulp.task("copyAssets", () => {
 
 async function createPackage({platform, arch}) {
     const packageName = "PineLiveToolkit"
-    const target = path.resolve(__dirname, "build", `${packageName}-${platform}-${arch}`)
+    const dirName = `${packageName}-${platform}-${arch}`
+    const zipFileName = `${dirName}.zip`
+    const target = path.resolve(__dirname, "build", dirName)
+    const targetZipPath = path.resolve(__dirname, "build", zipFileName)
     if(existsSync(target)){
         await fs.rm(target, {recursive: true})
     }
     await execCommand("npx", ["electron-packager", "lib", packageName, "--out=build", `--platform=${platform}`, `--arch=${arch}`, "--no-prune"], ".")
+    if(existsSync(zipFileName)){
+        await fs.rm(zipFileName)
+    }
+    await new Promise((resolve, reject) => {
+        const stream = gulp.src(path.join(target, "**", "*")).pipe(zip(zipFileName)).pipe(gulp.dest(path.resolve(__dirname, "build")))
+        stream.on("end", () => {
+            resolve()
+        })
+        stream.on("error", reject)
+    })
 }
 
 exports.createPackage_win32_x64 = gulp.task("createPackage_win32_x64", async function() {

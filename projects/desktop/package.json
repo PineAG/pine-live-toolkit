@@ -8,6 +8,7 @@
     "electron": "^22.0.2",
     "electron-packager": "^17.1.1",
     "gulp": "^4.0.2",
+    "gulp-zip": "^5.1.0",
     "typescript": "^4.9.4"
   },
   "dependencies": {
