@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
+        os: [windows-latest, macos-latest, ubuntu-latest]
         include:
           - os: windows-latest
             electron_platform: win32
