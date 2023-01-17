@@ -15,10 +15,14 @@ jobs:
       matrix:
         node-version: [18.x]
         os: [windows-latest, macos-latest, ubuntu-latest]
+        electron_arch: [x86_64, arm64]
         include:
           - os: windows-latest
             electron_platform: win32
-            electron_arch: x64
+            electron_arch: x86_64
+          - os: windows-latest
+            electron_platform: win32
+            electron_arch: arm64
           - os: macos-latest
             electron_platform: darwin
             electron_arch: x86_64
