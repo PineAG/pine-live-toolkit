@@ -56,6 +56,10 @@ exports.cleanUserData = gulp.task("cleanUserData", async function() {
     }
 })
 
+exports.copyAssets = gulp.task("copyAssets", () => {
+    return gulp.src("./src/**/*.png").pipe(gulp.dest("./lib"))
+})
+
 async function createPackage({platform, arch}) {
     const packageName = "PineLiveToolkit"
     const target = path.resolve(__dirname, "build", `${packageName}-${platform}-${arch}`)
@@ -69,5 +73,5 @@ exports.createPackage_win32_x64 = gulp.task("createPackage_win32_x64", async fun
     createPackage({platform: "win32", arch: "x64"})
 })
 
-exports.buildDevelopment = gulp.task("buildDevelopment", gulp.series("buildTypescript", "copyFrontendFiles"))
-exports.buildProduction = gulp.task("buildProduction", gulp.series("buildTypescript", "copyFrontendFiles", "cleanUserData", "initializePackages", "createPackage_win32_x64"))
+exports.buildDevelopment = gulp.task("buildDevelopment", gulp.series("buildTypescript", "copyAssets", "copyFrontendFiles"))
+exports.buildProduction = gulp.task("buildProduction", gulp.series("buildTypescript", "copyAssets", "copyFrontendFiles", "cleanUserData", "initializePackages", "createPackage_win32_x64"))

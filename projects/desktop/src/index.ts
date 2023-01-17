@@ -28,6 +28,7 @@ app.on("ready", () => {
         title: "Pine's Live Toolkit",
         width: 1280, height: 720,
         autoHideMenuBar: true,
+        icon: path.resolve(__dirname, "icon.png")
     })
     const url = `http://127.0.0.1:${PORT}/`
     tryLoadURL(window, url)
