@@ -1,5 +1,4 @@
 import "sqlite3"
-import "blob-polyfill"
 import path from "path"
 import {DataSource} from "typeorm"
 import fs from "fs/promises"

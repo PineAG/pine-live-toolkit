@@ -5,44 +5,23 @@
   "license": "GPL-3.0+",
   "private": true,
   "devDependencies": {
+    "electron": "^22.0.2",
+    "electron-packager": "^17.1.1",
+    "gulp": "^4.0.2",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
     "@pltk/fs-files-backend": "*",
     "@pltk/protocol": "*",
     "@pltk/restful-backend-server": "*",
     "@pltk/sql-backend": "*",
-    "blob-polyfill": "^7.0.20220408",
-    "electron": "^22.0.2",
-    "electron-builder": "^23.6.0",
-    "electron-packager": "^17.1.1",
-    "gulp": "^4.0.2",
     "sqlite3": "^5.1.4",
-    "typeorm": "^0.3.11",
-    "typescript": "^4.9.4"
+    "typeorm": "^0.3.11"
   },
   "scripts": {
-    "start": "yarn build-pack && yarn start-electron",
-    "build": "yarn build-pack && yarn copy-manifest && yarn copy-node-modules && electron-packager lib PineLiveToolkit --out=build --platform=win32 --arch=x64",
+    "start": "gulp buildDevelopment && yarn start-electron",
+    "build": "gulp buildProduction",
     "start-electron": "electron lib",
-    "build-pack": "yarn build-ts && yarn build-html && yarn copy-static",
-    "build-ts": "tsc --build --verbose",
-    "copy-node-modules": "cp -r ./node_modules ./lib/node_modules",
-    "build-html": "cp src/index.html lib/index.html",
-    "copy-static": "cp -r ../frontend/build ./lib/static",
-    "copy-manifest": "cp package.json lib/package.json"
-  },
-  "build": {
-    "appId": "com.pine-ag.pltk",
-    "productName": "PineLiveToolkit",
-    "win": {
-      "icon": "lib/static/favicon.ico",
-      "target": [
-        "nsis",
-        "portable"
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true
-    }
+    "build-ts": "tsc --build --verbose"
   }
 }

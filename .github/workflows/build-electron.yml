@@ -26,18 +26,20 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: Remove workspace
+    - name: Yarn Install
       run: |
-          rm package.json
+        yarn install
+    - name: Build Dependencies
+      run: |
+          cd maintenance
+          npx gulp buildLibs
     - name: Build Frontend
       run: |
           cd projects/frontend
-          yarn install
           yarn build
     - name: Build Electron
       run: |
           cd projects/desktop
-          yarn install
           yarn build
           cd build
           Compress-Archive PineLiveToolkit-win32-x64 PineLiveToolkit-win32-x64.zip
